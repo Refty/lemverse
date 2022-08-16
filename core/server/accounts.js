@@ -36,6 +36,7 @@ Accounts.onLogin(param => {
   }
 
   analytics.track(user._id, '👋 Log In', { type: param.type });
+  analytics.identify(user);
 });
 
 Accounts.validateLoginAttempt(param => {
