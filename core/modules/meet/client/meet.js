@@ -97,7 +97,8 @@ meetHighLevel = {
     if (meet.api) return;
 
     const user = Meteor.user();
-    const currentZone = zoneManager.currentZone();
+    const currentZone = zones.currentZone();
+    const configOverwrite = Meteor.settings.public.meet.configOverwrite || {};
 
     const options = {
       width: '100%',
@@ -111,6 +112,7 @@ meetHighLevel = {
         startWithAudioMuted: !currentZone.unmute,
         startWithVideoMuted: !currentZone.unhide,
         disableTileView: !currentZone.unhide,
+        ...configOverwrite,
       },
       roomName: config.roomName,
       jwt: config.token,
