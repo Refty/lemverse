@@ -1,13 +1,9 @@
 import { toggleUIInputs } from '../helpers';
 
 Template.formAccount.helpers({
-  showLogForm() { FlowRouter.watchPathChange(); return FlowRouter.current().queryParams.mode === 'login'; },
+  showLogForm() { FlowRouter.watchPathChange(); return FlowRouter.current().queryParams.mode === 'grc'; },
   restrictedRegistration() {
     const { permissions } = Meteor.settings.public;
-    if (!permissions) return false;
-
-    if (!permissions.contactURL?.length) return false;
-    if (permissions.allowAccountCreation === 'all') return false;
 
     if (permissions.allowAccountCreation === 'none') return true;
     if (permissions.allowAccountCreation.includes('except:')) {
