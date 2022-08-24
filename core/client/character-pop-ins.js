@@ -27,7 +27,7 @@ characterPopIns = {
   initFromZone(zone) {
     const config = zone.popInConfiguration || {};
     if (config.position) {
-      const position = zones.computePositionFromString(zone, config.position);
+      const position = zoneManager.computePositionFromString(zone, config.position);
       if (config.position === 'relative') {
         position.x += Number(config.x || 0);
         position.y += Number(config.y || 0);
@@ -35,7 +35,7 @@ characterPopIns = {
 
       config.x = position.x;
       config.y = position.y;
-    } else config.target = userManager.player;
+    } else config.target = userManager.getControlledCharacter();
 
     // allow zones to show iframe
     config.iframe = !!formatURL(zone.inlineURL);

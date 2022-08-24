@@ -1,5 +1,9 @@
+import { toggleUIInputs } from '../../../client/helpers';
+
 const inputSelector = '.console .js-command-input';
 const inputFileSelector = '.console .console-file';
+
+const canOpenConsole = () => !Session.get('console') && !Session.get('editor') && !Session.get('modal');
 
 const markInputFileWithContent = value => {
   const label = document.querySelector('label[for="console-file"]');
@@ -32,18 +36,16 @@ closeConsole = () => {
 
   document.querySelector(inputSelector)?.blur();
   document.querySelector(inputFileSelector).value = '';
-  hotkeys.setScope(scopes.player);
-  game.scene.keys.WorldScene.enableKeyboard(true, false);
+  toggleUIInputs(false);
 };
 
 openConsole = (autoSelectChannel = false) => {
-  if (Session.get('console') || Session.get('editor')) return false;
+  if (!canOpenConsole()) return false;
 
   if (autoSelectChannel) messagesModule.autoSelectChannel();
   clearInputFields(true);
   Session.set('console', true);
-  hotkeys.setScope(scopes.form);
-  game.scene.keys.WorldScene.enableKeyboard(false, false);
+  toggleUIInputs(true);
 
   return true;
 };
@@ -129,8 +131,8 @@ Template.console.onDestroyed(() => {
 });
 
 Template.console.events({
-  'focus .js-command-input'() { hotkeys.setScope(scopes.form); game.scene.keys.WorldScene.enableKeyboard(false, false); },
-  'blur .js-command-input'() { hotkeys.setScope(scopes.player); game.scene.keys.WorldScene.enableKeyboard(true, false); },
+  'focus .js-command-input'() { toggleUIInputs(true); },
+  'blur .js-command-input'() { toggleUIInputs(false); },
   'change .console-file'(event) { markInputFileWithContent(!!event.currentTarget.files.length); },
   'click .js-button-submit'(event) {
     event.preventDefault();

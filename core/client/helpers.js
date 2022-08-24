@@ -45,7 +45,7 @@ toggleUserProperty = (propertyName, value) => {
   const toggleCamOn = value || (value === undefined && !user.profile.shareVideo);
 
   if (toggleMicOn || toggleCamOn) {
-    const zone = zones.currentZone();
+    const zone = zoneManager.currentZone();
 
     // disable medias switch in meeting
     if (zone && meet.api) {
@@ -125,7 +125,7 @@ sendDataToUsers = (type, data, emitterId, userIds = []) => {
 
 sendDataToUsersInZone = (type, data, emitterId) => {
   const user = Meteor.user();
-  const usersInZone = zones.usersInZone(zones.currentZone(user));
+  const usersInZone = zoneManager.usersInZone(zoneManager.currentZone(user));
   const userInZoneIds = usersInZone.map(u => u._id);
   if (!userInZoneIds.length) throw new Error('no-targets');
 
@@ -214,6 +214,8 @@ registerRadialMenuModules = modules => {
   Session.set('radialMenuModules', loadedModules);
 };
 
+const allowPhaserMouseInputs = () => !Session.get('editor') && !Session.get('console');
+
 const nearestDuration = duration => {
   const message = [];
   message.push(lp.s.lpad(moment.duration(duration).asHours() | 0, 2, '0'));
@@ -246,6 +248,12 @@ const generateEntityThumbnail = (entity, thumbnailMaxSize = 35) => {
   return `background-image: url("lemverse.png"); background-size: contain; width: 100%; height: 100%;`;
 };
 
+const guestSkin = () => {
+  if (_.isObject(Meteor.settings.public.skins.guest)) return Meteor.settings.public.skins.guest;
+
+  return Levels.findOne().skins?.guest || {};
+};
+
 const textDirectionToVector = direction => {
   if (direction === 'left') return Phaser.Math.Vector2.LEFT;
   if (direction === 'right') return Phaser.Math.Vector2.RIGHT;
@@ -267,8 +275,19 @@ const vectorToTextDirection = vector => {
   return undefined;
 };
 
+// To avoid bugs related to network latency we accept a distance greater than that which launches a call to limit false negatives behaviors
+const canAnswerCall = user => {
+  if (userProximitySensor.isUserNear(user)) return true;
+
+  const callDistanceThreshold = Meteor.settings.public.character.callDistanceThreshold || 300;
+  return userProximitySensor.distance(Meteor.user(), user) <= callDistanceThreshold;
+};
+
 export {
+  allowPhaserMouseInputs,
+  canAnswerCall,
   clamp,
+  guestSkin,
   formatURLs,
   formatURL,
   generateEntityThumbnail,

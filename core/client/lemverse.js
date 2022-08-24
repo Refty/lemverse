@@ -135,7 +135,7 @@ Template.lemverse.onCreated(function () {
   this.autorun(() => {
     if (!Meteor.userId()) {
       Session.set('sceneWorldReady', false);
-      userManager.unsetMainPlayer();
+      userManager.setAsControlled();
     }
   });
 
@@ -147,7 +147,6 @@ Template.lemverse.onCreated(function () {
     Tracker.nonreactive(() => {
       const interfaceOpen = menuOpen || modalOpen;
       const worldScene = game.scene.getScene('WorldScene');
-      userManager.pauseAnimation(undefined, modalOpen);
       worldScene.enableMouse(!interfaceOpen);
       worldScene.enableKeyboard(!modalOpen, !modalOpen);
     });
@@ -211,12 +210,16 @@ Template.lemverse.onCreated(function () {
 
   this.autorun(() => {
     if (!Session.get('sceneWorldReady')) return;
-    game.scene.getScene('EditorScene')?.updateEditionMarker(Session.get('selectedTiles'));
+    const selectedMenu = Session.get('editorSelectedMenu');
+
+    Tracker.nonreactive(() => game.scene.getScene('EditorScene')?.updateEditionMarker(selectedMenu));
   });
 
   this.autorun(() => {
     if (!Session.get('sceneWorldReady')) return;
-    game.scene.getScene('EditorScene')?.onEditorModeChanged(Session.get('editorSelectedMenu'));
+    const selectedMenu = Session.get('editorSelectedMenu');
+
+    Tracker.nonreactive(() => game.scene.getScene('EditorScene')?.onEditorModeChanged(selectedMenu));
   });
 
   this.autorun(() => {
@@ -285,7 +288,7 @@ Template.lemverse.onCreated(function () {
       const uiScene = game.scene.getScene('UIScene');
 
       // ensures scene is fullscreen and without iframe loaded
-      zones.closeIframeElement();
+      zoneManager.closeIframeElement();
       updateViewport(worldScene, viewportModes.fullscreen);
 
       loadingScene.show();
@@ -364,13 +367,13 @@ Template.lemverse.onCreated(function () {
         log(`loading level: loading zones`);
         this.handleZonesSubscribe = this.subscribe('zones', levelId, () => {
           this.handleObserveZones = Zones.find().observe({
-            added(zone) { zones.onDocumentAdded(zone); },
-            changed(newZone, oldZone) { zones.onDocumentUpdated(newZone, oldZone); },
-            removed(zone) { zones.onDocumentRemoved(zone); },
+            added(zone) { zoneManager.onDocumentAdded(zone); },
+            changed(newZone, oldZone) { zoneManager.onDocumentUpdated(newZone, oldZone); },
+            removed(zone) { zoneManager.onDocumentRemoved(zone); },
           });
 
           log('loading level: all zones loaded');
-          zones.checkDistances(userManager.player);
+          zoneManager.checkDistances(userManager.getControlledCharacter());
         });
       });
 
@@ -446,7 +449,7 @@ Template.lemverse.onDestroyed(function () {
 
 Template.lemverse.helpers({
   allRemoteStreamsByUsers: () => peer.remoteStreamsByUsers.get(),
-  guest: () => Meteor.user()?.profile.guest,
+  guest: () => Meteor.user({ fields: { 'profile.guest': 1 } })?.profile.guest,
   loading: () => Session.get('loading'),
   screenMode: () => Template.instance().screenMode.get(),
   settingsOpen: () => (!Session.get('modal') ? false : (Session.get('modal').template.indexOf('settings') !== -1)),

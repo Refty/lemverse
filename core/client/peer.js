@@ -1,5 +1,6 @@
 import Peer from 'peerjs';
 import audioManager from './audio-manager';
+import { canAnswerCall } from './helpers';
 
 const debug = (text, meta) => {
   if (!Meteor.user().options?.debug) return;
@@ -116,24 +117,22 @@ peer = {
     this.callsToClose[userId] = setTimeout(() => this.closeCall(userId, origin), timeout);
   },
 
-  createPeerCall(peer, stream, user) {
-    const type = stream === userStreams.streams.main.instance ? 'main' : 'screen';
-
-    debug(`createPeerCall: calling remote user`, { user: user._id, type });
+  createPeerCall(peer, user, stream, streamType) {
+    debug(`createPeerCall: calling remote user`, { user: user._id, streamType });
     if (!stream) { error(`createPeerCall: stream is undefined`, { user, stream }); return; }
 
-    if (this.calls[`${user._id}-${type}`]) {
+    if (this.calls[`${user._id}-${streamType}`]) {
       debug(`createPeerCall: creation cancelled (call already started)`);
       return;
     }
 
-    if (!userProximitySensor.isUserNear(user)) {
+    if (!canAnswerCall(user)) {
       debug(`createPeerCall: creation cancelled (user is too far)`);
       this.close(user._id, 0, 'far-user');
       return;
     }
 
-    const call = peer.call(user._id, stream, { metadata: { userId: Meteor.userId(), type } });
+    const call = peer.call(user._id, stream, { metadata: { userId: Meteor.userId(), type: streamType } });
     if (!call) {
       error(`createPeerCall: an error occured during call creation (peerjs error)`);
       this.close(user._id, 0, 'peer-error');
@@ -141,16 +140,13 @@ peer = {
     }
 
     // update html element with the last stream instance
-    this.calls[`${user._id}-${type}`] = call;
-    this.createOrUpdateRemoteStream(user, type);
+    this.calls[`${user._id}-${streamType}`] = call;
+    this.createOrUpdateRemoteStream(user, streamType);
 
     // ensures peers are using last stream & tracks available
-    this.updatePeersStream(stream, type);
+    this.updatePeersStream(stream, streamType);
 
-    call.on('close', () => debug(`createPeerCall: call closed`, { userId: user._id }));
-    call.on('stream', remoteStream => debug(`createPeerCall: received stream !!!`, { userId: user._id, stream: remoteStream }));
-
-    debug(`createPeerCall: call in progress`, { user: user._id, type });
+    debug(`createPeerCall: call in progress`, { user: user._id, streamType });
   },
 
   async createPeerCalls(user) {
@@ -167,8 +163,8 @@ peer = {
     }
 
     const peer = await this.getPeer();
-    if (shareAudio || shareVideo) userStreams.createStream().then(stream => this.createPeerCall(peer, stream, user));
-    if (shareScreen) userStreams.createScreenStream().then(stream => this.createPeerCall(peer, stream, user));
+    if (shareAudio || shareVideo) userStreams.createStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.main));
+    if (shareScreen) userStreams.createScreenStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.screen));
   },
 
   destroy() {
@@ -200,7 +196,8 @@ peer = {
         if (existingSenderVideoTrack) existingSenderVideoTrack.replaceTrack(videoTrack);
         else call.peerConnection.addTrack(videoTrack);
 
-        debug(`updatePeersStream: stream main track updated for user`, { key });
+        if (!existingSenderAudioTrack || !existingSenderVideoTrack) debug(`updatePeersStream: stream main track added for user`, { key });
+        else debug(`updatePeersStream: stream main track updated for user`, { key });
       });
     } else if (type === streamTypes.screen) {
       debug(`updatePeersStream: screen share stream ${stream.id}`, { stream });
@@ -229,7 +226,7 @@ peer = {
     if (user?.profile.guest) return; // disable proximity sensor for guest user
 
     nearUsers.forEach(nearUser => {
-      const zone = zones.currentZone(nearUser);
+      const zone = zoneManager.currentZone(nearUser);
       if (zone?.disableCommunications) {
         lp.notif.warning(`${nearUser.profile.name} isn't available at the moment.<br /> Leave him a voice message by pressing "P"`);
         return;
@@ -344,17 +341,6 @@ peer = {
     // Send global notification
     sendEvent('proximity-started', { user: remoteUser });
 
-    // IMPORTANT :
-    // It looks like Meteor update locale collection when user focus the tab (chrome put asleep the tab maybe)
-    // So, the locale position is probably the old-one, blocking the logic below
-    // ensures users is still near on answer
-    // userProximitySensor.checkDistance(Meteor.user(), remoteUser);
-    // if (!userProximitySensor.isUserNear(remoteUser)) {
-    //   log(`answer call: user is too far`, remoteUserId);
-    //   this.close(remoteUserId);
-    //   return false;
-    // }
-
     // answer the call
     remoteCall.answer();
 
@@ -374,10 +360,6 @@ peer = {
       debug(`remoteCall: closed`, { userId: remoteUserId, type: remoteCall.metadata.type });
       this.close(remoteUserId, 0, 'peerjs-event');
     });
-
-    // ensures a call to the other user exists on an answer to avoid one-way calls, do nothing if a call is already started
-    // note: should not be necessary, disabled for now to avoid multiple calls
-    // this.createPeerCalls(remoteUser);
 
     return true;
   },
@@ -440,7 +422,7 @@ peer = {
     const { port, url: host, path, config } = result;
 
     const peerConfig = {
-      debug: debug ? 2 : 0,
+      debug: Meteor.user().options?.debug ? 2 : 0,
       host,
       port,
       path,
