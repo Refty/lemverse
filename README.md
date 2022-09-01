@@ -640,17 +640,15 @@ The app should now be accessible at `http://localhost:3000`, and MongoDB at `mon
 Webrtc is working when on localhost, but if you want to test with another computer you need to have an HTTPS connection.  
 You will need to use a tunnel to expose you laptop over internet.
 
-We decided to use [localtunnel](https://github.com/localtunnel/localtunnel).  
-Once it's installed on an accessible server, setup env variable `LT_DOMAIN` without http(s) so just the domain.
+We decided to use [ngrok](https://ngrok.com/download). Follow the steps to get a url ngrok like this : `https://d0c8-2a01-cb08-903f-2200-b918-d539-7d56-c5a6.ngrok.io`. This will be our `NGROK_HTTPS_URL`.
 
-After that, simply launch `ROOT_URL=https://lemverse-$(whoami).${LT_DOMAIN} meteor --settings settings-dev.json`.
+It's important to use the HTTPS and not HTTP.
 
-Modify `createMyPeer` in `peer.js` to change the host to `lemverse-peer-USER-DOMAIN` while `USER`=`whoami` and `DOMAIN`=`LT_DOMAIN` env variable.
+Once it's installed on an accessible server, on `settings-dev.json` replace `public.lp.website: http://localhost:3000` by `public.lp.website: NGROK_HTTPS_URL`  
 
-Access to your local instance at: `https://lemverse-USER-DOMAIN`.
+After that, simply launch `ROOT_URL=NGROK_HTTPS_URL meteor --settings settings-dev.json`.
 
-> :warning: Don't forget to change the port to 443 for peers when using local tunnel
-
+Access to your local instance at: `NGROK_HTTPS_URL`.
 ## First login
 
 Simply create your account and voila!  
