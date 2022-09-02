@@ -31,11 +31,7 @@ const startRetryCountdown = template => {
 };
 
 const passwordlessLogin = template => {
-  const options = {
-    selector: template.email,
-    options: { userCreationDisabled: true },
-  };
-  Accounts.requestLoginTokenForUser(options, err => {
+  Meteor.call('requestLoginTokenForActiveUser', template.email, err => {
     if (err && err.message !== 'User not found [403]') {
       lp.notif.error(err.message);
       return;

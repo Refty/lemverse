@@ -50,3 +50,14 @@ Accounts.validateLoginAttempt(param => {
 
   return true;
 });
+
+Meteor.methods({
+  requestLoginTokenForActiveUser: email => {
+    check(email, String);
+    const options = {
+      selector: { email },
+      options: { userCreationDisabled: true },
+    };
+    Meteor.call('requestLoginTokenForUser', options);
+  },
+});
