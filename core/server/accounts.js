@@ -47,6 +47,10 @@ Accounts.validateLoginAttempt(param => {
     error('validateLoginAttempt: watched ip detected!', { ip: lp.ip(param).ip, userId: user?._id });
     return false;
   }
+  if (user?.disabled) {
+    log('validateLoginAttempt: user account is inactive', { userId: user?._id });
+    return false;
+  }
 
   return true;
 });
@@ -54,6 +58,8 @@ Accounts.validateLoginAttempt(param => {
 Meteor.methods({
   requestLoginTokenForActiveUser: email => {
     check(email, String);
+    const user = Meteor.users.findOne({ 'emails.address': email });
+    if (user?.disabled) return;
     const options = {
       selector: { email },
       options: { userCreationDisabled: true },
