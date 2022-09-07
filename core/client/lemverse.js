@@ -1,6 +1,9 @@
 import hotkeys from 'hotkeys-js';
 import Phaser from 'phaser';
 import audioManager from './audio-manager';
+import initSentryClient from './sentry';
+
+initSentryClient();
 
 scopes = {
   player: 'player',
