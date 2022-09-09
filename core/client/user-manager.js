@@ -51,7 +51,13 @@ userManager = {
     this.characters[user._id] = character;
 
     if (guest) character.updateSkin(guestSkin()); // init with custom skin
-    else character.setName(name, baseline, nameColor);
+    else {
+      character.setName(name, baseline, nameColor);
+      if (user.guildId) {
+        const guildIcon = Guilds.findOne({ _id: user.guildId })?.icon;
+        if (guildIcon) character.setIcon(guildIcon);
+      }
+    }
 
     window.setTimeout(() => this.onDocumentUpdated(user), 0);
 
@@ -137,6 +143,9 @@ userManager = {
     // update name
     const nameUpdated = !guest && (name !== oldUser?.profile.name || baseline !== oldUser?.profile.baseline || nameColor !== oldUser?.profile.nameColor);
     if (nameUpdated) character.setName(name, baseline, nameColor);
+
+    // update guild icon
+    if (user.guildId !== oldUser?.guildId) character.setIcon(Guilds.findOne({ _id: user.guildId })?.icon);
 
     const userHasMoved = x !== oldUser?.profile.x || y !== oldUser?.profile.y;
     const loggedUser = Meteor.user();
