@@ -14,6 +14,7 @@ const baselineStyle = {
 
 const defaultTint = 0xFFFFFF;
 const baselineOffset = 20;
+const iconOffset = 3;
 
 class CharacterNameText {
   constructor(scene, name, baseline, tintName) {
@@ -65,9 +66,22 @@ class CharacterNameText {
     return this;
   }
 
+  setIcon(icon) {
+    if (this.icon) this.destroyIcon();
+    if (icon) {
+      game.scene.getScene('BootScene').loadImagesAtRuntime([icon], () => {
+        this.icon = this.scene.add.sprite(0, 0, icon.fileId);
+        this.icon.displayHeight = icon.height;
+        this.icon.displayWidth = icon.width;
+      });
+    }
+  }
+
   setPosition(x, y) {
-    this.name.setPosition(x, this.baseline ? y - baselineOffset : y);
+    const nameY = this.baseline ? y - baselineOffset : y;
+    this.name.setPosition(x, nameY);
     if (this.baseline) this.baseline.setPosition(x, y);
+    if (this.icon) this.icon.setPosition(x - (this.name.width + this.icon.displayWidth) / 2 - iconOffset, nameY);
   }
 
   destroyBaseline() {
@@ -77,9 +91,17 @@ class CharacterNameText {
     }
   }
 
+  destroyIcon() {
+    if (this.icon) {
+      this.icon.destroy();
+      this.icon = undefined;
+    }
+  }
+
   destroy() {
     this.name.destroy();
     this.destroyBaseline();
+    this.destroyIcon();
   }
 }
 
