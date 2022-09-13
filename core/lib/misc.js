@@ -235,14 +235,30 @@ const teleportUserInLevel = (user, level, source = 'teleporter') => {
   return level.name;
 };
 
+const canUseLevelFeature = (user, featureName) => {
+  check(user._id, Match.Id);
+  check(featureName, String);
+
+  const level = currentLevel(user);
+  const featurePermission = level?.featuresPermissions?.[featureName];
+
+  if (featurePermission === 'disabled') {
+    if (user.roles?.admin) lp.notif.error(`This feature is disabled: ${featureName}`);
+    return false;
+  } else if (!user.roles?.admin && featurePermission === 'adminOnly') {
+    return false;
+  } else return true;
+};
+
 export {
   canAccessZone,
-  canEditGuild,
   canEditActiveLevel,
+  canEditGuild,
   canEditLevel,
   canEditUserPermissions,
   canModerateLevel,
   canModerateUser,
+  canUseLevelFeature,
   completeUserProfile,
   currentLevel,
   fileOnBeforeUpload,

@@ -1,4 +1,5 @@
 import audioManager from '../../../client/audio-manager';
+import { canUseLevelFeature } from '../../../lib/misc';
 
 const playPunchAnimation = () => {
   userManager.scene.cameras.main.shake(250, 0.015, 0.02);
@@ -26,6 +27,9 @@ window.addEventListener('load', () => {
   });
 
   hotkeys('x', { scope: scopes.player }, e => {
+    const user = Meteor.user({ fields: { _id: 1, 'profile.levelId': 1, roles: 1 } });
+    if (!user || !canUseLevelFeature(user, 'punch')) return;
+
     e.preventDefault();
     e.stopPropagation();
     if (e.repeat) return;

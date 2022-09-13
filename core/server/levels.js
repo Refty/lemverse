@@ -189,7 +189,7 @@ Meteor.publish('currentLevel', function () {
 
   return Levels.find(
     { _id: levelId },
-    { fields: { name: 1, spawn: 1, hide: 1, height: 1, width: 1, editorUserIds: 1, createdBy: 1, sandbox: 1, guildId: 1 } },
+    { fields: { name: 1, spawn: 1, hide: 1, height: 1, width: 1, editorUserIds: 1, createdBy: 1, sandbox: 1, guildId: 1, featuresPermissions: 1 } },
   );
 });
 
@@ -211,11 +211,12 @@ Meteor.methods({
 
     return createLevel({ templateId });
   },
-  updateLevel(name, position, hide) {
+  updateLevel(name, position, hide, featurePermission = null) {
     if (!this.userId) throw new Meteor.Error('missing-user', 'A valid user is required');
     check(name, String);
     check(position, { x: Number, y: Number });
     check(hide, Boolean);
+    check(featurePermission, Match.OneOf(null, { shout: String }, { globalChat: String }, { punch: String }));
 
     const user = Meteor.user();
     const level = currentLevel(Meteor.user());
@@ -225,9 +226,11 @@ Meteor.methods({
     const query = { $set: { name, spawn: { x: position.x, y: position.y } } };
     if (hide) query.$set.hide = true;
     else query.$unset = { hide: 1 };
+    if (featurePermission) query.$set.featuresPermissions = { ...level.featuresPermissions || {}, ...featurePermission };
 
     Levels.update(level._id, query);
   },
+
   increaseLevelVisits(levelId) {
     if (!this.userId) return;
     check(levelId, Match.Id);
