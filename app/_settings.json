@@ -243,6 +243,7 @@
     },
 
     "s3": {
+      "use": false,
       "key": "AWSKEY",
       "secret": "AWSSECRET",
       "bucket": "BUCKETNAME",

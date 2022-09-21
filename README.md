@@ -556,6 +556,7 @@ Please note, that as stated in section `Deploy in production`, there is an addit
   // Allows to start multiple instance of lemverse using the same bucket represented as a file system
   // This is useful to scale horizontally
   "s3": {
+    "use": false,
     "key": "AWSKEY",
     "secret": "AWSSECRET",
     "bucket": "BUCKETNAME",
