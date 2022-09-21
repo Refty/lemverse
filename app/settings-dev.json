@@ -243,6 +243,13 @@
     }
   },
 
+  "s3": {
+    "key": "AWSKEY",
+    "secret": "AWSSECRET",
+    "bucket": "BUCKETNAME",
+    "region": "eu-west-3"
+  },
+
   "packages": {
     "service-configuration": {
       "custom": {
