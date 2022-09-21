@@ -565,6 +565,16 @@ Please note, that as stated in section `Deploy in production`, there is an addit
     }
   },
 
+  // Add external aws bucket to store files
+  // Allows to start multiple instance of lemverse using the same bucket represented as a file system
+  // This is useful to scale horizontally
+  "s3": {
+    "key": "AWSKEY",
+    "secret": "AWSSECRET",
+    "bucket": "BUCKETNAME",
+    "region": "eu-west-3"
+  },
+
   "packages": {
     // configure external authentication services
     "service-configuration": {
