@@ -10,27 +10,54 @@ import S3 from 'aws-sdk/clients/s3'; /* http://docs.aws.amazon.com/AWSJavaScript
 /* For better i/o performance */
 import fs from 'fs';
 
-const s3Conf = Meteor.settings.s3 || {};
-const bound = Meteor.bindEnvironment(callback => callback());
 
-if (s3Conf && s3Conf.key && s3Conf.secret && s3Conf.bucket && s3Conf.region) {
+import { fileOnBeforeUpload } from './misc';
+
+function fileSystemAdapter() {
+  const s3Conf = Meteor.settings.s3 || {};
+
+  if (!s3Conf || !s3Conf.use) {
+  // Original FilesCollection
+    return new FilesCollection({
+      collectionName: 'Files',
+      storagePath: Meteor.settings.public.files.storagePath,
+      downloadRoute: Meteor.settings.public.files.route,
+      public: true,
+      allowClientCode: false,
+      onBeforeUpload(file) { return fileOnBeforeUpload(file, file.mime); },
+    });
+  }
+
+  // AWS S3 FileCollection
+  const bound = Meteor.bindEnvironment(callback => callback());
   const s3 = new S3({
     secretAccessKey: s3Conf.secret,
     accessKeyId: s3Conf.key,
     region: s3Conf.region,
-    // sslEnabled: true, // optional
+    sslEnabled: true,
     httpOptions: {
       timeout: 6000,
       agent: false,
     },
   });
 
+  // check if s3 bucket exists
+  s3.headBucket({ Bucket: s3Conf.bucket }, err => {
+    if (err) {
+      throw new Meteor.Error('s3-bucket-not-found', `S3 bucket "${s3Conf.bucket}" not found`);
+    }
+  });
+
   // Declare the Meteor file collection on the Server
-  const UserFiles = new FilesCollection({
-    debug: false,
-    storagePath: 'assets/app/uploads/uploadedFiles', // FIXME: find the real path used by lemverse
-    collectionName: 'lemverseFiles',
-    allowClientCode: false, // Disallow Client to execute remove, use the Meteor.method
+  const Files = new FilesCollection({
+    collectionName: 'Files',
+    storagePath: Meteor.settings.public.files.storagePath,
+    downloadRoute: Meteor.settings.public.files.route,
+    public: true,
+    allowClientCode: false, // Disallow remove files from Client, important
+    debug: Meteor.settings.public.debug,
+
+    onBeforeUpload(file) { return fileOnBeforeUpload(file, file.mime); },
 
     // Start moving files to AWS:S3
     // after fully received by the Meteor server
@@ -47,32 +74,30 @@ if (s3Conf && s3Conf.key && s3Conf.secret && s3Conf.bucket && s3Conf.region) {
         }, error => {
           bound(() => {
             if (error) {
-              // FIXME: pretty sure it's bad practice to report an error without throwing it, but do we really want to crash the server?
-              // Yet i'm not sure how Meteor recovers from an error thrown in a callback
-              Meteor.Error(error);
-            } else {
-              // Update FilesCollection with link to the file at AWS
-              const update = { $set: {} };
-              update.$set[`versions.${version}.meta.pipePath`] = filePath;
-
-              this.collection.update({
-                _id: fileRef._id,
-              }, update, updError => {
-                if (updError) {
-                  Meteor.Error(error);
-                } else {
-                  // Unlink original files from FS after successful upload to AWS:S3
-                  this.unlink(this.collection.findOne(fileRef._id), version);
-                }
-              });
+              throw new Meteor.Error(error);
             }
+            // Update FilesCollection with link to the file at AWS
+            const update = { $set: {} };
+            update.$set[`versions.${version}.meta.pipePath`] = filePath;
+
+            this.collection.update({
+              _id: fileRef._id,
+            }, update, updateError => {
+              if (updateError) {
+                throw new Meteor.Error(updateError);
+              }
+              // Unlink original files from FS after successful upload to AWS:S3
+              // Unlink removes the file from the storagePath
+              // So we only need a storage of 5mB (onBeforeUpload) for the original files
+              this.unlink(this.collection.findOne(fileRef._id), version);
+            },
+            );
           });
         });
       });
     },
 
-
-    // FIXME: use direct CDN link instead intercepting Downloads
+    // TODO: use direct CDN link instead of intercepting Downloads
     // It's faster and cheaper
 
     // Intercept access to the file
@@ -110,10 +135,10 @@ if (s3Conf && s3Conf.key && s3Conf.secret && s3Conf.bucket && s3Conf.region) {
         const fileColl = this;
         s3.getObject(opts, function (error) {
           if (error) {
-            Meteor.Error(error);
             if (!http.response.finished) {
               http.response.end();
             }
+            throw new Meteor.Error(error);
           } else {
             if (http.request.headers.range && this.httpResponse.headers['content-range']) {
               // Set proper range header in according to what is returned from AWS:S3
@@ -138,8 +163,8 @@ if (s3Conf && s3Conf.key && s3Conf.secret && s3Conf.bucket && s3Conf.region) {
   // Monkeypatch the remove method
   // to also remove the file from AWS:S3
   // else we would have trailling files on AWS:S3
-  const _origRemove = UserFiles.remove;
-  UserFiles.remove = function (search) {
+  const _origRemove = Files.remove;
+  Files.remove = function (search) {
     const cursor = this.collection.find(search);
     cursor.forEach(fileRef => {
       _.each(fileRef.versions, vRef => {
@@ -151,7 +176,7 @@ if (s3Conf && s3Conf.key && s3Conf.secret && s3Conf.bucket && s3Conf.region) {
           }, error => {
             bound(() => {
               if (error) {
-                Meteor.Error(error);
+                throw new Meteor.Error(error);
               }
             });
           });
@@ -162,4 +187,7 @@ if (s3Conf && s3Conf.key && s3Conf.secret && s3Conf.bucket && s3Conf.region) {
     // remove original file from database
     _origRemove.call(this, search);
   };
+  return Files;
 }
+
+export default fileSystemAdapter;
