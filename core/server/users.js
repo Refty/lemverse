@@ -20,9 +20,15 @@ Meteor.publish('users', function (levelId) {
     };
   }
 
-  const users = Meteor.users.find(filters, { fields: mainFields });
+  const users = Meteor.users.find(filters, { fields: mainFields,
+    disableOplog: true,
+    pollingThrottleMs: 200,
+    pollingIntervalMs: 200 });
   const guildIds = users.map(u => u.guildId).filter(Boolean);
-  const guilds = Guilds.find({ _id: { $in: [...new Set(guildIds)] } });
+  const guilds = Guilds.find({ _id: { $in: [...new Set(guildIds)] },
+    disableOplog: true,
+    pollingThrottleMs: 200,
+    pollingIntervalMs: 200 });
 
   return [users, guilds];
 });
