@@ -1,4 +1,4 @@
-const userInterpolationInterval = 200;
+const userInterpolationInterval = Meteor.settings.public.userInterpolationInterval || 200;
 
 const networkManager = {
   throttledSendPlayerState: undefined,

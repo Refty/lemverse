@@ -360,6 +360,8 @@ Please note, that as stated in section `Deploy in production`, there is an addit
       "pinchDelta": 4 // Delta zoom on mobile pinch
     },
 
+    "userInterpolationInterval": 200, // Delay before saving a user position
+
     "peer": {
       // Settings about webrtc connection
       "answerMaxAttempt": 5,
