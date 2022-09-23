@@ -578,6 +578,12 @@ Please note, that as stated in section `Deploy in production`, there is an addit
     "region": "eu-west-3"
   },
 
+  // Use Monti APM
+  "monti": {
+    "appId": "",
+    "appSecret": ""
+  },
+
   "packages": {
     // configure external authentication services
     "service-configuration": {

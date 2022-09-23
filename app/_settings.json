@@ -250,6 +250,11 @@
       "region": "eu-west-3"
     },
 
+    "monti": {
+      "appId": "",
+      "appSecret": ""
+    },
+
     "packages": {
       "service-configuration": {
         "custom": {
