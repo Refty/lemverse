@@ -581,7 +581,10 @@ Please note, that as stated in section `Deploy in production`, there is an addit
   // Use Monti APM
   "monti": {
     "appId": "",
-    "appSecret": ""
+    "appSecret": "",
+    "options": {
+      "uploadSourceMaps": false
+    }
   },
 
   "packages": {

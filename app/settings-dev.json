@@ -253,7 +253,10 @@
 
   "monti": {
     "appId": "",
-    "appSecret": ""
+    "appSecret": "",
+    "options": {
+      "uploadSourceMaps": false
+    }
   },
 
   "packages": {
