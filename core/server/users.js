@@ -2,6 +2,8 @@ import { completeUserProfile, levelSpawnPosition, teleportUserInLevel } from '..
 
 const mainFields = { options: 1, profile: 1, roles: 1, status: { online: 1 }, beta: 1, guildId: 1 };
 
+Meteor.server.setPublicationStrategy('users', DDPServer.publicationStrategies.NO_MERGE);
+
 Meteor.publish('users', function (levelId) {
   check(levelId, Match.Maybe(Match.Id));
   if (!this.userId) return undefined;
