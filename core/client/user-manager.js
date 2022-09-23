@@ -114,6 +114,10 @@ userManager = {
     }
 
     if (hasSkinUpdate || user.profile.direction !== oldUser?.profile.direction) {
+      console.log("🚀 -----------------------------------------------------------------------------------------------------🚀")
+      console.log("🚀 ~ file: user-manager.js ~ line 118 ~ _checkForSkinUpdate ~ character.direction", character.direction)
+      console.log("🚀 -----------------------------------------------------------------------------------------------------🚀")
+
       const wasAnimationPaused = character.animationPaused;
       character.playAnimation('run', character.direction || 'down', true);
       if (wasAnimationPaused) character.setAnimationPaused(true);
@@ -309,10 +313,11 @@ userManager = {
 
     if (moving) {
       const direction = vectorToTextDirection(this.controlledCharacter.body.velocity);
+
       if (direction) this.controlledCharacter.playAnimation(characterAnimations.run, direction);
     } else this.controlledCharacter.setAnimationPaused(true);
 
-    if (moving || this.controlledCharacter.wasMoving) {
+    if (this.userCanMove && (moving || this.controlledCharacter.wasMoving)) {
       this.scene.physics.world.update(time, delta);
       throttledSavePlayer(this.controlledCharacter);
     }
@@ -436,5 +441,9 @@ userManager = {
 
   getControlledCharacter() {
     return this.controlledCharacter;
+  },
+
+  setUserCanMove(canMove = true) {
+    this.userCanMove = canMove;
   },
 };

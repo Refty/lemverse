@@ -168,8 +168,9 @@ module.exports = {
     BootScene: 'writable',
     EditorScene: 'writable',
     LoadingScene: 'writable',
-    WorldScene: 'writable',
+    OnboardingScene: 'writable',
     UIScene: 'writable',
+    WorldScene: 'writable',
 
     eventTypes: 'writable',
 

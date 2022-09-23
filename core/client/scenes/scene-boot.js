@@ -35,6 +35,7 @@ BootScene = new Phaser.Class({
   create() {
     this.scene.add('LoadingScene', LoadingScene, true);
     this.scene.add('WorldScene', WorldScene, true);
+    this.scene.add('OnboardingScene', OnboardingScene, true);
     this.scene.add('UIScene', UIScene, true);
     this.scene.add('EditorScene', EditorScene, true);
     this.scene.moveAbove('WorldScene', 'EditorScene');

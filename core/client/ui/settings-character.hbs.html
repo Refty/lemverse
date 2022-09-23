@@ -27,7 +27,7 @@
 
     <div class="customize-selection">
       {{#if or (eq (Session 'settings-character-category') "hair") (eq (Session 'settings-character-category') "accessory")}}
-        <div class="characters-choices {{#if isBodyPart this._id}}selected{{/if}}">
+        <div class="characters-choices {{#if isBodyPart this._id}}sele^cted{{/if}}">
           <div class="js-new-part sprite-character empty-choices" data-id="null"></div>
         </div>
       {{/if}}

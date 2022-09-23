@@ -105,6 +105,9 @@ levelManager = {
   },
 
   loadLevel(levelId) {
+    console.log('🚀 --------------------------------------------------------------------🚀');
+    console.log('🚀 ~ file: level-manager.js ~ line 108 ~ loadLevel ~ levelId', levelId);
+    console.log('🚀 --------------------------------------------------------------------🚀');
     if (Meteor.user().profile.levelId === levelId) return;
 
     // avoid simulation sending new user position while the server is updating him (blocking scene update and inputs)
@@ -165,6 +168,8 @@ levelManager = {
   onLevelLoaded() {
     this.scene.scene.wake();
 
+    console.log('ON PASSE LA');
+
     // simulate a first frame update to avoid weirds visual effects with characters animation and direction
     this.scene.update(0, 0);
     setTimeout(() => game.scene.keys.LoadingScene.hide(() => this.scene.enableKeyboard(true)), 0);
@@ -178,6 +183,7 @@ levelManager = {
     }
 
     if (Tiles.find().count() === 0) this.drawTriggers(true);
+    // Session.set('sceneWorldReady', true);
   },
 
   onTilesetUpdated(newTileset, oldTileset) {

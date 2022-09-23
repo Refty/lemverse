@@ -13,6 +13,7 @@
     z-index: 10;
     animation: fadeInOnboarding 1s;
     overflow-y: auto;
+    z-index: -10;
     
     .logo {
         width: fit-content;
@@ -30,9 +31,9 @@
     .main-title {
         padding: 8px 16px;
         max-width: 412px;
-        background: $lem-color-6;
+        // background: $lem-color-6;
         border-radius: 8px;
-        color: #FFFFFF;
+        // color: #FFFFFF;
         font-size: 1rem;
         line-height: 32px;
         text-align: center;
@@ -53,6 +54,38 @@
         background: $new-dark-secondary;
         border-radius: 16px;
         padding: 40px 20px;
+        position: relative;
+    }
+
+    .content:after {
+        content: ' ';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('assets/images/scene-onboarding-background.png');
+        background-repeat: repeat;
+        opacity: 1;
+        border-radius: 16px;
+        animation: leftAnim 10s linear infinite, fadeInBackground 2s;
+
+        &__left:after {
+            animation: leftAnim 10s linear infinite, fadeInBackground 2s;
+        }
+
+        .right {
+            animation: rightAnim 10s linear infinite, fadeInBackground 2s;
+        }
+
+        .bottom {
+            animation: bottomAnim 10s linear infinite, fadeInBackground 2s;
+        }
+
+        .top {
+            animation: topAnim 10s linear infinite, fadeInBackground 2s;
+        }
     }
     
     .permission-img {
@@ -64,7 +97,7 @@
         border-radius: 8px;
     }
     
-    .continue-button {
+    .button {
         all: unset;
         cursor: pointer;
         padding: 12px 16px;
@@ -76,7 +109,7 @@
         color: white;
         margin-top: 16px;
     
-        &__disabled {
+        .disabled {
             background: $gray200;
         }
     
@@ -93,7 +126,42 @@
         max-width: 650px;
         margin-bottom: 18px;
     }
-    
+
+    .keyboards {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+
+            .keyinput {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                width: 40px;
+                height: 40px;
+                border: 1px solid #FFFFFF;
+                border-radius: 8px;
+                color: white;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .pressed {
+                background-color: $lem-color-6;
+            }
+
+            .bottom-keyinput {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+            }
+        }
+    }
 }
 
 .onboarding:after {
@@ -108,7 +176,7 @@
     background-repeat: repeat;
     opacity: 0.1;
     z-index: -1;
-    animation: anim 10s linear infinite, fadeInBackground 2s;
+    animation: leftAnim 10s linear infinite, fadeInBackground 2s;
 }
 
 @keyframes fadeInOnboarding {
@@ -125,4 +193,30 @@
 @keyframes fadeInBackground {
     0% { opacity: 0; }
     100% { opacity: 0.1; }
+}
+
+
+@keyframes leftAnim {
+    100% {
+        background-position: -416px 0px;
+    }
+}
+
+
+@keyframes rightAnim {
+    100% {
+        background-position: 416px 0px;
+    }
+}
+
+@keyframes bottomAnim {
+    100% {
+        background-position: 0px 416px;
+    }
+}
+
+@keyframes topAnim {
+    100% {
+        background-position: 0px -416px;
+    }
 }
