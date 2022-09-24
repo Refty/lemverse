@@ -3,6 +3,7 @@ const userInterpolationInterval = 200;
 const networkManager = {
   throttledSendPlayerState: undefined,
   lastUserUpdate: new Date(),
+  updating: false,
 
   init() {
     this.throttledSendPlayerState = throttle(this._sendPlayerNewState.bind(this), userInterpolationInterval, { leading: false });
@@ -54,6 +55,7 @@ const networkManager = {
   },
 
   onCharacterStateReceived(state) {
+    if (state.userId === Meteor.userId()) return;
     const character = userManager.getCharacter(state.userId);
     if (!character) return;
 
@@ -78,8 +80,8 @@ const networkManager = {
   },
 
   _sendPlayerNewState(state) {
-    if (!state) return;
-
+    if (!state || this.updating) return;
+    this.updating = true;
     // No need to check that the userId really belongs to the user, Meteor does the check during the update
     Meteor.users.update(state.getData('userId'), {
       $set: {
@@ -87,7 +89,7 @@ const networkManager = {
         'profile.y': state.y,
         'profile.direction': state.direction,
       },
-    });
+    }, {}, () => { this.updating = false; });
   },
 };
 
