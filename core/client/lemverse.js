@@ -98,7 +98,7 @@ Template.lemverse.onCreated(function () {
 
         if (!notification.type) {
           audioManager.play('text-sound.wav', 0.5);
-          notify(Meteor.users.findOne(notification.createdBy), `📢 You have received a new message`);
+          notify(LocalUsers.findOne(notification.createdBy), `📢 You have received a new message`);
         }
 
         window.dispatchEvent(new CustomEvent(eventTypes.onNotificationReceived, { detail: { notification } }));
@@ -279,7 +279,7 @@ Template.lemverse.onCreated(function () {
     Tracker.nonreactive(() => {
       if (this.handleEntitiesSubscribe) this.handleEntitiesSubscribe.stop();
       if (this.handleTilesSubscribe) this.handleTilesSubscribe.stop();
-      if (this.handleUsersSubscribe) this.handleUsersSubscribe.stop();
+      if (this.handleUsersInterval) this.handleUsersInterval.clearInterval();
       if (this.handleZonesSubscribe) this.handleZonesSubscribe.stop();
       if (this.handleObserveEntities) this.handleObserveEntities.stop();
       if (this.handleObserveTiles) this.handleObserveTiles.stop();
@@ -340,18 +340,59 @@ Template.lemverse.onCreated(function () {
         });
       });
 
+      const getGuild = (guilds, id) => (id ? guilds.find(guild => guild._id === id) : undefined);
+
+      let throttle = false;
+      let date = Date.now();
+
+      const loadUsers = callback => {
+        Meteor.call('getUsers', (err, data) => {
+          throttle = false;
+          log(Date.now() - date);
+          date = Date.now();
+          if (err) { error('Can\'t fetch users update'); return; }
+          const newUsers = data.users.filter(user => user.status.online && user.profile.levelId === levelId);
+          const oldUsers = LocalUsers.find({ 'status.online': true, 'profile.levelId': levelId }).fetch();
+
+          newUsers.forEach(newUser => {
+            LocalUsers.upsert(
+              { _id: newUser._id }, { $set: newUser },
+            );
+            const oldUser = oldUsers.find(u => u._id === newUser._id);
+            if (oldUser && !_.isEqual(oldUser, newUser)) userManager.onDocumentUpdated(newUser, oldUser, getGuild(data.guilds, newUser.guildId));
+            else if (!oldUser) userManager.onDocumentAdded(newUser, getGuild(data.guilds, newUser.guildId));
+          });
+
+          oldUsers.filter(old => !newUsers.some(newu => old._id === newu._id)).forEach(deleteUser => {
+            userManager.onDocumentRemoved(deleteUser);
+            LocalUsers.remove(deleteUser._id);
+            userProximitySensor.removeNearUser(deleteUser);
+            lp.defer(() => peer.close(deleteUser._id, 0, 'user-disconnected'));
+          });
+
+          if (callback) callback();
+        });
+      };
+
       // Load users
       log(`loading level: loading users`);
-      this.handleUsersSubscribe = this.subscribe('users', levelId, () => {
-        this.handleObserveUsers = Meteor.users.find({ 'status.online': true, 'profile.levelId': levelId }).observe({
-          added(user) { userManager.onDocumentAdded(user); },
-          changed(user, oldUser) { userManager.onDocumentUpdated(user, oldUser); },
-          removed(user) {
-            userManager.onDocumentRemoved(user);
-            userProximitySensor.removeNearUser(user);
-            lp.defer(() => peer.close(user._id, 0, 'user-disconnected'));
-          },
-        });
+      this.handleUsersInterval = Meteor.setInterval(() => {
+        if (!throttle) {
+          throttle = true;
+          loadUsers();
+        } else log('throttle');
+      }, 200);
+      loadUsers(() => {
+      // this.handleUsersSubscribe = this.subscribe('users', levelId, () => {
+      //   this.handleObserveUsers = LocalUsers.find({ 'status.online': true, 'profile.levelId': levelId }).observe({
+      //     added(user) { userManager.onDocumentAdded(user); },
+      //     changed(user, oldUser) { userManager.onDocumentUpdated(user, oldUser); },
+      //     removed(user) {
+      //       userManager.onDocumentRemoved(user);
+      //       userProximitySensor.removeNearUser(user);
+      //       lp.defer(() => peer.close(user._id, 0, 'user-disconnected'));
+      //     },
+      //   });
 
         log('loading level: all users loaded');
         peer.init();
@@ -437,7 +478,7 @@ Template.lemverse.onDestroyed(function () {
   if (this.handleObserveZones) this.handleObserveZones.stop();
   if (this.handleEntitiesSubscribe) this.handleEntitiesSubscribe.stop();
   if (this.handleTilesSubscribe) this.handleTilesSubscribe.stop();
-  if (this.handleUsersSubscribe) this.handleUsersSubscribe.stop();
+  if (this.handleUsersInterval) this.handleUsersInterval.clearInterval();
   if (this.handleZonesSubscribe) this.handleZonesSubscribe.stop();
   if (this.resizeObserver) this.resizeObserver.disconnect();
 

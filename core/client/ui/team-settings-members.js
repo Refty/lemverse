@@ -1,4 +1,4 @@
-const users = guildId => Meteor.users.find({ guildId }, { sort: { 'profile.name': 1 } });
+const users = guildId => LocalUsers.find({ guildId }, { sort: { 'profile.name': 1 } });
 
 Template.teamSettingsMembers.onCreated(function () {
   this.guildId = Meteor.user().guildId;

@@ -23,7 +23,7 @@ const menuCurrentUser = (options = {}) => {
   const { userId } = menu;
   if (!userId) return undefined;
 
-  return Meteor.users.findOne(userId, options);
+  return LocalUsers.findOne(userId, options);
 };
 
 const lovePhrases = userName => [

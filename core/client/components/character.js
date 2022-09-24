@@ -241,7 +241,7 @@ class Character extends Phaser.GameObjects.Container {
       if (!allowPhaserMouseInputs()) return;
 
       const userId = this.getData('userId');
-      const user = Meteor.users.findOne(userId, { fields: { 'profile.guest': 1 } });
+      const user = LocalUsers.findOne(userId, { fields: { 'profile.guest': 1 } });
       if (user.profile.guest) return;
 
       this.setTint(configuration.colorStates.pointerOver);

@@ -1,6 +1,6 @@
 import { formatURL } from '../helpers';
 
-const getUser = template => Meteor.users.findOne(template.data.userId);
+const getUser = template => LocalUsers.findOne(template.data.userId);
 
 Template.userProfile.onCreated(function () {
   const { userId } = this.data;
@@ -9,7 +9,7 @@ Template.userProfile.onCreated(function () {
   this.guild = new ReactiveVar();
 
   this.subscribe('userProfile', userId, () => {
-    const user = Meteor.users.findOne(userId);
+    const user = LocalUsers.findOne(userId);
 
     if (!user.guildId) {
       this.guild.set(undefined);

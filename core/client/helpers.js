@@ -179,7 +179,7 @@ const replaceTextVars = text => text.replaceAll(/{{\s?[\w\s]*\s?}}/g, element =>
   const value = element.replace('{{', '').replace('}}', '');
   const [type] = value.split('_');
 
-  if (type === 'usr') return Meteor.users.findOne(value)?.profile.name || `User ${value}`;
+  if (type === 'usr') return LocalUsers.findOne(value)?.profile.name || `User ${value}`;
 
   return element;
 });

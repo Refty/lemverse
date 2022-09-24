@@ -1,7 +1,7 @@
 const maxAttempt = 10;
 const delayBetweenAttempt = 2000; // in ms
 
-const findRemoteUser = userId => Meteor.users.findOne(userId,
+const findRemoteUser = userId => LocalUsers.findOne(userId,
   { fields: {
     'profile.userMediaError': 1,
     'profile.shareAudio': 1,
@@ -99,7 +99,7 @@ Template.remoteStream.events({
     const { target } = event;
     removeAllFullScreenElement(target);
     target.classList.toggle('fullscreen');
-    const closeBtn = target.parentElement.querySelector('.js-fullscreen-close')
+    const closeBtn = target.parentElement.querySelector('.js-fullscreen-close');
     closeBtn?.classList.toggle('visible', target.classList.contains('fullscreen'));
 
     updatePhaserMouseInputState();

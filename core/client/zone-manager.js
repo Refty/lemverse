@@ -135,7 +135,7 @@ zoneManager = {
 
     const queryOption = { 'status.online': true, 'profile.levelId': zone.levelId };
     if (!includeCurrentUser) queryOption._id = { $ne: Meteor.userId() };
-    const users = Meteor.users.find(queryOption).fetch();
+    const users = LocalUsers.find(queryOption).fetch();
 
     const usersInZone = [];
     _.each(users, user => {

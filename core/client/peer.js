@@ -327,12 +327,12 @@ peer = {
         });
 
         connection.on('error', () => {
-          const user = Meteor.users.findOne(userId);
+          const user = LocalUsers.findOne(userId);
           if (user) lp.notif.warning(`${user.profile.name} was unavailable`);
           else lp.notif.warning(`${userId} is offline`);
         });
       } catch (err) {
-        const user = Meteor.users.findOne(userId);
+        const user = LocalUsers.findOne(userId);
         lp.notif.error(`An error has occured during connection with ${user?.profile.name || userId}`);
       }
     });
@@ -386,7 +386,7 @@ peer = {
     if (!this.enabled) { debug(`answerCall: peer is disabled`); return false; }
 
     if (!remoteUserId) { debug(`answerCall: incomplete metadata for the remote call`); return false; }
-    const remoteUser = Meteor.users.findOne({ _id: remoteUserId });
+    const remoteUser = LocalUsers.findOne({ _id: remoteUserId });
     if (!remoteUser) { debug(`answerCall: user not found "${remoteUserId}"`); return false; }
 
     // Send global notification
@@ -499,7 +499,7 @@ peer = {
       else if (peerErr.type === 'unavailable-id') lp.notif.error(`It seems that ${Meteor.settings.public.lp.product} is already open in another tab (unavailable-id)`);
       else if (peerErr.type === 'peer-unavailable') {
         const userId = peerErr.message.split(' ').pop();
-        const user = Meteor.users.findOne(userId);
+        const user = LocalUsers.findOne(userId);
         lp.notif.warning(`User ${user?.profile.name || userId} was unavailable`);
       } else lp.notif.error(`Peer ${peerErr} (${peerErr.type})`);
 

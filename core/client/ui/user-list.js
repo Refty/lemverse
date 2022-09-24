@@ -15,7 +15,7 @@ const users = (mode, guildId) => {
     filters = { ...filters, 'status.online': true, 'profile.levelId': levelId };
   } else if (mode === tabs.team) filters = { ...filters, $and: [{ guildId: { $exists: true } }, { guildId }] };
 
-  return Meteor.users.find(filters, { sort: { 'profile.name': 1 }, fields: userFields });
+  return LocalUsers.find(filters, { sort: { 'profile.name': 1 }, fields: userFields });
 };
 
 Template.userListEntry.helpers({
@@ -67,7 +67,7 @@ Template.userList.onCreated(function () {
   const user = Meteor.user();
   this.activeTab = new ReactiveVar(localStorage.getItem(userListTabKey) || (user.guildId ? tabs.team : tabs.level));
 
-  const guildIds = Meteor.users.find().map(u => u.guildId).filter(Boolean);
+  const guildIds = LocalUsers.find().map(u => u.guildId).filter(Boolean);
   this.subscribe('guilds', [...new Set(guildIds)]);
 });
 

@@ -8,7 +8,7 @@ const users = (scope = scopes.guild, ignoredUsers = []) => {
   if (scope === scopes.guild) filters.guildId = Meteor.user().guildId;
   else filters.guildId = { $exists: false };
 
-  return Meteor.users.find(filters, { sort: { 'profile.name': 1 } });
+  return LocalUsers.find(filters, { sort: { 'profile.name': 1 } });
 };
 
 const toggleUserSelection = (userId, template) => {

@@ -18,6 +18,8 @@ const messageReceived = {
   style: 'tooltip with-arrow fade-in',
 };
 
+LocalUsers = new Mongo.Collection(null);
+
 userManager = {
   inputVector: undefined,
   characters: {},
@@ -40,7 +42,7 @@ userManager = {
     this.controlledCharacter = undefined;
   },
 
-  onDocumentAdded(user) {
+  onDocumentAdded(user, guild) {
     if (this.characters[user._id]) return null;
 
     const { x, y, guest, direction, name, baseline, nameColor } = user.profile;
@@ -54,7 +56,7 @@ userManager = {
     else {
       character.setName(name, baseline, nameColor);
       if (user.guildId) {
-        const guildIcon = Guilds.findOne({ _id: user.guildId })?.icon;
+        const guildIcon = guild?.icon;
         if (guildIcon) character.setIcon(guildIcon);
       }
     }
@@ -67,7 +69,7 @@ userManager = {
   playReaction(player, reaction) {
     clearInterval(player.reactionHandler);
     if (meet.api && this.canPlayReactionSound && audioManager.reactionsSounds[reaction]) {
-      const otherUser = Meteor.users.findOne(player.userId);
+      const otherUser = LocalUsers.findOne(player.userId);
       if (otherUser && zoneManager.isUserInSameZone(Meteor.user(), otherUser)) audioManager.play(audioManager.reactionsSounds[reaction]);
 
       // avoid sound spamming
@@ -111,7 +113,7 @@ userManager = {
     }
   },
 
-  onDocumentUpdated(user, oldUser) {
+  onDocumentUpdated(user, oldUser, guild) {
     const character = this.characters[user._id];
     if (!character) return;
 
@@ -145,7 +147,7 @@ userManager = {
     if (nameUpdated) character.setName(name, baseline, nameColor);
 
     // update guild icon
-    if (user.guildId !== oldUser?.guildId) character.setIcon(Guilds.findOne({ _id: user.guildId })?.icon);
+    if (user.guildId !== oldUser?.guildId) character.setIcon(guild?.icon);
 
     const userHasMoved = x !== oldUser?.profile.x || y !== oldUser?.profile.y;
     const loggedUser = Meteor.user();
@@ -153,11 +155,11 @@ userManager = {
 
     if (user._id === loggedUser._id) {
       // network rubber banding
-      const dist = Math.hypot(character.x - x, character.y - y);
-      if (dist >= rubberBandingDistance) {
-        character.x = x;
-        character.y = y;
-      }
+      // const dist = Math.hypot(character.x - x, character.y - y);
+      // if (dist >= rubberBandingDistance) {
+      //   character.x = x;
+      //   character.y = y;
+      // }
 
       // ensures this.character is assigned to the logged user
       if (character.getData('userId') !== loggedUser._id || !character.body) this.setAsControlled(loggedUser._id);
@@ -166,7 +168,7 @@ userManager = {
       if (nameUpdated && meet.api) meet.userName(name);
 
       if (shouldCheckDistance) {
-        const otherUsers = Meteor.users.find({ _id: { $ne: loggedUser._id }, 'status.online': true, 'profile.levelId': loggedUser.profile.levelId }).fetch();
+        const otherUsers = LocalUsers.find({ _id: { $ne: loggedUser._id }, 'status.online': true, 'profile.levelId': loggedUser.profile.levelId }).fetch();
         userProximitySensor.checkDistances(loggedUser, otherUsers);
       }
     } else {
@@ -353,7 +355,7 @@ userManager = {
   onPeerDataReceived(dataReceived) {
     const { emitter: emitterUserId, type, data } = dataReceived;
 
-    const userEmitter = Meteor.users.findOne(emitterUserId);
+    const userEmitter = LocalUsers.findOne(emitterUserId);
     if (!userEmitter) return;
 
     const meta = {};

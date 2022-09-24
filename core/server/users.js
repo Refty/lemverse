@@ -4,11 +4,37 @@ const mainFields = { options: 1, profile: 1, roles: 1, status: { online: 1 }, be
 
 Meteor.server.setPublicationStrategy('users', DDPServer.publicationStrategies.NO_MERGE);
 
-Meteor.publish('users', function (levelId) {
-  check(levelId, Match.Maybe(Match.Id));
-  if (!this.userId) return undefined;
-  if (!levelId) levelId = Meteor.settings.defaultLevelId;
+class DataCache {
+  constructor(fetchFunction, millisecondsToLive = 100) {
+    this.millisecondsToLive = millisecondsToLive;
+    this.fetchFunction = fetchFunction;
+    this.cache = null;
+    this.getData = this.getData.bind(this);
+    this.resetCache = this.resetCache.bind(this);
+    this.isCacheExpired = this.isCacheExpired.bind(this);
+    this.fetchDate = new Date(0);
+  }
 
+  isCacheExpired() {
+    return (this.fetchDate.getTime() + this.millisecondsToLive) < new Date().getTime();
+  }
+
+  getData() {
+    if (!this.cache || this.isCacheExpired()) {
+      this.cache = this.fetchFunction();
+      this.fetchDate = new Date();
+      return this.cache;
+    } else {
+      return this.cache;
+    }
+  }
+
+  resetCache() {
+    this.fetchDate = new Date(0);
+  }
+}
+
+const getUsers = levelId => {
   const { guildId } = Meteor.user();
   let filters = { 'status.online': true, 'profile.levelId': levelId };
   if (guildId) {
@@ -20,17 +46,24 @@ Meteor.publish('users', function (levelId) {
     };
   }
 
-  const users = Meteor.users.find(filters, { fields: mainFields,
-    disableOplog: true,
-    pollingThrottleMs: 200,
-    pollingIntervalMs: 200 });
+  const users = Meteor.users.find(filters, { fields: mainFields });
   const guildIds = users.map(u => u.guildId).filter(Boolean);
-  const guilds = Guilds.find({ _id: { $in: [...new Set(guildIds)] },
-    disableOplog: true,
-    pollingThrottleMs: 200,
-    pollingIntervalMs: 200 });
+  const guilds = Guilds.find({ _id: { $in: [...new Set(guildIds)] } });
 
-  return [users, guilds];
+  return { users: users.fetch(), guilds: guilds.fetch() };
+};
+
+const getUsersCached = {};
+
+Meteor.methods({
+  getUsers(levelId) {
+    check(levelId, Match.Maybe(Match.Id));
+    if (!this.userId) return undefined;
+    if (!levelId) levelId = Meteor.settings.defaultLevelId;
+
+    if (!getUsersCached[levelId]) getUsersCached[levelId] = new DataCache(() => getUsers(levelId));
+    return getUsersCached[levelId].getData();
+  },
 });
 
 Meteor.publish('selfUser', function () {
