@@ -13,7 +13,6 @@ const characterAnimations = Object.freeze({
   run: 'run',
 });
 const timeBetweenReactionSound = 500;
-const rubberBandingDistance = 160;
 
 const messageReceived = {
   duration: 15000,
@@ -42,7 +41,7 @@ userManager = {
     this.controlledCharacter = undefined;
   },
 
-  onDocumentAdded(user) {
+  onDocumentAdded(user, guild) {
     if (this.characters[user._id]) return null;
 
     const { x, y, guest, direction } = user.profile;
@@ -56,7 +55,7 @@ userManager = {
       character.playAnimation(characterAnimations.run, 'down', true);
     }
 
-    window.setTimeout(() => this.onDocumentUpdated(user), 0);
+    this.onDocumentUpdated(user, undefined, guild);
 
     return character;
   },
@@ -99,7 +98,7 @@ userManager = {
     }
   },
 
-  onDocumentUpdated(user, oldUser) {
+  onDocumentUpdated(user, oldUser, guild) {
     const character = this.characters[user._id];
     if (!character) return;
 
@@ -114,10 +113,7 @@ userManager = {
     if (!user.profile.guest && oldUser?.profile.guest) {
       character.toggleMouseInteraction(true);
       character.setName(name, baseline, nameColor);
-      if (user.guildId) {
-        const guildIcon = Guilds.findOne({ _id: user.guildId })?.icon;
-        if (guildIcon) character.setIcon(guildIcon);
-      }
+      if (user.guildId && guild?.icon) character.setIcon(guild.icon);
     }
 
     // show reactions
@@ -138,20 +134,13 @@ userManager = {
     if (nameUpdated) character.setName(name || 'Guest', baseline, nameColor);
 
     // update guild icon
-    if (user.guildId !== oldUser?.guildId) character.setIcon(Guilds.findOne({ _id: user.guildId })?.icon);
+    if (user.guildId !== oldUser?.guildId) character.setIcon(guild?.icon);
 
     const userHasMoved = x !== oldUser?.profile.x || y !== oldUser?.profile.y;
     const loggedUser = Meteor.user();
     const shouldCheckDistance = userHasMoved;
 
     if (user._id === loggedUser._id) {
-      // network rubber banding
-      const dist = Math.hypot(character.x - x, character.y - y);
-      if (dist >= rubberBandingDistance) {
-        character.x = x;
-        character.y = y;
-      }
-
       // ensures this.character is assigned to the logged user
       if (character.getData('userId') !== loggedUser._id || !character.body) this.setAsControlled(loggedUser._id);
 

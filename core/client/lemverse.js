@@ -6,6 +6,7 @@ import { setReaction } from './helpers';
 import URLOpener from './url-opener';
 import { guestAllowed, permissionTypes } from '../lib/misc';
 import initSentryClient from './sentry';
+import { usersPollDiff, Polling } from './polling';
 
 initSentryClient();
 
@@ -329,7 +330,7 @@ Template.lemverse.onCreated(function () {
     Tracker.nonreactive(() => {
       if (this.handleEntitiesSubscribe) this.handleEntitiesSubscribe.stop();
       if (this.handleTilesSubscribe) this.handleTilesSubscribe.stop();
-      if (this.handleUsersSubscribe) this.handleUsersSubscribe.stop();
+      if (this.polling) this.polling.stop();
       if (this.handleZonesSubscribe) this.handleZonesSubscribe.stop();
       if (this.handleObserveEntities) this.handleObserveEntities.stop();
       if (this.handleObserveTiles) this.handleObserveTiles.stop();
@@ -386,17 +387,33 @@ Template.lemverse.onCreated(function () {
 
       // Load users
       log(`loading level: loading users`);
-      this.handleUsersSubscribe = this.subscribe('users', levelId, () => {
-        this.handleObserveUsers = Meteor.users.find({ 'status.online': true, 'profile.levelId': levelId }).observe({
-          added(user) { userManager.onDocumentAdded(user); },
-          changed(user, oldUser) { userManager.onDocumentUpdated(user, oldUser); },
-          removed(user) {
-            userManager.onDocumentRemoved(user);
-            userProximitySensor.removeNearUser(user);
-            lp.defer(() => peer.close(user._id, 0, 'user-disconnected'));
-          },
-        });
 
+      const polling = new Polling();
+
+      const loadUsers = onLoaded => {
+        Meteor.call('getUsers', Meteor.user()?.profile?.levelId, (err, data) => {
+          polling.setIdle(false);
+          if (err) { error('Can\'t fetch users update'); return; }
+          if (!data) return;
+          const newUsers = data.users.filter(user => user.status?.online && user.profile.levelId === levelId);
+          const oldUsers = Meteor.users.find({ 'status.online': true, 'profile.levelId': levelId }).fetch();
+
+          usersPollDiff(oldUsers, newUsers, data.guilds, {
+            added: (user, guild) => userManager.onDocumentAdded(user, guild),
+            changed: (newUser, oldUser, guild) => userManager.onDocumentUpdated(newUser, oldUser, guild),
+            removed: user => {
+              userManager.onDocumentRemoved(user);
+              userProximitySensor.removeNearUser(user);
+              lp.defer(() => peer.close(user._id, 0, 'user-disconnected'));
+            },
+          });
+          if (onLoaded) onLoaded();
+        });
+      };
+
+      polling.start(loadUsers, 200);
+
+      loadUsers(() => {
         log('loading level: all users loaded');
         peer.init();
 
@@ -481,7 +498,7 @@ Template.lemverse.onDestroyed(function () {
   if (this.handleObserveZones) this.handleObserveZones.stop();
   if (this.handleEntitiesSubscribe) this.handleEntitiesSubscribe.stop();
   if (this.handleTilesSubscribe) this.handleTilesSubscribe.stop();
-  if (this.handleUsersSubscribe) this.handleUsersSubscribe.stop();
+  if (this.polling) this.polling.stop();
   if (this.handleZonesSubscribe) this.handleZonesSubscribe.stop();
   if (this.resizeObserver) this.resizeObserver.disconnect();
 

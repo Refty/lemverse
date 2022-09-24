@@ -1,13 +1,9 @@
-import { completeUserProfile, getSpawnLevel, levelSpawnPosition, teleportUserInLevel } from '../lib/misc';
+import { completeUserProfile, getSpawnLevel, levelSpawnPosition, teleportUserInLevel, DataCache } from '../lib/misc';
 import { mainFields as guildMainFields } from './guilds';
 
 const mainFields = { options: 1, profile: 1, roles: 1, status: { idle: 1, online: 1 }, beta: 1, guildId: 1 };
 
-Meteor.publish('users', function (levelId) {
-  check(levelId, Match.Maybe(Match.Id));
-  if (!this.userId) return undefined;
-  if (!levelId) levelId = Meteor.settings.defaultLevelId;
-
+const getUsers = levelId => {
   const { guildId } = Meteor.user();
   let filters = { 'status.online': true, 'profile.levelId': levelId };
   if (guildId) {
@@ -23,7 +19,20 @@ Meteor.publish('users', function (levelId) {
   const guildIds = users.map(u => u.guildId).filter(Boolean);
   const guilds = Guilds.find({ _id: { $in: [...new Set(guildIds)] } }, { fields: guildMainFields });
 
-  return [users, guilds];
+  return { users: users.fetch(), guilds: guilds.fetch() };
+};
+
+const levelUsersCache = {};
+
+Meteor.methods({
+  getUsers(levelId) {
+    check(levelId, Match.Maybe(Match.Id));
+    if (!this.userId) return undefined;
+    if (!levelId) levelId = Meteor.settings.defaultLevelId;
+
+    if (!levelUsersCache[levelId]) levelUsersCache[levelId] = new DataCache(() => getUsers(levelId));
+    return levelUsersCache[levelId].getData();
+  },
 });
 
 Meteor.publish('selfUser', function () {

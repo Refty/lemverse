@@ -290,6 +290,27 @@ const guestAllowed = permissionType => {
   return !!guestPermissions[permissionType];
 };
 
+class DataCache {
+  constructor(fetchFunction, millisecondsToLive = 100) {
+    this.millisecondsToLive = millisecondsToLive;
+    this.fetchFunction = fetchFunction;
+    this.cache = null;
+    this.fetchDate = new Date(0);
+  }
+
+  isCacheExpired() {
+    return (this.fetchDate.getTime() + this.millisecondsToLive) < new Date().getTime();
+  }
+
+  getData() {
+    if (!this.cache || this.isCacheExpired()) {
+      this.cache = this.fetchFunction();
+      this.fetchDate = new Date();
+    }
+    return this.cache;
+  }
+}
+
 const getChannelType = channelId => {
   switch (channelId?.split('_')[0]) {
     case 'qst':
@@ -326,6 +347,7 @@ export {
   permissionTypes,
   subscribedUsersToEntity,
   teleportUserInLevel,
+  DataCache,
   randomInRange,
   randomFloatInRange,
 };
