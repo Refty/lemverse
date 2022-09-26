@@ -61,7 +61,7 @@ userManager = {
       }
     }
 
-    window.setTimeout(() => this.onDocumentUpdated(user), 0);
+    window.setTimeout(() => this.onDocumentUpdated(user, undefined, guild), 0);
 
     return character;
   },
