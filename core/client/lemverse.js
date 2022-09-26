@@ -343,13 +343,10 @@ Template.lemverse.onCreated(function () {
       const getGuild = (guilds, id) => (id ? guilds.find(guild => guild._id === id) : undefined);
 
       let throttle = false;
-      let date = Date.now();
 
       const loadUsers = callback => {
-        Meteor.call('getUsers', (err, data) => {
+        Meteor.call('getUsers', Meteor.user()?.profile?.levelId, (err, data) => {
           throttle = false;
-          log(Date.now() - date);
-          date = Date.now();
           if (err) { error('Can\'t fetch users update'); return; }
           const newUsers = data.users.filter(user => user.status.online && user.profile.levelId === levelId);
           const oldUsers = LocalUsers.find({ 'status.online': true, 'profile.levelId': levelId }).fetch();
