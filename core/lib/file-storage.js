@@ -110,6 +110,17 @@ function fileSystemAdapter() {
       }
 
       if (path) {
+        if (s3Conf.cdn.use) {
+          const cdnUrl = s3Conf.cdn.url.replace(/\/$/, '');
+          const completePath = `${cdnUrl}/${path}`.replace(/\/$/, '');
+
+          http.response.writeHead(307, {
+            Location: completePath,
+          });
+
+          return false;
+        }
+
         const opts = {
           Bucket: s3Conf.bucket,
           Key: path,
