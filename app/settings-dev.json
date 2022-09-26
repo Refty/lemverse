@@ -248,7 +248,11 @@
     "key": "AWSKEY",
     "secret": "AWSSECRET",
     "bucket": "BUCKETNAME",
-    "region": "eu-west-3"
+    "region": "eu-west-3",
+    "cdn": {
+      "use": false,
+      "url": "http://cdn.cloudfront.net/"
+    }
   },
 
   "monti": {
