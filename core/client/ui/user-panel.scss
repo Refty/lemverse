@@ -157,7 +157,7 @@
         }
 
         &.active {
-          background-color: $new-green;
+          background-color: var(--primary-color);
         }
 
         &:disabled {
@@ -166,7 +166,7 @@
 
         @media (hover: hover) {
           &:hover {
-            background-color: lighten($new-green, 20%);
+            background-color: var(--primary-color-lighten-20);
           }
         }
 
