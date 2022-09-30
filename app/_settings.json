@@ -8,7 +8,9 @@
       "gods": [],
       "production": true,
       "staging": false,
-      "enableLogClient": false
+      "enableLogClient": false,
+      "primaryColor": "#A5E6BA",
+      "secondaryColor": "#13C4A3"
     },
 
     "debug": false,
