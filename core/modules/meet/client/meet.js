@@ -45,6 +45,16 @@ const onZoneEntered = e => {
   } else if (meetingRoomService.api) updateMeetStates(zone);
 };
 
+function closeConference(meetingRoomService, _id, roomName) {
+  meetingRoomService.close();
+  Meteor.call('analyticsConferenceEnd', { zoneId: _id, zoneName: roomName });
+  linkedZoneId = undefined;
+
+  userManager.clearMediaStates();
+  updateViewport(game.scene.keys.WorldScene, viewportModes.fullscreen);
+  meetingRoomService.fullscreen(false);
+}
+
 const onZoneLeft = e => {
   const { zone, newZone } = e.detail;
   const { _id, roomName } = zone;
@@ -53,13 +63,7 @@ const onZoneLeft = e => {
   if (!meetingRoomService) return;
 
   if (linkedZoneId === _id) {
-    meetingRoomService.close();
-    Meteor.call('analyticsConferenceEnd', { zoneId: _id, zoneName: roomName });
-    linkedZoneId = undefined;
-
-    userManager.clearMediaStates();
-    updateViewport(game.scene.keys.WorldScene, viewportModes.fullscreen);
-    meetingRoomService.fullscreen(false);
+    closeConference(meetingRoomService, _id, roomName);
   }
 
   if (meetingRoomService.api && newZone) updateMeetStates(newZone);
@@ -68,11 +72,21 @@ const onZoneLeft = e => {
 const onZoneUpdated = e => {
   if (!linkedZoneId) return;
 
+  const meetingRoomService = meetingRoom.getMeetingRoomService();
+  const linkedZone = Zones.findOne(linkedZoneId);
+
+  // the linkedZoneId only exists if the user is in a meet room
+  // if the room the user is currently in has no name, it means it is not **anymore** a meet room (but it was)
+  if (!linkedZone.roomName) {
+    closeConference(meetingRoomService,
+      linkedZoneId,
+      linkedZone.roomName);
+  }
+
   const { zone } = e.detail;
   const currentZone = zoneManager.currentZone(Meteor.user());
   if (currentZone._id !== linkedZoneId) return;
 
-  const meetingRoomService = meetingRoom.getMeetingRoomService();
   meetingRoomService?.fullscreen(zone.fullscreen);
   const screenMode = zone.fullscreen ? viewportModes.small : viewportModes.splitScreen;
   updateViewport(game.scene.keys.WorldScene, screenMode);
