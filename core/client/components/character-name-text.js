@@ -44,6 +44,18 @@ class CharacterNameText extends Phaser.GameObjects.Container {
     return this;
   }
 
+  static getStrokeColor(color) {
+    if (!color) return '#000';
+    const c = color.substring(1);
+    const rgb = parseInt(c, 16);
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+
+    const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+    return luma > 150 ? '#000' : '#fff';
+  }
+
   setColor(color) {
     const tints = Meteor.settings.public.character.nameColors;
     if (tints) {
@@ -52,7 +64,11 @@ class CharacterNameText extends Phaser.GameObjects.Container {
       if (this.baseline) this.baseline.setTint(...tint);
     } else {
       this.name.setColor(color || defaultColor);
-      if (this.baseline) this.baseline.setColor(color);
+      this.name.setStroke(CharacterNameText.getStrokeColor(color), 3);
+      if (this.baseline) {
+        this.baseline.setColor(color);
+        this.baseline.setStroke(CharacterNameText.getStrokeColor(color), 3);
+      }
     }
     return this;
   }
