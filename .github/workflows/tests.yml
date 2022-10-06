@@ -1,0 +1,19 @@
+name: Run tests
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: [master]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    name: Coding style
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run coding style tests
+        run: docker build . -f ./Docker/lint.Dockerfile -t lemverse/lint
+      - name: Cleanup
+        if: always()
+        run: docker run lemverse/lint
