@@ -344,10 +344,13 @@ const getHslFromHex = H => {
   return { h, s, l };
 };
 
+const filesURL = `${Meteor.settings.public.lp.website}${Meteor.settings.public.files.route}/`;
+
 export {
   allowPhaserMouseInputs,
   canAnswerCall,
   clamp,
+  filesURL,
   formatURL,
   formatURLs,
   generateEntityThumbnail,
