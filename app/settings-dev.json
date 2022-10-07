@@ -10,7 +10,9 @@
       "staging": false,
       "enableLogClient": false,
       "primaryColor": "#A5E6BA",
-      "secondaryColor": "#13C4A3"
+      "secondaryColor": "#13C4A3",
+      "logoURL": "https://assets.website-files.com/62b4ba92180b4210cc065959/62b4c09cbc28c2286fc87ed6_Logo.svg",
+      "faviconURL": "https://assets.website-files.com/62b4ba92180b4210cc065959/62bdafd68a5ffb164edbdf51_Favicon%20(1).png"
     },
 
     "debug": false,
