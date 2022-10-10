@@ -1,2 +1,2 @@
-/core/*
-app/core/**/plugins/*
+app/core/*
+**/core/**/plugins/*

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-djlint app/core/ --check
+djlint ./core/ --check

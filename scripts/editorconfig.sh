@@ -1,3 +1,3 @@
 #!/bin/sh
 
-npx eclint check app/core/**/*
+npx eclint check ./core/**/*

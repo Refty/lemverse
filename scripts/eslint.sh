@@ -1,3 +1,3 @@
 #!/bin/sh
 
-eslint app/core
+npx eslint ./core
