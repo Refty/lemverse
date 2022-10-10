@@ -1,38 +1,35 @@
 <template name="lemverse">
-  <div class="lemverse {{#if neq (Session 'editor') 0}}edit{{/if}} {{#if loading}}loading{{/if}}">
+  <div class="lemverse {{#if neq (Session 'editor') 0 }}edit{{/if }} {{#if loading }}loading{{/if }}">
     <div class="simulation">
       <div id="game"></div>
       <div id="meet"></div>
       <div id="webpage">
-        <iframe src="" allowfullscreen="true" id="webpageIframe" title="Embedded content"></iframe>
+        <iframe src=""
+                allowfullscreen="true"
+                id="webpageIframe"
+                title="Embedded content"></iframe>
       </div>
     </div>
-
-    {{#if guest}}
-    {{> formAccount visible=loading}}
+    {{#if guest }}
+      {{> formAccount visible=loading}}
     {{/if}}
-
     {{#unless guest}}
     {{> editToolbox}}
-
     <div class="js-streams">
-      {{#each remoteUser in allRemoteStreamsByUsers}}
-      {{> remoteStream remoteUser=remoteUser }}
+      {{#each remoteUser in allRemoteStreamsByUsers }}
+        {{> remoteStream remoteUser=remoteUser }}
       {{/each}}
     </div>
-
     {{> userPanel loading=loading}}
     {{> radialMenu }}
-    {{/unless}}
-
-    {{> notificationButton}}
-    {{> zoneNameToaster}}
-    {{> modalContainer }}
-
-    <div class="modules">
-      {{#each module in modules}}
+  {{/unless}}
+  {{> notificationButton}}
+  {{> zoneNameToaster}}
+  {{> modalContainer }}
+  <div class="modules">
+    {{#each module in modules }}
       {{> Template.dynamic template=module}}
-      {{/each}}
-    </div>
+    {{/each}}
   </div>
+</div>
 </template>
