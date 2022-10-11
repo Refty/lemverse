@@ -21,6 +21,12 @@ const updateLevel = (name, spawnPosition, hide = false, featuresPermissions) => 
 };
 
 const getFeaturesPermissions = () => currentLevel(Meteor.user()).featuresPermissions || {};
+const updateFeaturePermissionLevel = (permission, event) => {
+  const level = currentLevel(Meteor.user());
+
+  updateLevel(level.name, level.spawn, level.hide, { [permission]: event.target.value });
+  event.target.blur();
+};
 
 Template.levelToolbox.events({
   'focus input'() { toggleUIInputs(true); },
@@ -40,22 +46,28 @@ Template.levelToolbox.events({
     updateLevel(level.name, { x, y }, level.hide);
   },
   'change .js-voice-amplifier-select'(event) {
-    const level = currentLevel(Meteor.user());
-
-    updateLevel(level.name, level.spawn, level.hide, { shout: event.target.value });
-    event.target.blur();
+    updateFeaturePermissionLevel('shout', event);
   },
   'change .js-global-chat-select'(event) {
-    const level = currentLevel(Meteor.user());
-
-    updateLevel(level.name, level.spawn, level.hide, { globalChat: event.target.value });
-    event.target.blur();
+    updateFeaturePermissionLevel('globalChat', event);
   },
   'change .js-punch-select'(event) {
-    const level = currentLevel(Meteor.user());
-
-    updateLevel(level.name, level.spawn, level.hide, { punch: event.target.value });
-    event.target.blur();
+    updateFeaturePermissionLevel('punch', event);
+  },
+  'change .js-reactions-select'(event) {
+    updateFeaturePermissionLevel('reactions', event);
+  },
+  'change .js-follow-select'(event) {
+    updateFeaturePermissionLevel('follow', event);
+  },
+  'change .js-send-vocal-select'(event) {
+    updateFeaturePermissionLevel('sendVocal', event);
+  },
+  'change .js-send-love-select'(event) {
+    updateFeaturePermissionLevel('sendLove', event);
+  },
+  'change .js-send-text-select'(event) {
+    updateFeaturePermissionLevel('sendText', event);
   },
 });
 
@@ -76,4 +88,9 @@ Template.levelToolbox.helpers({
   shout() { return getFeaturesPermissions().shout || 'enabled'; },
   globalChat() { return getFeaturesPermissions().globalChat || 'enabled'; },
   punch() { return getFeaturesPermissions().punch || 'enabled'; },
+  reaction() { return getFeaturesPermissions().reaction || 'enabled'; },
+  follow() { return getFeaturesPermissions().follow || 'enabled'; },
+  sendVocal() { return getFeaturesPermissions().sendVocal || 'enabled'; },
+  sendLove() { return getFeaturesPermissions().sendLove || 'enabled'; },
+  sendText() { return getFeaturesPermissions().sendText || 'enabled'; },
 });
