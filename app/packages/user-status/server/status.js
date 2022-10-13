@@ -248,7 +248,7 @@ const activeSession = (connection, date, userId) => {
 /*
   Handlers for various client-side events
 */
-Meteor.startup(onStartup);
+// Meteor.startup(onStartup);
 
 // Opening and closing of DDP connections
 Meteor.onConnection((connection) => {
