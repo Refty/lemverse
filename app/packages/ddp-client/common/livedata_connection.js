@@ -1760,21 +1760,7 @@ export class Connection {
     }
   }
 
-  onMessage(raw_msg) {
-    let msg;
-    try {
-      msg = DDPCommon.parseDDP(raw_msg);
-    } catch (e) {
-      Meteor._debug('Exception while parsing DDP', e);
-      return;
-    }
-
-    // Any message counts as receiving a pong, as it demonstrates that
-    // the server is still alive.
-    if (this._heartbeat) {
-      this._heartbeat.messageReceived();
-    }
-
+  _livedata(msg) {
     if (msg === null || !msg.msg) {
       if(!msg || !msg.testMessageOnConnect) {
         if (Object.keys(msg).length === 1 && msg.server_id) return;
@@ -1815,6 +1801,25 @@ export class Connection {
     } else {
       Meteor._debug('discarding unknown livedata message type', msg);
     }
+  }
+
+  onMessage(raw_msg) {
+    let msg;
+    try {
+      msg = DDPCommon.parseDDP(raw_msg);
+    } catch (e) {
+      Meteor._debug('Exception while parsing DDP', e);
+      return;
+    }
+
+    // Any message counts as receiving a pong, as it demonstrates that
+    // the server is still alive.
+    if (this._heartbeat) {
+      this._heartbeat.messageReceived();
+    }
+
+    if (msg?.msg === 'multi') msg.content.forEach(inner => this._livedata(inner));
+    else this._livedata(msg);
   }
 
   onReset() {

@@ -265,6 +265,9 @@ var Session = function (server, version, socket, options) {
   self.initialized = false;
   self.socket = socket;
 
+  self.messageQueue = [];
+  self.throttledSend = _.throttle(this._send.bind(this), 100);
+
   // Set to null when the session is destroyed. Multiple places below
   // use this to determine if the session is alive or not.
   self.inQueue = new Meteor._DoubleEndedQueue();
@@ -504,14 +507,24 @@ Object.assign(Session.prototype, {
     self.server._removeSession(self);
   },
 
+  _send() {
+    const self = this;
+    if (self.socket) {
+      const content = self.messageQueue;
+      self.messageQueue = [];
+      const msg = content.length > 1 ? { msg: 'multi', content } : content[0];
+      if (Meteor._printSentDDP) Meteor._debug('Sent DDP', DDPCommon.stringifyDDP(msg));
+      self.socket.send(DDPCommon.stringifyDDP(msg));
+    }
+  },
+
   // Send a message (doing nothing if no socket is connected right now).
   // It should be a JSON object (it will be stringified).
   send: function (msg) {
     var self = this;
     if (self.socket) {
-      if (Meteor._printSentDDP)
-        Meteor._debug("Sent DDP", DDPCommon.stringifyDDP(msg));
-      self.socket.send(DDPCommon.stringifyDDP(msg));
+      self.messageQueue.push(msg);
+      self.throttledSend();
     }
   },
 
