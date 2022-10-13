@@ -40,21 +40,7 @@ export function last(array, n, guard) {
 
 DDPCommon.SUPPORTED_DDP_VERSIONS = [ '1', 'pre2', 'pre1' ];
 
-DDPCommon.parseDDP = function (stringMessage) {
-  try {
-    var msg = JSON.parse(stringMessage);
-  } catch (e) {
-    Meteor._debug("Discarding message with invalid JSON", stringMessage);
-    return null;
-  }
-  // DDP messages must be objects.
-  if (msg === null || typeof msg !== 'object') {
-    Meteor._debug("Discarding non-object DDP message", stringMessage);
-    return null;
-  }
-
-  // massage msg to get it into "abstract ddp" rather than "wire ddp" format.
-
+const _parseDDP = (msg) => {
   // switch between "cleared" rep of unsetting fields and "undefined"
   // rep of same
   if (hasOwn.call(msg, 'cleared')) {
@@ -72,13 +58,33 @@ DDPCommon.parseDDP = function (stringMessage) {
       msg[field] = EJSON._adjustTypesFromJSONValue(msg[field]);
     }
   });
+}
+
+DDPCommon.parseDDP = function (stringMessage) {
+  try {
+    var msg = JSON.parse(stringMessage);
+  } catch (e) {
+    Meteor._debug("Discarding message with invalid JSON", stringMessage);
+    return null;
+  }
+  // DDP messages must be objects.
+  if (msg === null || typeof msg !== 'object') {
+    Meteor._debug("Discarding non-object DDP message", stringMessage);
+    return null;
+  }
+
+  // massage msg to get it into "abstract ddp" rather than "wire ddp" format.
+
+  if (msg.msg === 'multi') {
+    msg.content.forEach(inner => _parseDDP(inner));
+  } else {
+    _parseDDP(msg);
+  }
 
   return msg;
 };
 
-DDPCommon.stringifyDDP = function (msg) {
-  const copy = EJSON.clone(msg);
-
+const _stringifyDDP = (msg, copy) => {
   // swizzle 'changed' messages from 'fields undefined' rep to 'fields
   // and cleared' rep
   if (hasOwn.call(msg, 'fields')) {
@@ -108,6 +114,16 @@ DDPCommon.stringifyDDP = function (msg) {
       copy[field] = EJSON._adjustTypesToJSONValue(copy[field]);
     }
   });
+}
+
+DDPCommon.stringifyDDP = function (msg) {
+  const copy = EJSON.clone(msg);
+
+  if (msg.msg === 'multi') {
+    msg.content.forEach((inner, index) => _stringifyDDP(inner, copy.content[index]));
+  } else {
+    _stringifyDDP(msg, copy);
+  }
 
   if (msg.id && typeof msg.id !== 'string') {
     throw new Error("Message id is not a string");
