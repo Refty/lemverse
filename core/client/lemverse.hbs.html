@@ -5,11 +5,11 @@
       <div id="gameModules">
         {{#unless guest}}
           {{> radialMenu }}
+          {{> userPanel loading=loading}}
         {{/unless}}
         {{#each gameModule in gameModules}}
           {{> Template.dynamic template=gameModule}}
         {{/each}}
-        {{> userPanel loading=loading}}
       </div>
 
       {{# resizable id='resizableMeet' }}

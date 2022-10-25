@@ -131,7 +131,7 @@ userManager = {
 
     // update name
     const nameUpdated = (name !== oldUser?.profile.name || baseline !== oldUser?.profile.baseline || nameColor !== oldUser?.profile.nameColor);
-    if (nameUpdated) character.setName(name || 'Guest', baseline, nameColor);
+    if (nameUpdated) character.setName(name, baseline, nameColor);
 
     // update guild icon
     if (user.guildId !== oldUser?.guildId) character.setIcon(guild?.icon);
