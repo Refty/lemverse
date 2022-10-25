@@ -14,17 +14,17 @@ window.addEventListener('load', () => {
     if (option.id === 'open-inventory') toggleModal('inventory');
   });
 
-  Tracker.autorun(() => {
-    const user = Meteor.user({ fields: { guildId: 1 } });
-    if (!user || !user.guildId) return;
+  // Tracker.autorun(() => {
+  //   const user = Meteor.user({ fields: { guildId: 1 } });
+  //   if (!user || !user.guildId) return;
 
-    Tracker.nonreactive(() => {
-      registerModules(
-        [{ id: 'open-inventory', icon: '📦', shortcut: 73, label: 'Inventory', closeMenu: true, scope: 'me' }],
-        moduleType.RADIAL_MENU,
-      );
-    });
-  });
+  //   Tracker.nonreactive(() => {
+  //     registerModules(
+  //       [{ id: 'open-inventory', icon: '📦', shortcut: 73, label: 'Inventory', closeMenu: true, scope: 'me' }],
+  //       moduleType.RADIAL_MENU,
+  //     );
+  //   });
+  // });
 });
 
 Template.inventoryItemPanel.helpers({

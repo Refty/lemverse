@@ -8,43 +8,44 @@ window.addEventListener('load', () => {
   registerModules(['textualCommunicationTools'], moduleType.GAME);
   registerModules(['userListMessageButton'], moduleType.USER_LIST);
 
-registerModules([
-    { id: 'open-console', icon: '💬', shortcut: 56, order: 41, label: 'Text', closeMenu: true, scope: 'me' },
-    moduleType.RADIAL_MENU,
-  ]);
-
   Tracker.autorun(track => {
     if (Session.get('loading')) return;
 
     const user = Meteor.user();
     if (!user) return;
-
+    
+    if (user.roles?.admin) {
+      registerModules([
+      { id: 'open-console', icon: '💬', shortcut: 56, order: 41, label: 'Text', closeMenu: true, scope: 'me' }],
+      moduleType.RADIAL_MENU,
+    );
+      }
     if (user.roles?.admin || canUseLevelFeature(Meteor.user(), 'sendText')) {
       registerModules([
-        { id: 'send-text', icon: '💬', shortcut: 56, order: 41, label: 'Text', closeMenu: true, scope: 'other' },
+        { id: 'send-text', icon: '💬', shortcut: 56, order: 41, label: 'Text', closeMenu: true, scope: 'other' }],
     moduleType.RADIAL_MENU,
-      ]);
+      );
     }
 
     track.stop();
   });
 
-  Tracker.autorun(() => {
-    const user = Meteor.user({ fields: { guildId: 1 } });
-    if (!user || !user.guildId) return;
+  // Tracker.autorun(() => {
+  //   const user = Meteor.user({ fields: { guildId: 1 } });
+  //   if (!user || !user.guildId) return;
 
-    Tracker.nonreactive(() => {
-      registerModules(
-        [
-          { id: 'new-quest', icon: '📜', shortcut: 53, label: 'New task', closeMenu: true, scope: 'other' },
-          { id: 'show-quests', icon: '📜', shortcut: 57, order: 42, label: 'Tasks', closeMenu: true, scope: 'me' },
-        ],
-        moduleType.RADIAL_MENU,
-      );
+  //   Tracker.nonreactive(() => {
+  //     registerModules(
+  //       [
+  //         { id: 'new-quest', icon: '📜', shortcut: 53, label: 'New task', closeMenu: true, scope: 'other' },
+  //         { id: 'show-quests', icon: '📜', shortcut: 57, order: 42, label: 'Tasks', closeMenu: true, scope: 'me' },
+  //       ],
+  //       moduleType.RADIAL_MENU,
+  //     );
 
-      registerModules(['userListQuestButton'], moduleType.USER_LIST);
-    });
-  });
+  //     registerModules(['userListQuestButton'], moduleType.USER_LIST);
+  //   });
+  // });
 });
 
 const openMessagingInterface = channel => {

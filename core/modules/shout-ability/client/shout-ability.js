@@ -1,4 +1,5 @@
-import { canUseLevelFeature, moduleType } from '../../../lib/misc';
+import { canUseLevelFeature } from '../../../lib/misc';
+import { moduleType } from '../../../client/helpers';
 
 
 window.addEventListener('load', () => {
