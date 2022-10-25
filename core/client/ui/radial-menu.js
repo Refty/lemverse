@@ -72,8 +72,8 @@ Tracker.autorun(track => {
 
   // If it's an admin, we show the item but if it's disabled for all, the action will be ignored
   const isAdmin = user.roles?.admin;
-  if (!isAdmin && !canUseLevelFeature(user, 'reactions')) mainMenuItems.splice(0, 1);
-
+  if (!isAdmin && !canUseLevelFeature(user, 'reactions')) mainMenuItems.splice(1, 2);
+  if (!isAdmin) mainMenuItems.splice(1, 2);
   otherUserMenuItems = otherUserMenuItems.reduce((acc, item) => {
     if (item.id === 'follow' && (!isAdmin && !canUseLevelFeature(user, 'follow'))) return acc;
     if (item.id === 'send-vocal' && (!isAdmin && !canUseLevelFeature(user, 'sendVocal'))) return acc;
