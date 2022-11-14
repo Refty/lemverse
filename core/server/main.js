@@ -45,3 +45,20 @@ Picker.route('/http-bind', (_params, req, res) => {
     res.end(page.content);
   }));
 });
+
+const envsubst = object => {
+  if (_.isObject(object)) {
+    for (const key in object) {
+      const value = object[key];
+      if (_.isObject(value)) {
+        envsubst(value);
+      } else if (_.isString(value) && value.startsWith('$')) {
+        object[key] = process.env[object[key].substring(1)];
+      }
+    }
+  }
+};
+
+Meteor.startup(() => {
+  envsubst(Meteor.settings);
+});
