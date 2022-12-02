@@ -6,14 +6,15 @@
 
   // We split the HSL (Hue Saturarion Lightness) value to play with th lightness color
   // #A5E6BA converted to hsl(139, 57%, 77%);
-  --primary-color-hs: 139, 57%; 
-  --primary-color-l: 77%; 
+  --primary-color-hs: 139, 57%;
+  --primary-color-l: 77%;
   // #13C4A3 converted to hsl(169, 82%, 82%);
-  --secondary-color-hs: 169, 82%; 
-  --secondary-color-l: 82%; 
+  --secondary-color-hs: 169, 82%;
+  --secondary-color-l: 82%;
 
   // And now if we want our color lighter, we increase the lightness value BUT our value shouldn't be more than 100% or it will be black.
   --primary-color-lighten-20: hsl(var(--primary-color-hs), calc(var(--primary-color-l) + 20%));
+  --primary-color-lighten-75: hsl(var(--primary-color-hs), calc(var(--primary-color-l) + 75%));
 
   // Or darker, we decrease the lightness value
   --secondary-color-darken-5: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 5%));
