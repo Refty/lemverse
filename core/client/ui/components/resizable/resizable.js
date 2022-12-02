@@ -128,7 +128,7 @@ function moveToSideScreen(resizable) {
     resizable.style.right = 0;
     resizable.style.left = 'initial';
     resizable.style.width = '50%';
-    // We need to set border style splitted and use $primary-color on .css side because it's not supported here
+    // We need to set border style splitted and use var(--primary-color) on .css side because it's not supported here
     resizable.style.borderLeftWidth = '2px';
     resizable.style.borderLeftStyle = 'solid';
     resizable.style.borderRight = 'none';
