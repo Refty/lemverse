@@ -210,6 +210,10 @@ peer = {
       if (!this.callStartDates[user._id]) {
         this.callStartDates[user._id] = Date.now();
         Meteor.call('analyticsDiscussionAttend', { peerUserId: user._id, usersAttendingCount: this.getCallCount() });
+        if (this.expiration && parseInt(Date.now() / 1000, 10) > this.expiration) {
+          Meteor.call('analyticsCredentialsExpired');
+          debug('TURN credentials expired');
+        }
       }
     }
 
@@ -219,7 +223,7 @@ peer = {
       return;
     }
 
-    if (shareAudio || shareVideo) userStreams.createStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.main));
+    userStreams.createStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.main));
     if (shareScreen) userStreams.createScreenStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.screen));
   },
 
@@ -482,7 +486,7 @@ peer = {
     this.peerLoading = true;
     const result = await meteorCallWithPromise('getPeerConfig');
 
-    const { port, url: host, path, config } = result;
+    const { port, url: host, path, config, expiration } = result;
 
     const peerConfig = {
       debug: user.options?.debug ? 2 : 0,
@@ -495,6 +499,7 @@ peer = {
     if (skipConfig) delete peerConfig.config;
     if (this.peerInstance) this.destroy();
     this.peerInstance = new Peer(user._id, peerConfig);
+    this.expiration = expiration;
     this.peerLoading = false;
 
     debug(`createMyPeer: created`, { peerInstanceId: this.peerInstance.id });

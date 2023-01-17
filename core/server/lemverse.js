@@ -11,10 +11,13 @@ AccountsGuest.enabled = true;
 AccountsGuest.forced = true;
 AccountsGuest.name = true;
 
-const generateTURNCredentials = (name, secret) => {
+const getTURNCredentialsExpiration = () => {
   const duration = Meteor.settings.peer?.client.credentialDuration || 86400;
-  const unixTimeStamp = parseInt(Date.now() / 1000, 10) + duration;
-  const username = [unixTimeStamp, name].join(':');
+  return parseInt(Date.now() / 1000, 10) + duration;
+}
+
+const generateTURNCredentials = (name, secret) => {
+  const username = [getTURNCredentialsExpiration(), name].join(':');
   const hmac = crypto.createHmac('sha1', secret);
   hmac.setEncoding('base64');
   hmac.write(username);
@@ -52,6 +55,7 @@ Meteor.methods({
       url,
       port,
       path: Meteor.settings.peer.path,
+      expiration: getTURNCredentialsExpiration(),
       config: {
         ...config,
         iceServers,

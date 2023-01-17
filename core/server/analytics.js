@@ -108,6 +108,16 @@ Meteor.methods({
       users_attending_count: properties.usersAttendingCount,
     });
   },
+  analyticsCredentialsExpired() {
+    const { userId } = this;
+    if (!userId) return;
+
+    const user = Meteor.user();
+    analytics.track(userId, '⌛ Credentials expired', {
+      guild_id: user.guildId,
+      level_id: user.profile.levelId,
+    });
+  },
   analyticsDiscussionEnd(properties) {
     const { userId } = this;
     if (!userId) return;
