@@ -32,5 +32,3 @@ FlowRouter.route('/invite/:levelId', {
 })
 
 FlowRouter.route('/editor', { name: 'editor', action: renderRouteName })
-
-FlowRouter.route('/levels', { name: 'levels', action: renderRouteName })

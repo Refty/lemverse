@@ -22,6 +22,8 @@ const onMediaStreamStateChanged = (event) => {
 
 Template.userPanel.onCreated(function () {
     if (Meteor.settings.public.features?.userPanel?.enabled === false) return
+    if (!Meteor.userId()) return
+
     this.avatarURL = new ReactiveVar()
     window.addEventListener(eventTypes.onMediaStreamStateChanged, onMediaStreamStateChanged)
 
@@ -60,7 +62,7 @@ Template.userPanel.helpers({
         return talking() && Meteor.user({ fields: { 'profile.shareVideo': 1 } })?.profile.shareVideo
     },
     displayUserPanel() {
-        return Meteor.settings.public.features?.userPanel?.enabled !== false
+        return Meteor.settings.public.features?.userPanel?.enabled !== false && Meteor.userId()
     },
     canTalkToUser() {
         return (
