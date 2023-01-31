@@ -10,7 +10,7 @@
   width: 100%;
   padding: 32px 64px;
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   animation: fadeInOnboarding 1s;
   overflow-y: auto;
 
@@ -212,7 +212,7 @@
   .settingsCharacter {
     max-width: 650px;
     margin-bottom: 18px;
-    z-index: 2;
+    z-index: 4;
   }
 
 }
