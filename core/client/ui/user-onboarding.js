@@ -87,7 +87,7 @@ Template.userOnboarding.helpers({
   },
   hasLearnedAllDirections: () => {
     const learnedDirections = Session.get('learnedDirections') || [];
-    return learnedDirections.length === 4;
+    return learnedDirections.length >= 1;
   },
   direction: () => getDirectionFromKey(Session.get('pressedKeyboard')),
   getAvatarUrl: () => {
