@@ -108,6 +108,54 @@ Meteor.methods({
       users_attending_count: properties.usersAttendingCount,
     });
   },
+  analyticsStreamStarted(properties) {
+    const { userId } = this;
+    if (!userId) return;
+
+    check(properties, {
+      peerUserId: String,
+      streamId: String,
+      kind: String,
+    });
+    analytics.track(userId, '📞 Stream started', {
+      stream_id: properties.streamId,
+      peer_user_id: properties.peerUserId,
+      kind: properties.kind,
+    });
+  },
+  analyticsStreamEstablished(properties) {
+    const { userId } = this;
+    if (!userId) return;
+
+    check(properties, {
+      peerUserId: String,
+      streamId: String,
+      kind: String,
+      elapsed: Number,
+    });
+    analytics.track(userId, '✅ Stream established', {
+      stream_id: properties.streamId,
+      peer_user_id: properties.peerUserId,
+      kind: properties.kind,
+      elapsed: properties.elapsed,
+    });
+  },
+  analyticsMissingTrack(properties) {
+    const { userId } = this;
+    if (!userId) return;
+
+    check(properties, {
+      peerUserId: String,
+      streamId: String,
+      kind: String,
+    });
+
+    analytics.track(userId, '❌ Missing track', {
+      stream_id: properties.streamId,
+      peer_user_id: properties.peerUserId,
+      kind: properties.kind,
+    });
+  },
   analyticsCredentialsExpired() {
     const { userId } = this;
     if (!userId) return;

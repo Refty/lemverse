@@ -223,7 +223,7 @@ peer = {
       return;
     }
 
-    userStreams.createStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.main));
+    if (shareAudio || shareVideo) userStreams.createStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.main));
     if (shareScreen) userStreams.createScreenStream().then(stream => this.createPeerCall(peer, user, stream, streamTypes.screen));
   },
 
@@ -367,6 +367,74 @@ peer = {
     }
   },
 
+  initStreamMonitoring(remoteUserId, streamType) {
+    const streamsByUsers = this.remoteStreamsByUsers.get();
+    const stream = streamsByUsers.find(usr => usr._id === remoteUserId);
+    if (streamType === 'main' && !stream.videoStartedAt) {
+      stream.videoStartedAt = Date.now();
+      debug(`Video stream ${stream.streamId} starting...`);
+      Meteor.call('analyticsStreamStarted', { streamId: stream.streamId, peerUserId: remoteUserId, kind: 'video' });
+    }
+    if (streamType === 'main' && !stream.audioStartedAt) {
+      stream.audioStartedAt = Date.now();
+      debug(`Audio stream ${stream.streamId} starting...`);
+      Meteor.call('analyticsStreamStarted', { streamId: stream.streamId, peerUserId: remoteUserId, kind: 'audio' });
+    }
+    if (streamType === 'screen' && !stream.screenStartedAt) {
+      stream.screenStartedAt = Date.now();
+      debug(`Screen stream ${stream.streamId} starting...`);
+      Meteor.call('analyticsStreamStarted', { streamId: stream.streamId, peerUserId: remoteUserId, kind: 'screen' });
+    }
+  },
+
+  monitorStreams(userStream, remoteStream, streamType) {
+    if (streamType === 'main') {
+      const videoTrack = remoteStream.getVideoTracks()[0];
+      const audioTrack = remoteStream.getAudioTracks()[0];
+      if (videoTrack) {
+        videoTrack.onunmute = () => {
+          if (!userStream.videoEstablished) {
+            const elapsed = Date.now() - userStream.videoStartedAt;
+            debug(`Video stream ${userStream.streamId} established in ${elapsed} ms`);
+            Meteor.call('analyticsStreamEstablished', { streamId: userStream.streamId, peerUserId: userStream._id, kind: 'video', elapsed });
+            userStream.videoEstablished = true;
+          }
+        };
+      } else {
+        debug('Video track is missing!');
+        Meteor.call('analyticsMissingTrack', { streamId: userStream.streamId, peerUserId: userStream._id, kind: 'video' });
+      }
+      if (audioTrack) {
+        audioTrack.onunmute = () => {
+          if (!userStream.audioEstablished) {
+            const elapsed = Date.now() - userStream.audioStartedAt;
+            debug(`Audio stream ${userStream.streamId} established in ${elapsed} ms`);
+            Meteor.call('analyticsStreamEstablished', { streamId: userStream.streamId, peerUserId: userStream._id, kind: 'audio', elapsed });
+            userStream.audioEstablished = true;
+          }
+        };
+      } else {
+        debug('Audio track is missing!');
+        Meteor.call('analyticsMissingTrack', { streamId: userStream.streamId, peerUserId: userStream._id, kind: 'audio' });
+      }
+    } else if (streamType === 'screen') {
+      const videoTrack = remoteStream.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.onunmute = () => {
+          if (!userStream.screenEstablished) {
+            const elapsed = Date.now() - userStream.screenStartedAt;
+            debug(`Screen sharing stream ${userStream.streamId} established in ${elapsed} ms`);
+            Meteor.call('analyticsStreamEstablished', { streamId: userStream.streamId, peerUserId: userStream._id, kind: 'screen', elapsed });
+            userStream.screenEstablished = true;
+          }
+        };
+      } else {
+        debug('Screen sharing video track is missing!');
+        Meteor.call('analyticsMissingTrack', { streamId: userStream.streamId, peerUserId: userStream._id, kind: 'screen' });
+      }
+    }
+  },
+
   createOrUpdateRemoteStream(user, streamType, remoteStream = null) {
     const streamsByUsers = this.remoteStreamsByUsers.get();
 
@@ -376,6 +444,10 @@ peer = {
         main: {},
         screen: {},
         waitingCallAnswer: true,
+        streamId: Random.id(),
+        videoEstablished: false,
+        audioEstablished: false,
+        screenEstablished: false,
       });
     }
 
@@ -385,6 +457,7 @@ peer = {
           delete usr.waitingCallAnswer;
           usr[streamType] = {};
           usr[streamType].srcObject = remoteStream;
+          this.monitorStreams(usr, remoteStream, streamType);
         }
 
         return usr;
@@ -413,7 +486,8 @@ peer = {
     this.remoteCalls[callIdentifier] = remoteCall;
 
     // show the remote call with an empty stream
-    this.createOrUpdateRemoteStream(remoteUser, remoteCall.metadata.type);
+    this.createOrUpdateRemoteStream(remoteUser, remoteCall.metadata.type, null, true);
+    this.initStreamMonitoring(remoteUserId, remoteCall.metadata.type);
 
     // update call's with stream received
     remoteCall.on('stream', stream => {
