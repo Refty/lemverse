@@ -105,6 +105,43 @@ const getSimulationSize = () => {
     }
 }
 
+const getResizableMeetWidth = () => {
+    const { WorldScene } = game.scene.keys
+    if (WorldScene.viewportMode !== viewportModes.fullscreen && Session.get('screenMode') !== 'unlocked') {
+        return document.querySelector('.resizableMeet').clientWidth
+    }
+    return 0
+}
+
+const updateFollowOffset = () => {
+    if (!levelManager.map) return
+    const { WorldScene, UIScene } = game.scene.keys
+    const parentWidth = getSimulationSize().width
+    const elementWidth = getResizableMeetWidth()
+    const width = parentWidth - elementWidth
+    document.querySelector('.simulation').style.setProperty('--game-modules-adaptative-size', `${width}px`)
+
+    const offset = Session.get('screenSide') === 'right' ? -elementWidth / 2 : elementWidth / 2
+    const zoomFactor = 1 / WorldScene.cameras.main.zoom
+
+    WorldScene.cameras.main.followOffset.x = offset * zoomFactor
+    UIScene.cameras.main.followOffset.x = offset * zoomFactor
+
+    const boundX = Session.get('screenSide') === 'right' ? 0 : -elementWidth * zoomFactor
+    UIScene.cameras.main.setBounds(
+        boundX,
+        0,
+        levelManager.map.widthInPixels + elementWidth * zoomFactor,
+        levelManager.map.heightInPixels
+    )
+    WorldScene.cameras.main.setBounds(
+        boundX,
+        0,
+        levelManager.map.widthInPixels + elementWidth * zoomFactor,
+        levelManager.map.heightInPixels
+    )
+}
+
 updateViewport = (scene, mode) => {
     if (typeof mode !== 'string') mode = scene.viewportMode
 
@@ -122,7 +159,7 @@ updateViewport = (scene, mode) => {
     scene.cameras.main.setViewport(0, 0, width, height)
 
     scene.viewportMode = mode
-
+    updateFollowOffset()
     const event = new CustomEvent(eventTypes.onViewportUpdated)
     window.dispatchEvent(event)
 }
@@ -423,11 +460,12 @@ export {
     getSimulationSize,
     isMobile,
     meteorCallWithPromise,
+    moduleType,
     nearestDuration,
     replaceTextVars,
     setReaction,
     textDirectionToVector,
     toggleUIInputs,
+    updateFollowOffset,
     vectorToTextDirection,
-    moduleType,
 }
