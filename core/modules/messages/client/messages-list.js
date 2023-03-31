@@ -1,4 +1,4 @@
-import { canSubscribeToNotifications, messageModerationAllowed } from '../misc';
+import { messageModerationAllowed } from '../misc';
 import { channelIdToChannelName, formatDate, formatText, show } from './helpers';
 
 function computeReactionToolboxPosition(element) {
@@ -111,23 +111,6 @@ Template.messagesList.onCreated(function () {
 Template.messagesList.helpers({
   channelName() { return channelIdToChannelName(Session.get('messagesChannel'), false); },
   messages() { return sortedMessages(); },
-  canSubscribe() {
-    return canSubscribeToNotifications(Session.get('messagesChannel'));
-  },
-  subscribed() {
-    const channelId = Session.get('messagesChannel');
-    if (!canSubscribeToNotifications(channelId)) return false;
-
-    const { zoneLastSeenDates } = Meteor.user({ fields: { zoneLastSeenDates: 1 } });
-    return !zoneLastSeenDates || !zoneLastSeenDates[channelId];
-  },
-  muted() {
-    const channelId = Session.get('messagesChannel');
-    if (!canSubscribeToNotifications(channelId)) return false;
-
-    const { zoneMuted } = Meteor.user({ fields: { zoneMuted: 1 } });
-    return !zoneMuted || !zoneMuted[channelId];
-  },
   sameDay(index) {
     if (index === 0) return true;
 
@@ -145,49 +128,5 @@ Template.messagesList.helpers({
 });
 
 Template.messagesList.events({
-  'click .js-channel-subscribe'(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const channelId = Session.get('messagesChannel');
-    if (!channelId.includes('zon_') && !channelId.includes('lvl_')) return;
-    Meteor.call('messagesUpdateChannelLastSeenDate', channelId, true, err => {
-      if (err) return;
-      lp.notif.success('🔔 You will be notified of news from this channel');
-    });
-  },
-  'click .js-channel-unsubscribe'(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const channelId = Session.get('messagesChannel');
-    if (!channelId.includes('zon_')) return;
-    Meteor.call('messagesUnsubscribeFromChannelNotifications', channelId, err => {
-      if (err) return;
-      lp.notif.success('🔔 You will no longer be notified');
-    });
-  },
-  'click .js-channel-mute'(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const channelId = Session.get('messagesChannel');
-    if (!channelId.includes('zon_')) return;
-    Meteor.call('muteFromZone', channelId, true, err => {
-      if (err) return;
-      lp.notif.success('Notifications on this channel are now without sound 🔕 ... soundlessness and silence ...');
-    });
-  },
-  'click .js-channel-unmute'(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const channelId = Session.get('messagesChannel');
-    if (!channelId.includes('zon_')) return;
-    Meteor.call('unmuteFromZone', channelId, err => {
-      if (err) return;
-      lp.notif.success('Notifications on this channel are now unmuted and hearable 🔔 !');
-    });
-  },
   'click .js-message-list-close'() { closeConsole(); },
 });

@@ -157,50 +157,6 @@ hr.separator {
   }
 }
 
-
-button.js-notifications {
-  position: absolute;
-  bottom: 90px;
-  left: 30px;
-  padding: 4px 8px !important;
-  font-size: 2.5rem;
-  display: none;
-  z-index: 101;
-  width: 75px;
-  background-color: $light-orange;
-  border: 0;
-  border-radius: $radius;
-  height: 75px;
-  animation: pulse 1s infinite;
-
-  &.visible {
-    display: block;
-  }
-
-  &:hover {
-    background-color: lighten($light-orange, 15%);
-  }
-
-  &::after {
-    content: attr(data-count);
-    color: white;
-    position: absolute;
-    bottom: 7px;
-    right: 5px;
-    font-weight: bold;
-    font-size: 1.2rem;
-    background-color: darken($light-red, 10%);
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    line-height: 25px;
-  }
-
-  &[data-count="0"]::after {
-    display: none;
-  }
-}
-
 .alert {
   padding: 5px 10px;
   margin: 20px;

@@ -105,16 +105,6 @@ const filesAfterUploadVoiceRecorder = (user, fileRef) => {
   const { userIds } = fileRef.meta;
   if (!userIds.length) return;
 
-  const notifications = userIds.map(userId => ({
-    _id: Notifications.id(),
-    userId,
-    fileId: fileRef._id,
-    type: 'vocal',
-    createdAt: new Date(),
-    createdBy: user._id,
-  }));
-  Notifications.rawCollection().insertMany(notifications);
-
   log('filesAfterUploadVoiceRecorder: done', { userId: user._id });
 };
 

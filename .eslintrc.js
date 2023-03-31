@@ -85,7 +85,6 @@ module.exports = {
     Zones: 'writable',
     Levels: 'writable',
     Files: 'writable',
-    Notifications: 'writable',
     Messages: 'writable',
     Guilds: 'writable',
     Items: 'writable',

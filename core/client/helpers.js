@@ -29,8 +29,6 @@ eventTypes = Object.freeze({
   onMeetEnded: 'onMeetEnded',
   onMenuOptionSelected: 'onMenuOptionSelected',
   onMenuOptionUnselected: 'onMenuOptionUnselected',
-  onNotificationClicked: 'onNotificationClicked',
-  onNotificationReceived: 'onNotificationReceived',
   onPeerDataReceived: 'onPeerDataReceived',
   onMediaStreamStateChanged: 'onMediaStreamStateChanged',
   onTileAdded: 'onTileAdded',

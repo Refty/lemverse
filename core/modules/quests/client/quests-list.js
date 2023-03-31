@@ -174,12 +174,6 @@ Template.questsList.helpers({
   questListModeIsActive(mode) { return Template.instance().questListMode.get() === mode; },
   draftQuestSelected() { return Session.get('selectedQuestId') === draftQuestId(); },
   questSelected() { return Session.get('selectedQuestId') === this._id; },
-  questHasUpdates() {
-    const notification = Notifications.findOne({ channelId: this._id });
-    if (!notification) return false;
-
-    return !notification.read;
-  },
 });
 
 Template.questListEntry.helpers({

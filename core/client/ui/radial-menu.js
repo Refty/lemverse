@@ -53,7 +53,6 @@ const reactionMenuItems = [
 ];
 
 const mainMenuItems = [
-  { id: 'notifications', icon: '🔔', order: 0, shortcut: 54, label: 'Notifications', closeMenu: true },
   { id: 'reactions', icon: '😃', order: 1, shortcut: 53, label: 'Reactions' },
 ];
 
@@ -96,7 +95,6 @@ const onMenuOptionSelected = e => {
   const { option, user } = e.detail;
 
   if (option.id === 'reactions' && canUseLevelFeature(Meteor.user(), 'reactions', true)) buildMenuFromOptions(reactionMenuItems);
-  else if (option.id === 'notifications') toggleModal('notifications');
   else if (option.id === 'send-love' && user && canUseLevelFeature(Meteor.user(), 'sendLove', true)) setReaction(Random.choice(lovePhrases(user.profile.name)));
   else if (option.id === 'follow' && user && canUseLevelFeature(Meteor.user(), 'follow', true)) userManager.follow(user);
   else if (option.id === 'show-profile') Session.set('modal', { template: 'userProfile', userId: Session.get('menu')?.userId });

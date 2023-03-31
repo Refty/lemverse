@@ -39,9 +39,6 @@
     </div>
 
     {{> zoneNameToaster}}
-    {{#if displayNotificationButton}}
-      {{> notificationButton}}
-    {{/if}}
 
     {{#each mainModule in mainModules}}
       {{> Template.dynamic template=mainModule}}
