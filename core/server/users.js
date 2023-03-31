@@ -133,25 +133,12 @@ Meteor.methods({
 
         return teleportUserInLevel(Meteor.user(), Levels.findOne(levelId), 'teleporter')
     },
-    markNotificationAsRead(notificationId) {
-        if (!this.userId) return
-        check(notificationId, Match.Id)
-
-        Notifications.update({ _id: notificationId, userId: this.userId }, { $set: { read: true } })
-    },
-    markAllNotificationsAsRead() {
-        if (!this.userId) return
-
-        Notifications.update({ userId: this.userId }, { $set: { read: true } }, { multi: true })
-    },
     kickUser(userId) {
         if (!this.userId) throw new Meteor.Error('missing-user', 'A valid user is required')
         check(userId, Match.Id)
         if (!Meteor.settings.defaultKickLevelId)
             throw new Meteor.Error('missing-levelId', 'Missing configuration for defaultKickLevelId')
-        const level = Levels.findOne({
-            _id: Meteor.settings.defaultKickLevelId,
-        })
+        const level = Levels.findOne({ _id: Meteor.settings.defaultKickLevelId })
         if (!level) throw new Meteor.Error('missing-levelId', 'Level in defaultKickLevelId does not exists')
         log('kickUser', { kicker: Meteor.userId(), kicked: userId })
 

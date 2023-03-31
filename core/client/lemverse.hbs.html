@@ -23,8 +23,7 @@
             {{#each remoteUser in allRemoteStreamsByUsers}} {{> remoteStream remoteUser=remoteUser }} {{/each}}
         </div>
 
-        {{> zoneNameToaster}} {{#if displayNotificationButton}} {{> notificationButton}} {{/if}} {{#each mainModule in
-        mainModules}} {{> Template.dynamic template=mainModule}} {{/each}} {{> modalContainer }}
+        {{#each mainModule in mainModules}} {{> Template.dynamic template=mainModule}} {{/each}} {{> modalContainer }}
 
         <div class="modules">{{#each module in modules}} {{> Template.dynamic template=module}} {{/each}}</div>
     </div>
