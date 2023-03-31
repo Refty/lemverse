@@ -1,7 +1,7 @@
 <template name="textualCommunicationTools">
     {{#if canUseModule}}
     <div class="two-cols-modules {{#if show}}show{{/if}}">
-      <div class="left-content">{{#if useGenericChat}} {{> messagesChannelSelector}} {{/if}}</div>
+        <div class="left-content">{{#if useGenericChat}} {{> messagesChannelSelector}} {{/if}}</div>
         <div class="right-content">{{> messagesList}} {{> console}}</div>
     </div>
     {{/if}}

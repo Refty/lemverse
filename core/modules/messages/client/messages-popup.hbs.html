@@ -1,0 +1,22 @@
+<template name="messagesPopup">
+    <ul class="notifications">
+        {{#each message in messages}}
+        <div id="{{message.id}}" class="toast">
+            {{> avatarViewer user=message.user}}
+            <div class="right-content">
+                {{#if eq message.type 'global'}}
+                <p class="global-title">{{ channelName }}</p>
+                {{else if (eq message.type 'private')}}
+                <p class="private-title">Private</p>
+                {{/if}}
+                <div class="message-header">
+                    <p class="text">{{message.sender}}</p>
+                    <span class="time" title="{{message.date}}">{{message.time}}</span>
+                </div>
+                <p class="text">{{message.text}}</p>
+            </div>
+            <button type="button" class="cross" title="Close">✖</button>
+        </div>
+        {{/each}}
+    </ul>
+</template>

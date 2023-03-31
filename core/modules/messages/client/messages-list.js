@@ -11,7 +11,8 @@ function computeReactionToolboxPosition(element) {
     }
 }
 
-const sortedMessages = () => Messages.find({}, { sort: { createdAt: 1 } }).fetch()
+const sortedMessages = () =>
+    Messages.find({ channel: Session.get('messagesChannel') }, { sort: { createdAt: 1 } }).fetch()
 
 const scrollToBottom = () => {
     Tracker.afterFlush(() => {
