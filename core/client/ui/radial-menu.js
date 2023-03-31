@@ -52,17 +52,7 @@ const reactionMenuItems = [
     { id: 'emoji', icon: '❤️', shortcut: 51 },
 ]
 
-const mainMenuItems = [
-    {
-        id: 'notifications',
-        icon: '🔔',
-        order: 0,
-        shortcut: 54,
-        label: 'Notifications',
-        closeMenu: true,
-    },
-    { id: 'reactions', icon: '😃', order: 1, shortcut: 53, label: 'Reactions' },
-]
+const mainMenuItems = [{ id: 'reactions', icon: '😃', order: 1, shortcut: 53, label: 'Reactions' }]
 
 let otherUserMenuItems = [
     {
@@ -122,7 +112,6 @@ const onMenuOptionSelected = (e) => {
 
     if (option.id === 'reactions' && canUseLevelFeature(Meteor.user(), 'reactions', true))
         buildMenuFromOptions(reactionMenuItems)
-    else if (option.id === 'notifications') toggleModal('notifications')
     else if (option.id === 'send-love' && user && canUseLevelFeature(Meteor.user(), 'sendLove', true))
         setReaction(Random.choice(lovePhrases(user.profile.name)))
     else if (option.id === 'follow' && user && canUseLevelFeature(Meteor.user(), 'follow', true))

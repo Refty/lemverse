@@ -1,5 +1,4 @@
 import { meteorCallWithPromise } from '../../../client/helpers'
-import { canSubscribeToNotifications } from '../misc'
 
 const messageMaxLength = 4096
 
@@ -51,22 +50,6 @@ messagesModule = {
         this.handleMessagesSubscribe = Meteor.subscribe('messages', channel)
         this.channel = channel
         Session.set('messagesChannel', channel) // set console in the new channel
-        this.markChannelAsRead(channel)
-    },
-
-    markChannelAsRead(channel) {
-        if (canSubscribeToNotifications(channel)) {
-            Meteor.call('messagesUpdateChannelLastSeenDate', channel, () => {
-                const zone = Zones.findOne(channel)
-                if (zone) zoneManager.destroyNewContentIndicator(zone)
-            })
-        } else if (channel.includes('qst_')) {
-            const notification = Notifications.findOne({
-                $or: [{ questId: channel }, { channelId: channel }],
-                userId: Meteor.userId(),
-            })
-            if (notification && !notification.read) Notifications.update(notification._id, { $set: { read: true } })
-        }
     },
 
     async sendWebRTCMessage(channel, content) {
@@ -120,7 +103,6 @@ messagesModule = {
             })
         )
 
-        this.markChannelAsRead(channel)
         if (!channel.includes('qst_') && content.length) this.sendWebRTCMessage(channel, content)
 
         return messageId

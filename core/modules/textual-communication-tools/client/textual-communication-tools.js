@@ -1,4 +1,3 @@
-import audioManager from '../../../client/audio-manager'
 import { moduleType } from '../../../client/helpers'
 import { guestAllowed, canUseLevelFeature } from '../../../lib/misc'
 
@@ -74,48 +73,6 @@ const openMessagingInterface = (channel) => {
     openConsole()
 }
 
-const onNotificationReceived = async (e) => {
-    if (Meteor.settings.public.features?.notificationButton?.enabled === false) return
-    const { notification } = e.detail
-
-    if (!notification.channelId?.includes('qst_')) return
-
-    let message
-    if (notification.type === 'quest-new') message = `📜 A new task is available!`
-    else if (notification.type === 'quest-updated') message = `📜 A task has been updated`
-
-    const notificationInstance = await notify(Meteor.users.findOne(notification.createdBy), message)
-    if (!notificationInstance) {
-        if (notification.type === 'quest-new') audioManager.play('trumpet-fanfare.mp3', 0.25)
-        else audioManager.play('text-sound.wav', 0.5)
-
-        return
-    }
-
-    notificationInstance.onclick = () => {
-        e.preventDefault()
-        Session.set('quests', {
-            selectedQuestId: notification.questId,
-            origin: 'notifications',
-        })
-    }
-}
-
-const onNotificationClicked = (e) => {
-    const { notification } = e.detail
-
-    const questId = notification.questId || notification.channelId
-    const questNotification = questId?.includes('qst_')
-
-    if (questNotification) {
-        closeModal()
-        Session.set('quests', {
-            selectedQuestId: questId,
-            origin: 'notifications',
-        })
-    } else if (!this.fileId) openMessagingInterface(questId)
-}
-
 const onMenuOptionSelected = (e) => {
     const { option, user } = e.detail
 
@@ -141,15 +98,11 @@ const onPeerDataReceived = (e) => {
 Template.textualCommunicationTools.onCreated(() => {
     messagesModule.init()
     window.addEventListener(eventTypes.onMenuOptionSelected, onMenuOptionSelected)
-    window.addEventListener(eventTypes.onNotificationClicked, onNotificationClicked)
-    window.addEventListener(eventTypes.onNotificationReceived, onNotificationReceived)
     window.addEventListener(eventTypes.onPeerDataReceived, onPeerDataReceived)
 })
 
 Template.textualCommunicationTools.onDestroyed(() => {
     window.removeEventListener(eventTypes.onMenuOptionSelected, onMenuOptionSelected)
-    window.removeEventListener(eventTypes.onNotificationClicked, onNotificationClicked)
-    window.removeEventListener(eventTypes.onNotificationReceived, onNotificationReceived)
     window.removeEventListener(eventTypes.onPeerDataReceived, onPeerDataReceived)
 })
 

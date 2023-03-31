@@ -1,6 +1,5 @@
 import hotkeys from 'hotkeys-js'
 import Phaser from 'phaser'
-import audioManager from './audio-manager'
 import meetingRoom from './meeting-room'
 import { setReaction, getHslFromHex } from './helpers'
 import URLOpener from './url-opener'
@@ -150,31 +149,6 @@ Template.lemverse.onCreated(function () {
 
     this.currentLevelId = undefined
     this.subscribe('characters')
-
-    this.subscribe('notifications', () => {
-        this.handleObserveNotifications = Notifications.find({
-            createdAt: { $gte: new Date() },
-        }).observe({
-            async added(notification) {
-                // remove notification when the user is already watching the channel targeted
-                if (notification.type !== 'vocal' && notification.channelId === Session.get('messagesChannel')) {
-                    Notifications.remove(notification._id)
-                    return
-                }
-
-                if (!notification.type) {
-                    audioManager.play('text-sound.wav', 0.5)
-                    notify(Meteor.users.findOne(notification.createdBy), `📢 You have received a new message`)
-                }
-
-                window.dispatchEvent(
-                    new CustomEvent(eventTypes.onNotificationReceived, {
-                        detail: { notification },
-                    })
-                )
-            },
-        })
-    })
 
     this.subscribe('tilesets', () => {
         log('All tilesets loaded')
@@ -567,7 +541,6 @@ Template.lemverse.onCreated(function () {
 Template.lemverse.onDestroyed(function () {
     if (this.handleObserveUsers) this.handleObserveUsers.stop()
     if (this.handleObserveEntities) this.handleObserveEntities.stop()
-    if (this.handleObserveNotifications) this.handleObserveNotifications.stop()
     if (this.handleObserveTiles) this.handleObserveTiles.stop()
     if (this.handleObserveTilesets) this.handleObserveTilesets.stop()
     if (this.handleObserveZones) this.handleObserveZones.stop()
@@ -601,14 +574,5 @@ Template.lemverse.helpers({
     modules: () => Session.get('modules'),
     mainModules: () => Session.get('mainModules'),
     gameModules: () => Session.get('gameModules'),
-    displayNotificationButton: () => Meteor.settings.public.features?.notificationButton?.enabled !== false,
     allowFormLogin: () => Meteor.settings.public.permissions?.allowFormLogin !== false,
-})
-
-Template.lemverse.events({
-    'mouseup .button.js-notifications': function (event) {
-        event.preventDefault()
-        event.stopPropagation()
-        toggleModal('notifications')
-    },
 })

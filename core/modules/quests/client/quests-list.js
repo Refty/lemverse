@@ -187,12 +187,6 @@ Template.questsList.helpers({
     questSelected() {
         return Session.get('selectedQuestId') === this._id
     },
-    questHasUpdates() {
-        const notification = Notifications.findOne({ channelId: this._id })
-        if (!notification) return false
-
-        return !notification.read
-    },
 })
 
 Template.questListEntry.helpers({
