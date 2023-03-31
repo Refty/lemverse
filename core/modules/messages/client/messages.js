@@ -5,7 +5,7 @@ const messageMaxLength = 4096
 const ignoreChannelAutoSwitch = () => !Session.get('console') || (Session.get('messagesChannel') || '').includes('qst_')
 
 messagesModule = {
-    handleMessagesSubscribe: undefined,
+    handleChannelMessagesSubscribe: undefined,
     channel: undefined,
     lastZoneEntered: undefined,
 
@@ -47,7 +47,7 @@ messagesModule = {
         if (!channel || channel === this.channel) return
 
         this.stopListeningMessagesChannel()
-        this.handleMessagesSubscribe = Meteor.subscribe('messages', channel)
+        this.handleChannelMessagesSubscribe = Meteor.subscribe('channelMessages', channel)
         this.channel = channel
         Session.set('messagesChannel', channel) // set console in the new channel
     },
@@ -110,7 +110,7 @@ messagesModule = {
 
     stopListeningMessagesChannel() {
         this.channel = undefined
-        this.handleMessagesSubscribe?.stop()
+        this.handleChannelMessagesSubscribe?.stop()
         Session.set('messagesChannel', undefined)
     },
     targetedChannel() {

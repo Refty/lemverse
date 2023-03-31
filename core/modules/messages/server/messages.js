@@ -19,12 +19,25 @@ Meteor.startup(() => {
     })
 })
 
-Meteor.publish('messages', function (channel) {
+Meteor.publish('channelMessages', function (channel) {
     check(channel, String)
     if (!this.userId) return undefined
     if (!messagingAllowed(channel, this.userId)) throw new Meteor.Error('not-authorized', 'Access not allowed')
 
     return Messages.find({ channel }, { sort: { createdAt: -1 }, limit })
+})
+
+Meteor.publish('messages', () => {
+    const userId = Meteor.userId()
+
+    return Messages.find(
+        {
+            $or: [{ channel: { $regex: userId } }, { channel: { $eq: Meteor.users.findOne(userId)?.profile.levelId } }],
+            createdAt: { $gte: new Date() },
+            createdBy: { $ne: userId },
+        },
+        { sort: { createdAt: -1 }, limit }
+    )
 })
 
 Meteor.methods({
