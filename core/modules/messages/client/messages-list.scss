@@ -1,293 +1,293 @@
-@import "../../../client/variables";
+@import '../../../client/variables';
 
 .messages-module {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background-color: rgba($main-color, 0.95);
-  border-radius: $radius $radius 0 0;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s linear;
-  position: relative;
-
-  &.show {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .channel-name {
-    margin: 0;
-    padding: 0 15px;
-    text-align: left;
-    background-color: $main-color;
-    color: $main-text-color;
-    height: 45px;
-    line-height: 45px;
-  }
-
-  .js-message-list-close {
-    position: absolute;
-    right: 10px;
-    top: 13px;
-    appearance: none;
-    background: none;
-    border: 0;
-    cursor: pointer;
-    font-size: 1.2rem;
-    font-weight: 700;
-    line-height: 1;
-    opacity: 0.8;
-    color: white;
-    z-index: 10;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .actions {
-    position: absolute;
-    top: 10px;
-    right: 42px;
-
-    button {
-      cursor: pointer;
-      border-radius: $radius;
-      border: 0;
-      padding: 5px 10px;
-      color: white;
-      font-weight: bold;
-
-      &.js-channel-subscribe {
-        background-color: var(--secondary-color);
-
-        &:hover {
-          background-color: var(--secondary-color-darken-10);
-        }
-      }
-
-      &.js-channel-unsubscribe {
-        background-color: $light-red;
-
-        &:hover {
-          background-color: darken($light-red, 10%);
-        }
-      }
-
-      &.js-channel-mute {
-        background-color: var(--secondary-color);
-
-        &:hover {
-          background-color: var(--secondary-color-darken-10)
-        }
-      }
-
-      &.js-channel-unmute {
-        background-color: $light-red;
-
-        &:hover {
-          background-color: darken($light-red, 10%);
-        }
-      }
-    }
-  }
-
-  .messages-list {
-    height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 10px 10px 5px;
-    overflow-y: auto;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba($main-color, 0.95);
+    border-radius: $radius $radius 0 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s linear;
+    position: relative;
 
-    .separation-day {
-      position: relative;
-      height: 25px;
-      min-height: 25px;
-
-      &::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        height: 1px;
-        width: 100%;
-        transform: translateY(-50%);
-        background-color: $light-red;
-      }
-
-      .text {
-        color: $light-red;
-        text-align: center;
-        background-color: #343645;
-        z-index: 10;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        padding: 0 30px;
-        font-size: 0.9rem;
-      }
-    }
-
-    .js-message {
-      position: relative;
-      display: flex;
-      margin-top: 0;
-      color: $main-text-color;
-
-      +.js-message {
-        margin-top: 10px;
-      }
-
-      &:last-child {
-        margin-bottom: 10px;
-      }
-
-      .message-content {
-        width: 100%;
-
-        .files {
-          margin-top: 10px;
-          max-width: 100%;
-
-          img {
-            max-width: 100%;
-            max-height: 300px;
-          }
-        }
-
-        .reactions {
-          display: flex;
-          gap: 3px;
-          list-style-type: none;
-          padding: 5px 0 0;
-          margin: 0;
-
-          .reaction {
-            padding: 2px;
-            cursor: pointer;
-            box-sizing: border-box;
-            width: 40px;
-            border-radius: 1rem;
-            color: white;
-            text-align: center;
-            background-color: lighten($main-color, 20%);
-            user-select: none;
-            font-size: 0.9rem;
-
-            &.owner {
-              background-color: darken($light-blue, 10%);
-            }
-
-            &:hover {
-              background-color: $light-blue;
-            }
-          }
-        }
-      }
-
-      &:hover .action.show {
+    &.show {
         opacity: 1;
         pointer-events: all;
-      }
+    }
 
-      >div:first-child {
-        width: 45px;
-        min-width: 45px;
+    .channel-name {
+        margin: 0;
+        padding: 0 15px;
+        text-align: left;
+        background-color: $main-color;
+        color: $main-text-color;
         height: 45px;
-        margin-right: 10px;
-      }
+        line-height: 45px;
+    }
 
-      .actions-container {
-        .action {
-          position: absolute;
-          right: 0px;
-          top: 8px;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity 0.25s;
+    .js-message-list-close {
+        position: absolute;
+        right: 10px;
+        top: 13px;
+        appearance: none;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1;
+        opacity: 0.8;
+        color: white;
+        z-index: 10;
 
-          >button {
-            background-color: $light-blue;
-            color: white;
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            margin: 0;
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    .actions {
+        position: absolute;
+        top: 10px;
+        right: 42px;
+
+        button {
+            cursor: pointer;
+            border-radius: $radius;
             border: 0;
-            font-size: 0.9rem;
+            padding: 5px 10px;
+            color: white;
             font-weight: bold;
 
-            &:hover {
-              background-color: darken($light-blue, 10%);
+            &.js-channel-subscribe {
+                background-color: var(--secondary-color);
+
+                &:hover {
+                    background-color: var(--secondary-color-darken-10);
+                }
             }
-          }
-          &:nth-child(2) {
-            right: 40px;
-            >button {
-              background-color: $light-red;
 
-              &:hover {
-                background-color: darken($light-red, 20%);
-              }
+            &.js-channel-unsubscribe {
+                background-color: $light-red;
+
+                &:hover {
+                    background-color: darken($light-red, 10%);
+                }
             }
-          }
-          &:nth-child(3) {
-            right: 80px;
-            >button {
-              background-color: darken($light-red, 15%);
-              &:hover {
-                background-color: darken($light-red, 20%);
-              }
+
+            &.js-channel-mute {
+                background-color: var(--secondary-color);
+
+                &:hover {
+                    background-color: var(--secondary-color-darken-10);
+                }
             }
-          }
+
+            &.js-channel-unmute {
+                background-color: $light-red;
+
+                &:hover {
+                    background-color: darken($light-red, 10%);
+                }
+            }
         }
-      }
-
-      .avatar-viewer {
-        width: 70px;
-        height: 70px;
-        border-radius: $radius;
-        background-color: $main-color;
-
-        &:hover {
-          background-color: lighten($main-color, 20%);
-        }
-
-        .character-body-part-container {
-          transform: scale(0.7) translate(-1px, -28px);
-        }
-
-        .avatar::before {
-          width: 6px;
-          height: 6px;
-        }
-      }
-
-      .js-username {
-        cursor: pointer;
-        font-weight: 600;
-
-        &:hover {
-          color: darken(white, 20%);
-        }
-      }
-
-      .time {
-        cursor: pointer;
-        font-size: 0.75em;
-        color: darken($main-text-color, 10%);
-      }
-
-      .text {
-        margin: 0;
-        padding-top: 2px;
-
-        a {
-          color: $light-blue;
-        }
-      }
     }
-  }
+
+    .messages-list {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 10px 10px 5px;
+        overflow-y: auto;
+
+        .separation-day {
+            position: relative;
+            height: 25px;
+            min-height: 25px;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                height: 1px;
+                width: 100%;
+                transform: translateY(-50%);
+                background-color: $light-red;
+            }
+
+            .text {
+                color: $light-red;
+                text-align: center;
+                background-color: #343645;
+                z-index: 10;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                padding: 0 30px;
+                font-size: 0.9rem;
+            }
+        }
+
+        .js-message {
+            position: relative;
+            display: flex;
+            margin-top: 0;
+            color: $main-text-color;
+
+            + .js-message {
+                margin-top: 10px;
+            }
+
+            &:last-child {
+                margin-bottom: 10px;
+            }
+
+            .message-content {
+                width: 100%;
+
+                .files {
+                    margin-top: 10px;
+                    max-width: 100%;
+
+                    img {
+                        max-width: 100%;
+                        max-height: 300px;
+                    }
+                }
+
+                .reactions {
+                    display: flex;
+                    gap: 3px;
+                    list-style-type: none;
+                    padding: 5px 0 0;
+                    margin: 0;
+
+                    .reaction {
+                        padding: 2px;
+                        cursor: pointer;
+                        box-sizing: border-box;
+                        width: 40px;
+                        border-radius: 1rem;
+                        color: white;
+                        text-align: center;
+                        background-color: lighten($main-color, 20%);
+                        user-select: none;
+                        font-size: 0.9rem;
+
+                        &.owner {
+                            background-color: darken($light-blue, 10%);
+                        }
+
+                        &:hover {
+                            background-color: $light-blue;
+                        }
+                    }
+                }
+            }
+
+            &:hover .action.show {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            > div:first-child {
+                width: 45px;
+                min-width: 45px;
+                height: 45px;
+                margin-right: 10px;
+            }
+
+            .actions-container {
+                .action {
+                    position: absolute;
+                    right: 0px;
+                    top: 8px;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.25s;
+
+                    > button {
+                        background-color: $light-blue;
+                        color: white;
+                        width: 30px;
+                        height: 30px;
+                        padding: 0;
+                        margin: 0;
+                        border: 0;
+                        font-size: 0.9rem;
+                        font-weight: bold;
+
+                        &:hover {
+                            background-color: darken($light-blue, 10%);
+                        }
+                    }
+                    &:nth-child(2) {
+                        right: 40px;
+                        > button {
+                            background-color: $light-red;
+
+                            &:hover {
+                                background-color: darken($light-red, 20%);
+                            }
+                        }
+                    }
+                    &:nth-child(3) {
+                        right: 80px;
+                        > button {
+                            background-color: darken($light-red, 15%);
+                            &:hover {
+                                background-color: darken($light-red, 20%);
+                            }
+                        }
+                    }
+                }
+            }
+
+            .avatar-viewer {
+                width: 70px;
+                height: 70px;
+                border-radius: $radius;
+                background-color: $main-color;
+
+                &:hover {
+                    background-color: lighten($main-color, 20%);
+                }
+
+                .character-body-part-container {
+                    transform: scale(0.7) translate(-1px, -28px);
+                }
+
+                .avatar::before {
+                    width: 6px;
+                    height: 6px;
+                }
+            }
+
+            .js-username {
+                cursor: pointer;
+                font-weight: 600;
+
+                &:hover {
+                    color: darken(white, 20%);
+                }
+            }
+
+            .time {
+                cursor: pointer;
+                font-size: 0.75em;
+                color: darken($main-text-color, 10%);
+            }
+
+            .text {
+                margin: 0;
+                padding-top: 2px;
+
+                a {
+                    color: $light-blue;
+                }
+            }
+        }
+    }
 }

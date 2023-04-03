@@ -1,45 +1,45 @@
-@import "../_variables";
+@import '../_variables';
 
 .invitation-url-field {
-  display: flex;
-  flex-direction: column;
-  margin: 10px 10px 25px;
-  background-color: #1e2029;
-  padding: 20px;
-  border-radius: 5px;
-  gap: 5px;
-
-  label {
-    font-size: 0.9rem;
-  }
-
-  input {
-    border-radius: $radius 0 0 $radius;
-  }
-
-  .field-content {
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+    flex-direction: column;
+    margin: 10px 10px 25px;
+    background-color: #1e2029;
+    padding: 20px;
+    border-radius: 5px;
+    gap: 5px;
 
-  button {
-    border-radius: 0 $radius $radius 0;
-    width: 145px;
-    margin-top: 5px;
-
-    @include media-max("phone-down") {
-      width: 45px;
-
-      .text {
-        display: none;
-      }
+    label {
+        font-size: 0.9rem;
     }
 
-    svg {
-      width: 18px;
-      height: 18px;
-      transform: translate(-2px, 3px);
+    input {
+        border-radius: $radius 0 0 $radius;
     }
-  }
+
+    .field-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button {
+        border-radius: 0 $radius $radius 0;
+        width: 145px;
+        margin-top: 5px;
+
+        @include media-max('phone-down') {
+            width: 45px;
+
+            .text {
+                display: none;
+            }
+        }
+
+        svg {
+            width: 18px;
+            height: 18px;
+            transform: translate(-2px, 3px);
+        }
+    }
 }

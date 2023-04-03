@@ -1,203 +1,216 @@
 const modes = Object.freeze({
-  mine: 'mine',
-  completed: 'completed',
-});
+    mine: 'mine',
+    completed: 'completed',
+})
 
-const onConsoleClosed = () => Session.set('quests', undefined);
+const onConsoleClosed = () => Session.set('quests', undefined)
 
-const selectQuest = questId => {
-  Session.set('selectedQuestId', questId);
-  messagesModule.changeMessagesChannel(questId);
-};
+const selectQuest = (questId) => {
+    Session.set('selectedQuestId', questId)
+    messagesModule.changeMessagesChannel(questId)
+}
 
-const quests = mode => {
-  let filters = {};
-  if (mode === modes.mine) {
-    filters = {
-      $or: [
-        { createdBy: Meteor.userId() },
-        { targets: Meteor.userId() },
-        { targets: { $size: 0 } },
-      ],
-      completed: { $exists: false },
-    };
-  } else if (mode === modes.completed) {
-    filters = {
-      $or: [
-        { targets: Meteor.userId() },
-        { createdBy: Meteor.userId() },
-      ],
-      completed: true,
-    };
-  }
-
-  const allQuests = Quests.find(filters, { sort: { createdAt: -1 } }).fetch();
-  return _.groupBy(allQuests, qst => (qst.origin.includes('ent_') ? qst.origin : 'mine'));
-};
-
-const autoSelectQuest = template => {
-  const selectedQuestId = Session.get('quests')?.selectedQuestId || '';
-  if (selectedQuestId.includes('qst_')) selectQuest(selectedQuestId);
-  else {
-    const allQuests = quests(template.questListMode.get());
-    const firstQuest = Object.keys(allQuests).length ? Object.values(allQuests)[0][0] : undefined;
-    if (firstQuest) selectQuest(firstQuest._id);
-    else {
-      messagesModule.stopListeningMessagesChannel();
-      Session.set('selectedQuestId', undefined);
+const quests = (mode) => {
+    let filters = {}
+    if (mode === modes.mine) {
+        filters = {
+            $or: [{ createdBy: Meteor.userId() }, { targets: Meteor.userId() }, { targets: { $size: 0 } }],
+            completed: { $exists: false },
+        }
+    } else if (mode === modes.completed) {
+        filters = {
+            $or: [{ targets: Meteor.userId() }, { createdBy: Meteor.userId() }],
+            completed: true,
+        }
     }
-  }
 
-  // auto switch quest-list mode
-  if (selectedQuestId) {
-    const quest = Quests.findOne(selectedQuestId);
+    const allQuests = Quests.find(filters, { sort: { createdAt: -1 } }).fetch()
+    return _.groupBy(allQuests, (qst) => (qst.origin.includes('ent_') ? qst.origin : 'mine'))
+}
 
-    let mode = modes.mine;
-    if (!quest) mode = modes.mine;
-    else if (quest.completed) mode = modes.completed;
-    else if (!quest.targets.length) mode = modes.mine;
-    template.questListMode.set(mode);
-  }
-};
+const autoSelectQuest = (template) => {
+    const selectedQuestId = Session.get('quests')?.selectedQuestId || ''
+    if (selectedQuestId.includes('qst_')) selectQuest(selectedQuestId)
+    else {
+        const allQuests = quests(template.questListMode.get())
+        const firstQuest = Object.keys(allQuests).length ? Object.values(allQuests)[0][0] : undefined
+        if (firstQuest) selectQuest(firstQuest._id)
+        else {
+            messagesModule.stopListeningMessagesChannel()
+            Session.set('selectedQuestId', undefined)
+        }
+    }
+
+    // auto switch quest-list mode
+    if (selectedQuestId) {
+        const quest = Quests.findOne(selectedQuestId)
+
+        let mode = modes.mine
+        if (!quest) mode = modes.mine
+        else if (quest.completed) mode = modes.completed
+        else if (!quest.targets.length) mode = modes.mine
+        template.questListMode.set(mode)
+    }
+}
 
 const draftQuestId = () => {
-  const selectedQuestId = Session.get('quests')?.selectedQuestId;
-  if (!selectedQuestId) return undefined;
-  if (Quests.findOne(selectedQuestId)) return undefined;
+    const selectedQuestId = Session.get('quests')?.selectedQuestId
+    if (!selectedQuestId) return undefined
+    if (Quests.findOne(selectedQuestId)) return undefined
 
-  return selectedQuestId;
-};
+    return selectedQuestId
+}
 
-const beforeSendingMessage = e => {
-  const { channel } = e.detail;
-  if (!channel.includes('qst_') || !Session.get('quests')) return;
+const beforeSendingMessage = (e) => {
+    const { channel } = e.detail
+    if (!channel.includes('qst_') || !Session.get('quests')) return
 
-  const quest = Quests.findOne(channel);
-  if (quest) return;
-  const name = document.querySelector('.js-quest-name')?.value;
+    const quest = Quests.findOne(channel)
+    if (quest) return
+    const name = document.querySelector('.js-quest-name')?.value
 
-  Quests.insert({
-    _id: channel,
-    origin: Session.get('quests').origin,
-    targets: Session.get('quests').targets || [],
-    createdAt: new Date(),
-    createdBy: Meteor.userId(),
-    name,
-  });
-};
+    Quests.insert({
+        _id: channel,
+        origin: Session.get('quests').origin,
+        targets: Session.get('quests').targets || [],
+        createdAt: new Date(),
+        createdBy: Meteor.userId(),
+        name,
+    })
+}
 
-const entityName = (entityId, defaultName = 'Entity') => Entities.findOne(entityId)?.name || defaultName;
+const entityName = (entityId, defaultName = 'Entity') => Entities.findOne(entityId)?.name || defaultName
 
-createQuestDraft = (targets, origin) => Session.set('quests', { selectedQuestId: Quests.id(), targets, origin });
+createQuestDraft = (targets, origin) => Session.set('quests', { selectedQuestId: Quests.id(), targets, origin })
 
 Template.questsList.events({
-  'click .js-quest'(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    selectQuest(event.currentTarget.dataset.questId);
-  },
-  'click .js-quest-switch-mode'(event, templateInstance) {
-    event.preventDefault();
-    event.stopPropagation();
-    Session.set('quests', { origin: 'menu' });
+    'click .js-quest': function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        selectQuest(event.currentTarget.dataset.questId)
+    },
+    'click .js-quest-switch-mode': function (event, templateInstance) {
+        event.preventDefault()
+        event.stopPropagation()
+        Session.set('quests', { origin: 'menu' })
 
-    const { mode } = event.target.dataset;
-    templateInstance.questListMode.set(modes[mode] || modes.mine);
-    autoSelectQuest(templateInstance);
-  },
-});
+        const { mode } = event.target.dataset
+        templateInstance.questListMode.set(modes[mode] || modes.mine)
+        autoSelectQuest(templateInstance)
+    },
+})
 
 Template.questsList.onCreated(function () {
-  Session.set('quests', undefined);
-  Session.set('selectedQuestId', undefined);
-  this.questListMode = new ReactiveVar(modes.mine);
-  this.userSubscribeHandler = undefined;
-  this.questSubscribeHandler = undefined;
+    Session.set('quests', undefined)
+    Session.set('selectedQuestId', undefined)
+    this.questListMode = new ReactiveVar(modes.mine)
+    this.userSubscribeHandler = undefined
+    this.questSubscribeHandler = undefined
 
-  this.autorun(() => {
-    if (!Session.get('quests')) {
-      this.userSubscribeHandler?.stop();
-      this.questSubscribeHandler?.stop();
-      Session.set('selectedQuestId', undefined);
-      return;
-    }
+    this.autorun(() => {
+        if (!Session.get('quests')) {
+            this.userSubscribeHandler?.stop()
+            this.questSubscribeHandler?.stop()
+            Session.set('selectedQuestId', undefined)
+            return
+        }
 
-    Tracker.nonreactive(() => {
-      openConsole();
-      messagesModule.stopListeningMessagesChannel();
+        Tracker.nonreactive(() => {
+            openConsole()
+            messagesModule.stopListeningMessagesChannel()
 
-      this.questSubscribeHandler = this.subscribe('quests', () => {
-        const userIds = Quests.find().fetch().flatMap(quest => [quest.createdBy, ...(quest.targets || [])]).filter(Boolean);
-        if (userIds?.length) this.userSubscribeHandler = this.subscribe('usernames', [...new Set(userIds)]);
+            this.questSubscribeHandler = this.subscribe('quests', () => {
+                const userIds = Quests.find()
+                    .fetch()
+                    .flatMap((quest) => [quest.createdBy, ...(quest.targets || [])])
+                    .filter(Boolean)
+                if (userIds?.length) this.userSubscribeHandler = this.subscribe('usernames', [...new Set(userIds)])
 
-        autoSelectQuest(this);
-      });
-    });
-  });
+                autoSelectQuest(this)
+            })
+        })
+    })
 
-  window.addEventListener(eventTypes.consoleClosed, onConsoleClosed);
-  window.addEventListener(eventTypes.beforeSendingMessage, beforeSendingMessage);
-});
+    window.addEventListener(eventTypes.consoleClosed, onConsoleClosed)
+    window.addEventListener(eventTypes.beforeSendingMessage, beforeSendingMessage)
+})
 
 Template.questsList.onDestroyed(() => {
-  Session.set('quests', undefined);
-  window.removeEventListener(eventTypes.consoleClosed, onConsoleClosed);
-  window.removeEventListener(eventTypes.beforeSendingMessage, beforeSendingMessage);
-});
+    Session.set('quests', undefined)
+    window.removeEventListener(eventTypes.consoleClosed, onConsoleClosed)
+    window.removeEventListener(eventTypes.beforeSendingMessage, beforeSendingMessage)
+})
 
 Template.questsList.helpers({
-  show() { return Session.get('quests'); },
-  questsCategorized() {
-    const mode = Template.instance().questListMode.get();
-    const categoryDefaultName = mode === modes.completed ? 'Done' : 'My quests';
-    const questsArray = quests(mode);
-    const categorizedQuests = Object.entries(questsArray).map(([key, value]) => ({ name: entityName(key, categoryDefaultName), count: value.length, quests: value, order: key === 'mine' ? -1 : 0 }));
+    show() {
+        return Session.get('quests')
+    },
+    questsCategorized() {
+        const mode = Template.instance().questListMode.get()
+        const categoryDefaultName = mode === modes.completed ? 'Done' : 'My quests'
+        const questsArray = quests(mode)
+        const categorizedQuests = Object.entries(questsArray).map(([key, value]) => ({
+            name: entityName(key, categoryDefaultName),
+            count: value.length,
+            quests: value,
+            order: key === 'mine' ? -1 : 0,
+        }))
 
-    return categorizedQuests.sort((a, b) => a.order - b.order);
-  },
-  isActiveMode(mode) { return Template.instance().questListMode.get() === mode; },
-  newQuest() {
-    const questId = draftQuestId();
-    if (!questId) return undefined;
+        return categorizedQuests.sort((a, b) => a.order - b.order)
+    },
+    isActiveMode(mode) {
+        return Template.instance().questListMode.get() === mode
+    },
+    newQuest() {
+        const questId = draftQuestId()
+        if (!questId) return undefined
 
-    const { targets, origin } = Session.get('quests');
-    if (!targets || targets.length === 0) return entityName(origin);
+        const { targets, origin } = Session.get('quests')
+        if (!targets || targets.length === 0) return entityName(origin)
 
-    if (!targets.length) return undefined;
+        if (!targets.length) return undefined
 
-    const userId = targets[0];
-    if (!userId?.includes('usr_')) return undefined;
+        const userId = targets[0]
+        if (!userId?.includes('usr_')) return undefined
 
-    return Meteor.users.findOne(userId)?.profile.name || 'New quest';
-  },
-  draftQuestId() { return draftQuestId(); },
-  questListModeIsActive(mode) { return Template.instance().questListMode.get() === mode; },
-  draftQuestSelected() { return Session.get('selectedQuestId') === draftQuestId(); },
-  questSelected() { return Session.get('selectedQuestId') === this._id; },
-  questHasUpdates() {
-    const notification = Notifications.findOne({ channelId: this._id });
-    if (!notification) return false;
+        return Meteor.users.findOne(userId)?.profile.name || 'New quest'
+    },
+    draftQuestId() {
+        return draftQuestId()
+    },
+    questListModeIsActive(mode) {
+        return Template.instance().questListMode.get() === mode
+    },
+    draftQuestSelected() {
+        return Session.get('selectedQuestId') === draftQuestId()
+    },
+    questSelected() {
+        return Session.get('selectedQuestId') === this._id
+    },
+    questHasUpdates() {
+        const notification = Notifications.findOne({ channelId: this._id })
+        if (!notification) return false
 
-    return !notification.read;
-  },
-});
+        return !notification.read
+    },
+})
 
 Template.questListEntry.helpers({
-  title() {
-    if (this.name) return this.name;
+    title() {
+        if (this.name) return this.name
 
-    const fromEntity = this.origin.includes('ent_');
-    if (this.createdBy !== Meteor.userId()) {
-      if (fromEntity) return entityName(this.origin);
-      else return Meteor.users.findOne(this.createdBy)?.profile.name || '[deleted]';
-    }
+        const fromEntity = this.origin.includes('ent_')
+        if (this.createdBy !== Meteor.userId()) {
+            if (fromEntity) return entityName(this.origin)
+            return Meteor.users.findOne(this.createdBy)?.profile.name || '[deleted]'
+        }
 
-    if (fromEntity) return `> ${entityName(this.origin)}`;
-    else if (this.targets?.length === 1) return `> ${Meteor.users.findOne(this.targets[0])?.profile.name || '[deleted]'}`;
-    else return `> ${this.targets.length} users`;
-  },
-  user() {
-    if (this.createdBy === Meteor.userId()) return Meteor.user();
-    return Meteor.users.findOne(this.createdBy);
-  },
-});
+        if (fromEntity) return `> ${entityName(this.origin)}`
+        if (this.targets?.length === 1) return `> ${Meteor.users.findOne(this.targets[0])?.profile.name || '[deleted]'}`
+        return `> ${this.targets.length} users`
+    },
+    user() {
+        if (this.createdBy === Meteor.userId()) return Meteor.user()
+        return Meteor.users.findOne(this.createdBy)
+    },
+})

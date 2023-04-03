@@ -1,192 +1,295 @@
-import FileType from 'file-type';
-import '../collections';
-import gm from 'gm';
-import { favicons } from 'favicons';
-import { fileOnBeforeUpload } from '../lib/misc';
+import FileType from 'file-type'
+import '../collections'
+import gm from 'gm'
+import { favicons } from 'favicons'
+import { fileOnBeforeUpload } from '../lib/misc'
 
 const faviconsConfiguration = {
-  appName: 'lemverse',
-  icons: {
-    android: false,
-    appleIcon: ['apple-touch-icon.png'],
-    appleStartup: false,
-    favicons: ['favicon-16x16.png', 'favicon-32x32.png'],
-    windows: false,
-    yandex: false,
-  },
-};
+    appName: 'lemverse',
+    icons: {
+        android: false,
+        appleIcon: ['apple-touch-icon.png'],
+        appleStartup: false,
+        favicons: ['favicon-16x16.png', 'favicon-32x32.png'],
+        windows: false,
+        yandex: false,
+    },
+}
 
 const filesAfterUploadEditorTileset = (user, fileRef) => {
-  log('filesAfterUploadEditorTileset: start', { userId: user._id, fileRef });
-  if (!/png|jpe?g/i.test(fileRef.extension || '')) return;
+    log('filesAfterUploadEditorTileset: start', { userId: user._id, fileRef })
+    if (!/png|jpe?g/i.test(fileRef.extension || '')) return
 
-  // Only Admin can upload files
-  if (!user?.roles?.admin) { error('filesAfterUploadEditorTileset: someone unauthorized tried to do an action', { userId: user._id, fileRef }); return; }
-
-  // Retrieve size
-  let image;
-  try {
-    image = gm(fileRef.path);
-  } catch (err) {
-    error('filesAfterUploadEditorTileset: error with GraphicsMagick', { userId: user._id, fileRef, err });
-    if (fileRef?._id) Files.remove({ _id: fileRef._id });
-    return;
-  }
-  const size = lp.syncApi(image.size, image);
-  const { width, height } = size;
-
-  const existingTileset = Tilesets.findOne({ fileName: fileRef.name });
-
-  if (existingTileset?._id) {
-    // Update
-    log('filesAfterUploadEditorTileset: update the tileset', { userId: user._id, tilesetId: existingTileset._id, fileId: fileRef._id });
-    Tilesets.update({ _id: existingTileset._id }, { $set: { height, width, fileId: fileRef._id } });
-  } else {
-    // Create
-    log('filesAfterUploadEditorTileset: create a new tileset', { userId: user._id, fileId: fileRef._id });
-
-    const newId = Tilesets.id();
-    Tilesets.insert({ _id: newId, createdAt: new Date(), createdBy: user._id, name: fileRef.name, gid: fileRef.meta.gid, height, width, fileId: fileRef._id, fileName: fileRef.name });
-
-    log('filesAfterUploadEditorTileset: created tileset', { userId: user._id, tilesetId: newId });
-  }
-};
-
-const filesAfterUploadEditorCharacter = (user, fileRef) => {
-  log('filesAfterUploadEditorCharacter: start', { userId: user._id, fileRef });
-  if (!/png|jpe?g/i.test(fileRef.extension || '')) return;
-
-  // Only Admin can upload files
-  if (!user?.roles?.admin) { error('filesAfterUploadEditorCharacter: someone unauthorized tried to do an action', { userId: user._id, fileRef }); return; }
-
-  // Retrieve size
-  let image;
-  try {
-    image = gm(fileRef.path);
-  } catch (err) {
-    error('filesAfterUploadEditorCharacter: error with GraphicsMagick', { userId: user._id, fileRef, err });
-    if (fileRef?._id) Files.remove({ _id: fileRef._id });
-    return;
-  }
-  const size = lp.syncApi(image.size, image);
-  const { formats, frameHeight, frameWidth } = Meteor.settings.public.assets.character;
-  const { width, height } = size;
-
-  if (!formats[`w-${width}`]) {
-    Files.remove({ _id: fileRef._id });
-    error('filesAfterUploadEditorCharacter: image in wrong format', { userId: user._id, fileRef, width, height, frameHeight, frameWidth, formats: Object.keys(formats) });
-    return;
-  }
-
-  if (height % frameHeight !== 0) log(`filesAfterUploadEditorCharacter: image height is invalid, last frames couldn't appear`, { userId: user._id, fileRef, width, height, frameHeight, frameWidth, formats: Object.keys(formats) });
-  if (width % frameWidth !== 0) log(`filesAfterUploadEditorCharacter: image width is invalid, last frames couldn't appear`, { userId: user._id, fileRef, width, height, frameHeight, frameWidth, formats: Object.keys(formats) });
-
-  const existingCharacters = Characters.findOne({ fileName: fileRef.name });
-
-  if (existingCharacters?._id) {
-    // Update
-    log('filesAfterUploadEditorCharacter: update the character sheet', { userId: user._id, tilesetId: existingCharacters._id, fileId: fileRef._id });
-    Characters.update({ _id: existingCharacters._id }, { $set: { height, width, fileId: fileRef._id } });
-  } else {
-    // Create
-    log('filesAfterUploadEditorCharacter: create a character sheet', { userId: user._id, fileId: fileRef._id });
-
-    const newId = Characters.id();
-    Characters.insert({ _id: newId, createdAt: new Date(), createdBy: user._id, height, width, fileId: fileRef._id, fileName: fileRef.name });
-
-    log('filesAfterUploadEditorCharacter: created character sheet', { userId: user._id, tilesetId: newId });
-  }
-};
-
-const filesAfterUploadVoiceRecorder = (user, fileRef) => {
-  log('filesAfterUploadVoiceRecorder: start', { userId: user._id, fileRef });
-  if (!/webm|ogg|mp4/i.test(fileRef.extension || '')) return;
-
-  const { userIds } = fileRef.meta;
-  if (!userIds.length) return;
-
-  const notifications = userIds.map(userId => ({
-    _id: Notifications.id(),
-    userId,
-    fileId: fileRef._id,
-    type: 'vocal',
-    createdAt: new Date(),
-    createdBy: user._id,
-  }));
-  Notifications.rawCollection().insertMany(notifications);
-
-  log('filesAfterUploadVoiceRecorder: done', { userId: user._id });
-};
-
-const filesAfterUploadAsset = async (user, fileRef) => {
-  log('filesAfterUploadAsset: start', { userId: user._id, fileRef });
-
-  if (fileRef.extension === 'json') {
-    if (!spritesheetValid(fileRef)) throw new Meteor.Error('invalid-spritesheet', 'invalid sprite sheet format');
-
-    const existingAsset = Assets.findOne({ fileName: fileRef.name });
-    if (existingAsset) {
-      log('filesAfterUploadAsset: updating', { userId: user._id, assetId: existingAsset._id, fileId: fileRef._id });
-      Assets.update(existingAsset._id, { $set: { fileId: fileRef._id, updatedAt: new Date() } });
-    } else {
-      log('filesAfterUploadAsset: creating new asset', { userId: user._id, fileId: fileRef._id });
-      const assetId = Assets.id();
-      Assets.insert({
-        _id: assetId,
-        createdAt: new Date(),
-        createdBy: user._id,
-        fileId: fileRef._id,
-        fileName: fileRef.name,
-        type: 'spritesheet',
-      });
-      log('filesAfterUploadAsset: created', { userId: user._id, assetId });
+    // Only Admin can upload files
+    if (!user?.roles?.admin) {
+        error('filesAfterUploadEditorTileset: someone unauthorized tried to do an action', {
+            userId: user._id,
+            fileRef,
+        })
+        return
     }
 
-    rewriteSpritesheet(fileRef);
-    importSpritesheetFramesAsEntities(fileRef);
-  }
+    // Retrieve size
+    let image
+    try {
+        image = gm(fileRef.path)
+    } catch (err) {
+        error('filesAfterUploadEditorTileset: error with GraphicsMagick', {
+            userId: user._id,
+            fileRef,
+            err,
+        })
+        if (fileRef?._id) Files.remove({ _id: fileRef._id })
+        return
+    }
+    const size = lp.syncApi(image.size, image)
+    const { width, height } = size
 
-  log('filesAfterUploadAsset: done', { userId: user._id });
-};
+    const existingTileset = Tilesets.findOne({ fileName: fileRef.name })
 
+    if (existingTileset?._id) {
+        // Update
+        log('filesAfterUploadEditorTileset: update the tileset', {
+            userId: user._id,
+            tilesetId: existingTileset._id,
+            fileId: fileRef._id,
+        })
+        Tilesets.update({ _id: existingTileset._id }, { $set: { height, width, fileId: fileRef._id } })
+    } else {
+        // Create
+        log('filesAfterUploadEditorTileset: create a new tileset', {
+            userId: user._id,
+            fileId: fileRef._id,
+        })
 
-const filesAfterUploadFavicon = async fileRef => {
-  log('filesAfterUploadFavicon: start', { fileRef });
+        const newId = Tilesets.id()
+        Tilesets.insert({
+            _id: newId,
+            createdAt: new Date(),
+            createdBy: user._id,
+            name: fileRef.name,
+            gid: fileRef.meta.gid,
+            height,
+            width,
+            fileId: fileRef._id,
+            fileName: fileRef.name,
+        })
 
-  const response = await favicons(fileRef.path, faviconsConfiguration);
-  const allFiles = response.images.concat(response.files);
+        log('filesAfterUploadEditorTileset: created tileset', {
+            userId: user._id,
+            tilesetId: newId,
+        })
+    }
+}
 
-  // fileId can't contain file extension + special characters like '-'
-  allFiles.forEach(image => Files.write(image.contents, { fileName: image.name, fileId: image.name.split('.')[0].replace('-', '') }, () => {}, true));
+const filesAfterUploadEditorCharacter = (user, fileRef) => {
+    log('filesAfterUploadEditorCharacter: start', { userId: user._id, fileRef })
+    if (!/png|jpe?g/i.test(fileRef.extension || '')) return
 
-  log('filesAfterUploadFavicon: done', { fileRef });
-};
+    // Only Admin can upload files
+    if (!user?.roles?.admin) {
+        error('filesAfterUploadEditorCharacter: someone unauthorized tried to do an action', {
+            userId: user._id,
+            fileRef,
+        })
+        return
+    }
+
+    // Retrieve size
+    let image
+    try {
+        image = gm(fileRef.path)
+    } catch (err) {
+        error('filesAfterUploadEditorCharacter: error with GraphicsMagick', {
+            userId: user._id,
+            fileRef,
+            err,
+        })
+        if (fileRef?._id) Files.remove({ _id: fileRef._id })
+        return
+    }
+    const size = lp.syncApi(image.size, image)
+    const { formats, frameHeight, frameWidth } = Meteor.settings.public.assets.character
+    const { width, height } = size
+
+    if (!formats[`w-${width}`]) {
+        Files.remove({ _id: fileRef._id })
+        error('filesAfterUploadEditorCharacter: image in wrong format', {
+            userId: user._id,
+            fileRef,
+            width,
+            height,
+            frameHeight,
+            frameWidth,
+            formats: Object.keys(formats),
+        })
+        return
+    }
+
+    if (height % frameHeight !== 0)
+        log(`filesAfterUploadEditorCharacter: image height is invalid, last frames couldn't appear`, {
+            userId: user._id,
+            fileRef,
+            width,
+            height,
+            frameHeight,
+            frameWidth,
+            formats: Object.keys(formats),
+        })
+    if (width % frameWidth !== 0)
+        log(`filesAfterUploadEditorCharacter: image width is invalid, last frames couldn't appear`, {
+            userId: user._id,
+            fileRef,
+            width,
+            height,
+            frameHeight,
+            frameWidth,
+            formats: Object.keys(formats),
+        })
+
+    const existingCharacters = Characters.findOne({ fileName: fileRef.name })
+
+    if (existingCharacters?._id) {
+        // Update
+        log('filesAfterUploadEditorCharacter: update the character sheet', {
+            userId: user._id,
+            tilesetId: existingCharacters._id,
+            fileId: fileRef._id,
+        })
+        Characters.update({ _id: existingCharacters._id }, { $set: { height, width, fileId: fileRef._id } })
+    } else {
+        // Create
+        log('filesAfterUploadEditorCharacter: create a character sheet', {
+            userId: user._id,
+            fileId: fileRef._id,
+        })
+
+        const newId = Characters.id()
+        Characters.insert({
+            _id: newId,
+            createdAt: new Date(),
+            createdBy: user._id,
+            height,
+            width,
+            fileId: fileRef._id,
+            fileName: fileRef.name,
+        })
+
+        log('filesAfterUploadEditorCharacter: created character sheet', {
+            userId: user._id,
+            tilesetId: newId,
+        })
+    }
+}
+
+const filesAfterUploadVoiceRecorder = (user, fileRef) => {
+    log('filesAfterUploadVoiceRecorder: start', { userId: user._id, fileRef })
+    if (!/webm|ogg|mp4/i.test(fileRef.extension || '')) return
+
+    const { userIds } = fileRef.meta
+    if (!userIds.length) return
+
+    const notifications = userIds.map((userId) => ({
+        _id: Notifications.id(),
+        userId,
+        fileId: fileRef._id,
+        type: 'vocal',
+        createdAt: new Date(),
+        createdBy: user._id,
+    }))
+    Notifications.rawCollection().insertMany(notifications)
+
+    log('filesAfterUploadVoiceRecorder: done', { userId: user._id })
+}
+
+const filesAfterUploadAsset = async (user, fileRef) => {
+    log('filesAfterUploadAsset: start', { userId: user._id, fileRef })
+
+    if (fileRef.extension === 'json') {
+        if (!spritesheetValid(fileRef)) throw new Meteor.Error('invalid-spritesheet', 'invalid sprite sheet format')
+
+        const existingAsset = Assets.findOne({ fileName: fileRef.name })
+        if (existingAsset) {
+            log('filesAfterUploadAsset: updating', {
+                userId: user._id,
+                assetId: existingAsset._id,
+                fileId: fileRef._id,
+            })
+            Assets.update(existingAsset._id, {
+                $set: { fileId: fileRef._id, updatedAt: new Date() },
+            })
+        } else {
+            log('filesAfterUploadAsset: creating new asset', {
+                userId: user._id,
+                fileId: fileRef._id,
+            })
+            const assetId = Assets.id()
+            Assets.insert({
+                _id: assetId,
+                createdAt: new Date(),
+                createdBy: user._id,
+                fileId: fileRef._id,
+                fileName: fileRef.name,
+                type: 'spritesheet',
+            })
+            log('filesAfterUploadAsset: created', { userId: user._id, assetId })
+        }
+
+        rewriteSpritesheet(fileRef)
+        importSpritesheetFramesAsEntities(fileRef)
+    }
+
+    log('filesAfterUploadAsset: done', { userId: user._id })
+}
+
+const filesAfterUploadFavicon = async (fileRef) => {
+    log('filesAfterUploadFavicon: start', { fileRef })
+
+    const response = await favicons(fileRef.path, faviconsConfiguration)
+    const allFiles = response.images.concat(response.files)
+
+    // fileId can't contain file extension + special characters like '-'
+    allFiles.forEach((image) =>
+        Files.write(
+            image.contents,
+            {
+                fileName: image.name,
+                fileId: image.name.split('.')[0].replace('-', ''),
+            },
+            () => {},
+            true
+        )
+    )
+
+    log('filesAfterUploadFavicon: done', { fileRef })
+}
 
 Files.onBeforeUpload = function (file) {
-  if (this.eof) {
-    const { mime } = Promise.await(FileType.fromFile(file.path)) || file; // fallback to default mime for non binary-based file
+    if (this.eof) {
+        const { mime } = Promise.await(FileType.fromFile(file.path)) || file // fallback to default mime for non binary-based file
 
-    const fileValid = fileOnBeforeUpload(file, mime);
-    if (!fileValid) return fileValid;
-    if (file.meta?.source === 'editor-assets' && mime === 'application/json') return Promise.await(spritesheetValid(file));
-  }
+        const fileValid = fileOnBeforeUpload(file, mime)
+        if (!fileValid) return fileValid
+        if (file.meta?.source === 'editor-assets' && mime === 'application/json')
+            return Promise.await(spritesheetValid(file))
+    }
 
-  return true;
-};
+    return true
+}
 
-Files.on('afterUpload', fileRef => {
-  const source = fileRef.meta?.source;
-  const user = source !== 'favicon' && Meteor.users.findOne(fileRef.userId);
-  log('FilesCollection: afterUpload start', { userId: user?._id, fileRef });
+Files.on('afterUpload', (fileRef) => {
+    const source = fileRef.meta?.source
+    const user = source !== 'favicon' && Meteor.users.findOne(fileRef.userId)
+    log('FilesCollection: afterUpload start', { userId: user?._id, fileRef })
 
-  if (source === 'editor-assets') filesAfterUploadAsset(user, fileRef);
-  else if (source === 'editor-characters') filesAfterUploadEditorCharacter(user, fileRef);
-  else if (source === 'editor-tilesets') filesAfterUploadEditorTileset(user, fileRef);
-  else if (source === 'voice-recorder') filesAfterUploadVoiceRecorder(user, fileRef);
-  else if (source === 'favicon') filesAfterUploadFavicon(fileRef);
-});
+    if (source === 'editor-assets') filesAfterUploadAsset(user, fileRef)
+    else if (source === 'editor-characters') filesAfterUploadEditorCharacter(user, fileRef)
+    else if (source === 'editor-tilesets') filesAfterUploadEditorTileset(user, fileRef)
+    else if (source === 'voice-recorder') filesAfterUploadVoiceRecorder(user, fileRef)
+    else if (source === 'favicon') filesAfterUploadFavicon(fileRef)
+})
 
-Meteor.publish('files', fileIds => {
-  check(fileIds, [String]);
-  return Files.find({ _id: { $in: fileIds } }).cursor;
-});
+Meteor.publish('files', (fileIds) => {
+    check(fileIds, [String])
+    return Files.find({ _id: { $in: fileIds } }).cursor
+})

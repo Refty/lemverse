@@ -1,37 +1,35 @@
 <template name="userProfile">
-  {{#modal title=title}}
+    {{#modal title=title}}
     <div class="header">
-      <h2 class="h2">
-        <span class="js-title">{{title}}</span>
-        {{#unless myProfile}}
-        <div class="tooltip">
-          <button type="button" class="emoji-before-tooltip js-report">🚨</button>
-          <span class="tooltiptext">Report</span>
-        </div>
-        {{/unless}}
-      </h2>
-      <hr class="separator">
+        <h2 class="h2">
+            <span class="js-title">{{title}}</span>
+            {{#unless myProfile}}
+            <div class="tooltip">
+                <button type="button" class="emoji-before-tooltip js-report">🚨</button>
+                <span class="tooltiptext">Report</span>
+            </div>
+            {{/unless}}
+        </h2>
+        <hr class="separator" />
     </div>
     <div class="user-profile">
-      <div class="content container">
-        <div>
-          <label for="team" class="label">Team</label>
-          {{or guild "-"}}
+        <div class="content container">
+            <div>
+                <label for="team" class="label">Team</label>
+                {{or guild "-"}}
+            </div>
+            <div>
+                <label for="website" class="label">Website</label>
+                {{#if website}}
+                <a target="_blank" class="website-link" href="{{website}}" rel="noopener">{{website}}</a>
+                {{else}} - {{/if}}
+            </div>
+            <div>
+                <label for="bio" class="label">Bio/Hobbies</label>
+                {{or profile.bio "-"}}
+            </div>
         </div>
-        <div>
-          <label for="website" class="label">Website</label>
-          {{#if website}}
-            <a target="_blank" class="website-link" href="{{website}}" rel="noopener">{{website}}</a>
-          {{else}}
-            -
-          {{/if}}
-        </div>
-        <div>
-          <label for="bio" class="label">Bio/Hobbies</label>
-          {{or profile.bio "-"}}
-        </div>
-      </div>
-      <div class="age">{{age}} days old in {{settings.public.lp.product}}</div>
+        <div class="age">{{age}} days old in {{settings.public.lp.product}}</div>
     </div>
-  {{/modal}}
+    {{/modal}}
 </template>

@@ -1,58 +1,31 @@
 <template name="lemverse">
-  <div class="lemverse {{#if neq (Session 'editor') 0}}edit{{/if}} {{#if loading}}loading{{/if}}">
-    <div class="simulation">
-      <div id="game"></div>
-      <div id="gameModules">
-        {{#unless guest}}
-          {{> radialMenu }}
-          {{> userPanel loading=loading}}
-        {{/unless}}
-        {{#each gameModule in gameModules}}
-          {{> Template.dynamic template=gameModule}}
-        {{/each}}
-      </div>
+    <div class="lemverse {{#if neq (Session 'editor') 0}}edit{{/if}} {{#if loading}}loading{{/if}}">
+        <div class="simulation">
+            <div id="game"></div>
+            <div id="gameModules">
+                {{#unless guest}} {{> radialMenu }} {{> userPanel loading=loading}} {{/unless}} {{#each gameModule in
+                gameModules}} {{> Template.dynamic template=gameModule}} {{/each}}
+            </div>
 
-      {{# resizable id='resizableMeet' }}
-        <div class="meet"></div>
-      {{/resizable}}
-
-      {{# resizable id='resizableWebpage' }}
-        <div id="webpage">
-          <iframe src="" allowfullscreen="true" id="webpageIframe" title="Embedded content"></iframe>
+            {{# resizable id='resizableMeet' }}
+            <div class="meet"></div>
+            {{/resizable}} {{# resizable id='resizableWebpage' }}
+            <div id="webpage">
+                <iframe src="" allowfullscreen="true" id="webpageIframe" title="Embedded content"></iframe>
+            </div>
+            {{/resizable}}
         </div>
-      {{/resizable}}
 
+        {{#if and (and guest (not onboarding)) allowFormLogin}} {{> formAccount visible=loading}} {{else if onboarding}}
+        {{> userOnboarding}} {{else if and (not guest not onboarding)}} {{> editToolbox}} {{/if}}
+
+        <div class="js-streams">
+            {{#each remoteUser in allRemoteStreamsByUsers}} {{> remoteStream remoteUser=remoteUser }} {{/each}}
+        </div>
+
+        {{> zoneNameToaster}} {{#if displayNotificationButton}} {{> notificationButton}} {{/if}} {{#each mainModule in
+        mainModules}} {{> Template.dynamic template=mainModule}} {{/each}} {{> modalContainer }}
+
+        <div class="modules">{{#each module in modules}} {{> Template.dynamic template=module}} {{/each}}</div>
     </div>
-
-    {{#if and (and guest (not onboarding)) allowFormLogin}}
-      {{> formAccount visible=loading}}
-    {{else if onboarding}}
-      {{> userOnboarding}}
-    {{else if and (not guest not onboarding)}}
-      {{> editToolbox}}
-    {{/if}}
-
-    <div class="js-streams">
-      {{#each remoteUser in allRemoteStreamsByUsers}}
-      {{> remoteStream remoteUser=remoteUser }}
-      {{/each}}
-    </div>
-
-    {{> zoneNameToaster}}
-    {{#if displayNotificationButton}}
-      {{> notificationButton}}
-    {{/if}}
-
-    {{#each mainModule in mainModules}}
-      {{> Template.dynamic template=mainModule}}
-    {{/each}}
-
-    {{> modalContainer }}
-
-    <div class="modules">
-      {{#each module in modules}}
-      {{> Template.dynamic template=module}}
-      {{/each}}
-    </div>
-  </div>
 </template>

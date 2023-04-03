@@ -1,29 +1,29 @@
 :root {
-  --edit-border-size: 1rem;
-  --edit-border-radius: 1rem;
-  --primary-color: #A5E6BA;
-  --secondary-color: #13C4A3;
+    --edit-border-size: 1rem;
+    --edit-border-radius: 1rem;
+    --primary-color: #a5e6ba;
+    --secondary-color: #13c4a3;
 
-  // We split the HSL (Hue Saturarion Lightness) value to play with th lightness color
-  // #A5E6BA converted to hsl(139, 57%, 77%);
-  --primary-color-hs: 139, 57%;
-  --primary-color-l: 77%;
-  // #13C4A3 converted to hsl(169, 82%, 82%);
-  --secondary-color-hs: 169, 82%;
-  --secondary-color-l: 82%;
+    // We split the HSL (Hue Saturarion Lightness) value to play with th lightness color
+    // #A5E6BA converted to hsl(139, 57%, 77%);
+    --primary-color-hs: 139, 57%;
+    --primary-color-l: 77%;
+    // #13C4A3 converted to hsl(169, 82%, 82%);
+    --secondary-color-hs: 169, 82%;
+    --secondary-color-l: 82%;
 
-  // And now if we want our color lighter, we increase the lightness value BUT our value shouldn't be more than 100% or it will be black.
-  --primary-color-lighten-20: hsl(var(--primary-color-hs), calc(var(--primary-color-l) + 20%));
-  --primary-color-lighten-75: hsl(var(--primary-color-hs), calc(var(--primary-color-l) + 75%));
+    // And now if we want our color lighter, we increase the lightness value BUT our value shouldn't be more than 100% or it will be black.
+    --primary-color-lighten-20: hsl(var(--primary-color-hs), calc(var(--primary-color-l) + 20%));
+    --primary-color-lighten-75: hsl(var(--primary-color-hs), calc(var(--primary-color-l) + 75%));
 
-  // Or darker, we decrease the lightness value
-  --secondary-color-darken-5: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 5%));
-  --secondary-color-darken-10: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 10%));
-  --secondary-color-darken-15: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 15%));
-  --secondary-color-darken-20: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 20%));
+    // Or darker, we decrease the lightness value
+    --secondary-color-darken-5: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 5%));
+    --secondary-color-darken-10: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 10%));
+    --secondary-color-darken-15: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 15%));
+    --secondary-color-darken-20: hsl(var(--secondary-color-hs), calc(var(--secondary-color-l) - 20%));
 }
 
-$text-color: #D17851;
+$text-color: #d17851;
 $lem-border: rgba(0, 38, 255, 0.08);
 $primary-color-transparent-1: rgba(59, 58, 79, 0.4);
 $lem-color-1: #8d7865;
@@ -35,7 +35,7 @@ $lem-color-6: #ffa077;
 $lem-color-7: #d14e53;
 $lem-color-8: #3c3c3c;
 $lem-color-9: #1d1d1d;
-$lem-color-10: #3B3A4F;
+$lem-color-10: #3b3a4f;
 
 // Shade of grey
 $gray100: #f0f7f8;
@@ -45,31 +45,31 @@ $gray400: #6b7e86;
 $gray500: #425a65;
 $main-color: #201d2c;
 $highlight-color: #b18800;
-$light-red: #EB584E;
-$light-blue: #4381C1;
-$light-yellow: #FFE19C;
-$light-orange: #FFBB04;
+$light-red: #eb584e;
+$light-blue: #4381c1;
+$light-yellow: #ffe19c;
+$light-orange: #ffbb04;
 $main-text-color: #eeebf1;
 $radius: 0.5rem;
 
-$new-yellow: #E7DFC6;
-$new-red: #C73E1D;
+$new-yellow: #e7dfc6;
+$new-red: #c73e1d;
 $new-dark-primary: #201d2c;
 $new-dark-secondary: #262837;
 
 $breakpoints: (
-  "phone-down": 600px,
-  "tablet-up": 768px,
-  "tablet-down": 900px,
-  "desktop-up": 1024px,
-  "desktop-down": 1280px,
-  "widescreen-up": 1440px
+    'phone-down': 600px,
+    'tablet-up': 768px,
+    'tablet-down': 900px,
+    'desktop-up': 1024px,
+    'desktop-down': 1280px,
+    'widescreen-up': 1440px,
 );
 
 @mixin media-max($_key) {
-  @media screen and (max-width: map-get($breakpoints, $_key)) {
-    & {
-      @content;
+    @media screen and (max-width: map-get($breakpoints, $_key)) {
+        & {
+            @content;
+        }
     }
-  }
 }

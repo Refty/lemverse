@@ -1,30 +1,26 @@
 Meteor.publish('quests', function () {
-  if (!this.userId) return undefined;
+    if (!this.userId) return undefined
 
-  const { entitySubscriptionIds } = Meteor.user();
-  return Quests.find(
-    {
-      $or: [
-        { origin: { $in: entitySubscriptionIds } },
-        { targets: this.userId },
-        { createdBy: Meteor.userId() },
-      ],
-    },
-    { sort: { completed: 1, createdAt: 1 } },
-  );
-});
+    const { entitySubscriptionIds } = Meteor.user()
+    return Quests.find(
+        {
+            $or: [{ origin: { $in: entitySubscriptionIds } }, { targets: this.userId }, { createdBy: Meteor.userId() }],
+        },
+        { sort: { completed: 1, createdAt: 1 } }
+    )
+})
 
 Meteor.methods({
-  questUsers(questId) {
-    if (!this.userId) return undefined;
-    check(questId, Match.Id);
+    questUsers(questId) {
+        if (!this.userId) return undefined
+        check(questId, Match.Id)
 
-    const quest = Quests.findOne(questId);
-    if (!quest) throw new Meteor.Error(404, 'Quest not found.');
+        const quest = Quests.findOne(questId)
+        if (!quest) throw new Meteor.Error(404, 'Quest not found.')
 
-    const userIds = quest.targets || [];
-    userIds.push(quest.createdBy);
+        const userIds = quest.targets || []
+        userIds.push(quest.createdBy)
 
-    return Meteor.users.find({ _id: { $in: userIds } }).fetch();
-  },
-});
+        return Meteor.users.find({ _id: { $in: userIds } }).fetch()
+    },
+})

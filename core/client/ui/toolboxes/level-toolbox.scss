@@ -1,24 +1,24 @@
 .level-toolbox {
-  padding: 0 15px;
-  display: flex;
-  flex-direction: column;
-  color: white;
-
-  .label-option {
+    padding: 0 15px;
     display: flex;
-    align-items: center;
-    font-size: 0.85rem;
-    margin: 15px 0;
-  }
+    flex-direction: column;
+    color: white;
 
-  .feature-dropdown {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .label-option {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        margin: 15px 0;
+    }
 
-  .select {
-    width: fit-content;
-    min-width: 110px;
-  }
+    .feature-dropdown {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .select {
+        width: fit-content;
+        min-width: 110px;
+    }
 }

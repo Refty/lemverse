@@ -1,119 +1,119 @@
-@import "../_variables";
+@import '../_variables';
 
 .button {
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-block;
-  line-height: normal;
-  user-select: none;
-  vertical-align: middle;
-  background-color: darken($light-blue, 15%);
-  border: 0;
-  color: white;
-  font-size: 100%;
-  padding: .5em 1em;
-  text-decoration: none;
-  margin-top: 7px;
-  width: 100%;
-  transition: all 0.25s;
-  border-radius: 5px;
-
-  &:hover {
-    background-color: darken($light-blue, 5%);
-    color: #fff;
-  }
-
-  &.green {
-    background-color: var(--secondary-color-darken-15);
-
-    &:hover {
-      background-color: var(--secondary-color-darken-5);
-      color: #fff;
-    }
-  }
-
-  &.link {
-    background: transparent;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    line-height: normal;
+    user-select: none;
+    vertical-align: middle;
+    background-color: darken($light-blue, 15%);
     border: 0;
-    color: $light-blue;
+    color: white;
+    font-size: 100%;
+    padding: 0.5em 1em;
     text-decoration: none;
-  }
-
-  &.outline {
-    background: transparent;
-    border: 1px solid $light-blue;
-    color: $light-blue;
+    margin-top: 7px;
+    width: 100%;
+    transition: all 0.25s;
+    border-radius: 5px;
 
     &:hover {
-      background: $light-blue;
-      border: 1px solid transparent;
-      color: white;
+        background-color: darken($light-blue, 5%);
+        color: #fff;
     }
-  }
 
-  &[disabled] {
-    pointer-events: none;
-    filter: saturate(30%);
-  }
+    &.green {
+        background-color: var(--secondary-color-darken-15);
+
+        &:hover {
+            background-color: var(--secondary-color-darken-5);
+            color: #fff;
+        }
+    }
+
+    &.link {
+        background: transparent;
+        border: 0;
+        color: $light-blue;
+        text-decoration: none;
+    }
+
+    &.outline {
+        background: transparent;
+        border: 1px solid $light-blue;
+        color: $light-blue;
+
+        &:hover {
+            background: $light-blue;
+            border: 1px solid transparent;
+            color: white;
+        }
+    }
+
+    &[disabled] {
+        pointer-events: none;
+        filter: saturate(30%);
+    }
 }
 
 .label {
-  display: block;
-  padding-top: 15px;
-  font-size: 10pt;
-  color: $main-text-color;
-  cursor: pointer;
+    display: block;
+    padding-top: 15px;
+    font-size: 10pt;
+    color: $main-text-color;
+    cursor: pointer;
 }
 
 .input,
 .textarea,
 .select {
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  appearance: none;
-  display: inline-block;
-  min-height: 36px;
-  padding: 8px 12px;
-  width: 100%;
-  margin-top: 5px;
-  background-color: #2e303f;
-  border: 1px solid transparent;
-  box-sizing: border-box;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  color: #b1afb8;
-  outline: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    display: inline-block;
+    min-height: 36px;
+    padding: 8px 12px;
+    width: 100%;
+    margin-top: 5px;
+    background-color: #2e303f;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #b1afb8;
+    outline: none;
 
-  &:focus {
-    border: 1px solid var(--primary-color);
-  }
+    &:focus {
+        border: 1px solid var(--primary-color);
+    }
 
-  &[type="range"] {
-    appearance: revert;
-  }
+    &[type='range'] {
+        appearance: revert;
+    }
 }
 
 .select {
-  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-  background-repeat: no-repeat;
-  background-position-x: 100%;
-  background-position-y: 7px;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-position-y: 7px;
 }
 
 .link {
-  border-radius: 10px;
-  background-color: transparent;
-  border: 0;
-  text-decoration: underline;
-  color: $light-blue;
-
-  &:hover {
+    border-radius: 10px;
     background-color: transparent;
-    color: lighten($light-blue, 10%);
-    cursor: pointer;
-  }
+    border: 0;
+    text-decoration: underline;
+    color: $light-blue;
 
-  &[disabled] {
-    pointer-events: none;
-  }
+    &:hover {
+        background-color: transparent;
+        color: lighten($light-blue, 10%);
+        cursor: pointer;
+    }
+
+    &[disabled] {
+        pointer-events: none;
+    }
 }

@@ -1,84 +1,84 @@
-@import "../../_variables";
+@import '../../_variables';
 
 .zones-toolbox {
-  margin: 5px 10px;
-  display: flex;
-  flex-direction: column;
-  color: white;
+    margin: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    color: white;
 
-  .js-zone-add {
-    margin: 0 0 5px;
-    font-size: 0.85rem;
-  }
-
-  .pointer {
-    display: block;
-    height: 30px;
-    text-align: center;
-  }
-
-  .zones {
-    overflow: auto;
-    flex-grow: 1;
-
-    .zone {
-      display: block;
-      padding: 4px 10px;
-      font-size: 0.9rem;
+    .js-zone-add {
+        margin: 0 0 5px;
+        font-size: 0.85rem;
     }
 
-    .js-properties,
-    .js-set1,
-    .js-set2 {
-      cursor: pointer;
+    .pointer {
+        display: block;
+        height: 30px;
+        text-align: center;
     }
 
-    .zone:hover {
-      background-color: #E5E9F0;
-      color: $main-color;
-    }
+    .zones {
+        overflow: auto;
+        flex-grow: 1;
 
-    .zone.active {
-      background-color: #D8DEE9;
+        .zone {
+            display: block;
+            padding: 4px 10px;
+            font-size: 0.9rem;
+        }
 
-      .point.active {
-        background-color: #4C566A;
-      }
+        .js-properties,
+        .js-set1,
+        .js-set2 {
+            cursor: pointer;
+        }
+
+        .zone:hover {
+            background-color: #e5e9f0;
+            color: $main-color;
+        }
+
+        .zone.active {
+            background-color: #d8dee9;
+
+            .point.active {
+                background-color: #4c566a;
+            }
+        }
     }
-  }
 }
 
 .zones-toolbox-properties {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  > :first-child {
-    flex-grow: 1;
-    flex-shrink: 1;
-  }
-
-  textarea {
-    width: 100%;
-    height: 210px;
-    flex: 1;
-    background-color: transparent;
-    color: white;
-    font-size: 0.9rem;
-    line-height: 1.3rem;
-  }
-
-  .actions {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    height: 100%;
 
-    .button {
-      width: auto;
-      margin: 5px;
+    > :first-child {
+        flex-grow: 1;
+        flex-shrink: 1;
     }
 
-    .button:nth-last-child(2) {
-      margin-left: auto;
+    textarea {
+        width: 100%;
+        height: 210px;
+        flex: 1;
+        background-color: transparent;
+        color: white;
+        font-size: 0.9rem;
+        line-height: 1.3rem;
     }
-  }
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+
+        .button {
+            width: auto;
+            margin: 5px;
+        }
+
+        .button:nth-last-child(2) {
+            margin-left: auto;
+        }
+    }
 }

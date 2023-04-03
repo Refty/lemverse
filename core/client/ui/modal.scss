@@ -1,129 +1,128 @@
-@import "../_variables";
+@import '../_variables';
 
 .modal-container {
-  pointer-events: none;
+    pointer-events: none;
 
-  .background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 200;
-    background-color: $main-color;
-    opacity: 0;
-    transition: opacity 0.15s linear;
-  }
-
-  .modal {
-    .modal-window {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 201;
-      width: 100%;
-      max-width: 930px;
-      max-height: 750px;
-      height: calc(100vh - 3.5rem);
-      background-color: $new-dark-secondary;
-      color: white;
-      border: 0;
-      border-radius: $radius;
-      margin: 0;
-      overflow: hidden;
-      padding: 0;
-      opacity: 0;
-      transition: opacity 0.15s linear;
-
-      @include media-max("phone-down") {
-        max-width: initial;
-        max-height: initial;
-        height: 100%;
-        border-radius: initial;
-      }
-
-      &.height-auto {
-        height: auto;
-      }
-
-      .modal-body {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        overflow: hidden;
-      }
-
-
-      .js-modal-close {
+    .background {
         position: absolute;
-        right: 20px;
-        top: 20px;
-        appearance: none;
-        background: none;
-        border: 0;
-        cursor: pointer;
-        font-size: 1.55rem;
-        font-weight: 700;
-        line-height: 1;
-        opacity: 0.8;
-        color: white;
-        padding: 8px;
-        z-index: 60;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-
-      .modal-title {
-        color: $main-text-color;
-        text-align: left;
-        font-size: 1.15rem;
-        margin: 0;
-        padding: 12px 15px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 200;
         background-color: $main-color;
-        font-weight: bold;
-      }
+        opacity: 0;
+        transition: opacity 0.15s linear;
+    }
 
-      .modal-content {
-        color: $main-text-color;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-
-        .header {
-          padding: 0 20px;
-
-          .h2 {
-            font-size: 1.6rem;
-            font-weight: 600;
-            margin: 24px 0 20px;
-          }
-
-          .separator {
+    .modal {
+        .modal-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 201;
+            width: 100%;
+            max-width: 930px;
+            max-height: 750px;
+            height: calc(100vh - 3.5rem);
+            background-color: $new-dark-secondary;
+            color: white;
+            border: 0;
+            border-radius: $radius;
             margin: 0;
-          }
+            overflow: hidden;
+            padding: 0;
+            opacity: 0;
+            transition: opacity 0.15s linear;
+
+            @include media-max('phone-down') {
+                max-width: initial;
+                max-height: initial;
+                height: 100%;
+                border-radius: initial;
+            }
+
+            &.height-auto {
+                height: auto;
+            }
+
+            .modal-body {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .js-modal-close {
+                position: absolute;
+                right: 20px;
+                top: 20px;
+                appearance: none;
+                background: none;
+                border: 0;
+                cursor: pointer;
+                font-size: 1.55rem;
+                font-weight: 700;
+                line-height: 1;
+                opacity: 0.8;
+                color: white;
+                padding: 8px;
+                z-index: 60;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+
+            .modal-title {
+                color: $main-text-color;
+                text-align: left;
+                font-size: 1.15rem;
+                margin: 0;
+                padding: 12px 15px;
+                background-color: $main-color;
+                font-weight: bold;
+            }
+
+            .modal-content {
+                color: $main-text-color;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+
+                .header {
+                    padding: 0 20px;
+
+                    .h2 {
+                        font-size: 1.6rem;
+                        font-weight: 600;
+                        margin: 24px 0 20px;
+                    }
+
+                    .separator {
+                        margin: 0;
+                    }
+                }
+            }
         }
-      }
+
+        &.visible {
+            .modal-window {
+                opacity: 1;
+            }
+        }
     }
 
     &.visible {
-      .modal-window {
-        opacity: 1;
-      }
-    }
-  }
+        pointer-events: all;
 
-  &.visible {
-    pointer-events: all;
+        .background {
+            opacity: 0.25;
+        }
 
-    .background {
-      opacity: 0.25;
+        .modal .modal-window {
+            opacity: 1;
+        }
     }
-
-    .modal .modal-window {
-      opacity: 1;
-    }
-  }
 }

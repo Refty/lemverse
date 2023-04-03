@@ -1,104 +1,104 @@
 .selected-tileset {
-  margin: 0;
-  padding: 0;
-  flex-grow: 1;
-  overflow-y: scroll;
-  position: relative;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1;
+    overflow-y: scroll;
+    position: relative;
 
-  .marker {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 1px solid black;
-    pointer-events: none;
-  }
+    .marker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: 1px solid black;
+        pointer-events: none;
+    }
 
-  .layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 0 2px;
-    border-radius: 2px;
-    pointer-events: none;
-    font-size: 9px;
-    border: 1px solid black;
-    background-color: #ECEFF4;
-  }
+    .layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0 2px;
+        border-radius: 2px;
+        pointer-events: none;
+        font-size: 9px;
+        border: 1px solid black;
+        background-color: #eceff4;
+    }
 
-  img {
-    cursor: pointer;
-    image-rendering: pixelated;
-  }
+    img {
+        cursor: pointer;
+        image-rendering: pixelated;
+    }
 }
 
 .info {
-  height: 100vh;
-  width: 250px;
-  border: 1px solid black;
-  user-select: none;
-  overflow-y: scroll;
+    height: 100vh;
+    width: 250px;
+    border: 1px solid black;
+    user-select: none;
+    overflow-y: scroll;
 
-  .drop-tileset {
-    margin: 0 9px;
-    padding: 0 9px;
-    border: dashed 2px transparent;
+    .drop-tileset {
+        margin: 0 9px;
+        padding: 0 9px;
+        border: dashed 2px transparent;
 
-    &.is-over {
-      border-color: black;
-    }
-  }
-
-  div.js-tilesets-select {
-    cursor: pointer;
-    display: flex;
-
-    .tileset-name {
-      align-self: center;
+        &.is-over {
+            border-color: black;
+        }
     }
 
-    .js-tileset-remove {
-      margin-right: 10px;
-    }
+    div.js-tilesets-select {
+        cursor: pointer;
+        display: flex;
 
-    input.hidden {
-      display: none;
-    }
+        .tileset-name {
+            align-self: center;
+        }
 
-    &:hover {
-      background-color: #ddd;
-    }
+        .js-tileset-remove {
+            margin-right: 10px;
+        }
 
-    &.active {
-      background-color: #0f0;
+        input.hidden {
+            display: none;
+        }
+
+        &:hover {
+            background-color: #ddd;
+        }
+
+        &.active {
+            background-color: #0f0;
+        }
     }
-  }
 }
 
 .modal.tile-properties-modal {
-  z-index: 15;
-  display: flex;
-  flex-direction: column;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-
-  >div {
+    z-index: 15;
     display: flex;
-  }
-
-  > :first-child {
     flex-direction: column;
-    flex: 1;
-  }
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
 
-  textarea {
-    width: 100%;
-    height: 210px;
-    flex: 1;
-  }
+    > div {
+        display: flex;
+    }
 
-  .js-zone-delete {
-    margin-left: auto;
-  }
+    > :first-child {
+        flex-direction: column;
+        flex: 1;
+    }
+
+    textarea {
+        width: 100%;
+        height: 210px;
+        flex: 1;
+    }
+
+    .js-zone-delete {
+        margin-left: auto;
+    }
 }
