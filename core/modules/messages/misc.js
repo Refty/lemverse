@@ -25,7 +25,6 @@ const messagingAllowed = (channel, userId) => {
 
     check(channel, Match.Id)
     if (channel.includes('zon_')) return zoneMessagingAllowed(Zones.findOne(channel), Meteor.users.findOne(userId))
-    if (channel.includes('qst_')) return canAccessQuest && canAccessQuest(channel, userId)
     if (channel.includes('lvl_')) return Meteor.users.findOne(userId)?.profile.levelId === channel
 
     return false
