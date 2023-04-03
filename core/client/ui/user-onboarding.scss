@@ -11,7 +11,7 @@
     padding: 32px 64px;
     position: absolute;
     z-index: 3;
-    animation: fadeInOnboarding 1s;
+    animation: fade-in-onboarding 1s;
     overflow-y: auto;
 
     .logo {
@@ -116,28 +116,28 @@
                 width: 16px;
                 scale: 2;
                 background-position: -48px -7px;
-                image-rendering: -moz-crisp-edges;
+                image-rendering: crisp-edges;
                 image-rendering: -o-crisp-edges;
-                image-rendering: -webkit-optimize-contrast;
+                image-rendering: optimize-contrast;
                 image-rendering: pixelated;
                 image-rendering: optimize-contrast;
                 -ms-interpolation-mode: nearest-neighbor;
             }
 
             .left {
-                animation: avatarLeft 0.5s steps(6) infinite;
+                animation: avatar-left 0.5s steps(6) infinite;
             }
 
             .right {
-                animation: avatarRight 0.5s steps(6) infinite;
+                animation: avatar-right 0.5s steps(6) infinite;
             }
 
             .up {
-                animation: avatarUp 0.5s steps(6) infinite;
+                animation: avatar-up 0.5s steps(6) infinite;
             }
 
             .down {
-                animation: avatarDown 0.5s steps(6) infinite;
+                animation: avatar-down 0.5s steps(6) infinite;
             }
         }
     }
@@ -156,19 +156,19 @@
     }
 
     .left::after {
-        animation: backgroundLeft 2s linear infinite;
+        animation: background-left 2s linear infinite;
     }
 
     .right::after {
-        animation: backgroundRight 2s linear infinite;
+        animation: background-right 2s linear infinite;
     }
 
     .down::after {
-        animation: backgroundDown 2s linear infinite;
+        animation: background-down 2s linear infinite;
     }
 
     .up::after {
-        animation: backgroundUp 2s linear infinite;
+        animation: background-up 2s linear infinite;
     }
 
     .permission-img {
@@ -224,10 +224,10 @@
     background-repeat: repeat;
     opacity: 0.1;
     z-index: -1;
-    animation: anim 10s linear infinite, fadeInBackground 2s;
+    animation: anim 10s linear infinite, fade-in-background 2s;
 }
 
-@keyframes fadeInOnboarding {
+@keyframes fade-in-onboarding {
     0% {
         opacity: 0;
     }
@@ -243,7 +243,7 @@
     }
 }
 
-@keyframes fadeInBackground {
+@keyframes fade-in-background {
     0% {
         opacity: 0;
     }
@@ -253,33 +253,33 @@
     }
 }
 
-@keyframes backgroundRight {
+@keyframes background-right {
     100% {
-        background-position: -416px 0px;
+        background-position: -416px 0;
     }
 }
 
-@keyframes backgroundLeft {
+@keyframes background-left {
     100% {
-        background-position: 416px 0px;
+        background-position: 416px 0;
     }
 }
 
-@keyframes backgroundDown {
+@keyframes background-down {
     100% {
-        background-position: 0px -416px;
+        background-position: 0 -416px;
     }
 }
 
-@keyframes backgroundUp {
+@keyframes background-up {
     100% {
-        background-position: 0px 416px;
+        background-position: 0 416px;
     }
 }
 
-@keyframes avatarRight {
+@keyframes avatar-right {
     from {
-        background-position: 0px -70px;
+        background-position: 0 -70px;
     }
 
     to {
@@ -287,7 +287,7 @@
     }
 }
 
-@keyframes avatarLeft {
+@keyframes avatar-left {
     from {
         background-position: -192px -70px;
     }
@@ -297,7 +297,7 @@
     }
 }
 
-@keyframes avatarUp {
+@keyframes avatar-up {
     from {
         background-position: -96px -70px;
     }
@@ -307,7 +307,7 @@
     }
 }
 
-@keyframes avatarDown {
+@keyframes avatar-down {
     from {
         background-position: -288px -70px;
     }

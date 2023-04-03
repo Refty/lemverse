@@ -32,10 +32,7 @@ $state-checked-color: #fff;
 
         .toggle {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            top: 0;
+            inset: 0;
             background-color: $switch-background-color;
             transition: 0.4s;
 

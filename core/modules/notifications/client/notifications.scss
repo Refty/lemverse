@@ -7,17 +7,14 @@ button.emoji-before-tooltip {
     padding: 0;
     cursor: pointer;
     outline: inherit;
-
     margin-top: 0;
     margin-left: 20px;
     vertical-align: text-bottom;
     align-items: center;
     justify-content: center;
-
     height: 30px;
     width: 30px;
     font-size: 12px;
-
     background-color: darken($light-blue, 20%);
     border-radius: 50%;
 }
@@ -42,7 +39,7 @@ button.emoji-before-tooltip {
     position: absolute;
     z-index: 1;
     font-size: 0.5em !important;
-    opacity: 70%;
+    opacity: 0.7;
     width: 120px;
     height: 30px;
     margin-left: 20px;

@@ -16,10 +16,10 @@ const targets = () => {
 }
 
 Template.entityEditor.events({
-    'click .back_btn': function () {
+    'click .back-btn': function () {
         closeInterface()
     },
-    'click .switch_anim': function () {
+    'click .switch-anim': function () {
         const entity = selectedEntity()
         Meteor.call('useEntity', entity.entityId ? entity.entityId : entity._id)
     },

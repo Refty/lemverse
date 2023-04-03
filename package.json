@@ -1,39 +1,42 @@
 {
-  "name": "lemverse",
-  "version": "1.0.0",
-  "description": "lemverse master root",
-  "main": ".eslintrc.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint app/core --fix"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/l3mpire/lemverse.git"
-  },
-  "resolutions": {
-    "@babel/parser": "7.18.0"
-  },
-  "author": "",
-  "license": "AGPLV3",
-  "bugs": {
-    "url": "https://github.com/l3mpire/lemverse/issues"
-  },
-  "homepage": "https://github.com/l3mpire/lemverse#readme",
-  "devDependencies": {
-    "@babel/core": "^7.21.4",
-    "@babel/eslint-parser": "^7.21.3",
-    "@babel/eslint-plugin": "^7.19.1",
-    "babel-eslint": "^10.1.0",
-    "editorconfig-checker": "^4.0.2",
-    "eslint": "^8.37.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^8.6.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-meteor": "^7.3.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.8.7",
-    "stylelint": "^14.16.1",
-    "stylelint-config-standard-scss": "^6.1.0"
-  }
+    "name": "lemverse",
+    "version": "1.0.0",
+    "description": "lemverse master root",
+    "main": ".eslintrc.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint app/core --fix",
+        "stylelint": "stylelint **/*.scss --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/l3mpire/lemverse.git"
+    },
+    "resolutions": {
+        "@babel/parser": "7.18.0"
+    },
+    "author": "",
+    "license": "AGPLV3",
+    "bugs": {
+        "url": "https://github.com/l3mpire/lemverse/issues"
+    },
+    "homepage": "https://github.com/l3mpire/lemverse#readme",
+    "devDependencies": {
+        "@babel/core": "^7.21.4",
+        "@babel/eslint-parser": "^7.21.3",
+        "@babel/eslint-plugin": "^7.19.1",
+        "babel-eslint": "^10.1.0",
+        "editorconfig-checker": "^4.0.2",
+        "eslint": "^8.37.0",
+        "eslint-config-airbnb-base": "^15.0.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-meteor": "^7.3.0",
+        "eslint-plugin-prettier": "^4.2.1",
+        "prettier": "^2.8.7",
+        "stylelint": "^15.4.0",
+        "stylelint-config-prettier": "^9.0.5",
+        "stylelint-config-recommended": "^11.0.0",
+        "stylelint-config-recommended-scss": "^9.0.1"
+    }
 }
