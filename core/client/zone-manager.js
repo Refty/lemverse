@@ -1,281 +1,315 @@
-import { canAccessZone } from '../lib/misc';
+import { canAccessZone } from '../lib/misc'
 
-const getZoneCenter = zone => [(zone.x1 + zone.x2) * 0.5, (zone.y1 + zone.y2) * 0.5];
+const getZoneCenter = (zone) => [(zone.x1 + zone.x2) * 0.5, (zone.y1 + zone.y2) * 0.5]
 
-const newContentAnimation = { duration: 250, ease: 'Cubic', yoyo: true, hold: 2000, repeat: -1 };
+const newContentAnimation = {
+    duration: 250,
+    ease: 'Cubic',
+    yoyo: true,
+    hold: 2000,
+    repeat: -1,
+}
 const zoneAnimations = {
-  newContent: () => ({
-    alpha: { ...newContentAnimation, value: 0.05 },
-  }),
-};
+    newContent: () => ({
+        alpha: { ...newContentAnimation, value: 0.05 },
+    }),
+}
 
-const teleportUserOutsideZone = zone => {
-  const [x, y] = zone.teleportEndpoint ? zone.teleportEndpoint.split(',') : [73, 45];
-  userManager.teleportMainUser(+x, +y);
-};
+const teleportUserOutsideZone = (zone) => {
+    const [x, y] = zone.teleportEndpoint ? zone.teleportEndpoint.split(',') : [73, 45]
+    userManager.teleportMainUser(+x, +y)
+}
 
 zoneManager = {
-  activeZone: undefined,
-  previousAvailableZones: [],
-  newContentSprites: {},
-  scene: undefined,
-  zones: [],
+    activeZone: undefined,
+    previousAvailableZones: [],
+    newContentSprites: {},
+    scene: undefined,
+    zones: [],
 
-  init(scene) {
-    this.scene = scene;
-  },
+    init(scene) {
+        this.scene = scene
+    },
 
-  destroy() {
-    this.newContentSprites = {};
-    this.zones = [];
-  },
+    destroy() {
+        this.newContentSprites = {}
+        this.zones = []
+    },
 
-  onDocumentAdded(zone) {
-    this.checkZoneForNewContent(zone);
-    this.refreshZoneList();
-    if (zone.popInConfiguration?.autoOpen) characterPopIns.initFromZone(zone);
-    window.dispatchEvent(new CustomEvent(eventTypes.onZoneAdded, { detail: { zone } }));
-  },
+    onDocumentAdded(zone) {
+        this.checkZoneForNewContent(zone)
+        this.refreshZoneList()
+        if (zone.popInConfiguration?.autoOpen) characterPopIns.initFromZone(zone)
+        window.dispatchEvent(new CustomEvent(eventTypes.onZoneAdded, { detail: { zone } }))
+    },
 
-  onDocumentRemoved(zone) {
-    this.destroyNewContentIndicator(zone);
-    this.refreshZoneList();
-    window.dispatchEvent(new CustomEvent(eventTypes.onZoneRemoved, { detail: { zone } }));
-  },
+    onDocumentRemoved(zone) {
+        this.destroyNewContentIndicator(zone)
+        this.refreshZoneList()
+        window.dispatchEvent(new CustomEvent(eventTypes.onZoneRemoved, { detail: { zone } }))
+    },
 
-  onDocumentUpdated(zone) {
-    this.checkZoneForNewContent(zone);
-    this.refreshZoneList();
-    window.dispatchEvent(new CustomEvent(eventTypes.onZoneUpdated, { detail: { zone } }));
-  },
+    onDocumentUpdated(zone) {
+        this.checkZoneForNewContent(zone)
+        this.refreshZoneList()
+        window.dispatchEvent(new CustomEvent(eventTypes.onZoneUpdated, { detail: { zone } }))
+    },
 
-  currentZone(user) {
-    if (!user || user._id === Meteor.userId()) return this.activeZone;
+    currentZone(user) {
+        if (!user || user._id === Meteor.userId()) return this.activeZone
 
-    const zones = this.findZonesForPosition({ x: user.profile.x, y: user.profile.y });
-    if (!zones.length) return undefined;
+        const zones = this.findZonesForPosition({
+            x: user.profile.x,
+            y: user.profile.y,
+        })
+        if (!zones.length) return undefined
 
-    const sortedZones = this.sortByNearest(zones, user.profile.x, user.profile.y);
-    return sortedZones[0];
-  },
+        const sortedZones = this.sortByNearest(zones, user.profile.x, user.profile.y)
+        return sortedZones[0]
+    },
 
-  setFullscreen(zone, value) {
-    Zones.update(zone._id, { $set: { fullscreen: !!value } });
-  },
+    setFullscreen(zone, value) {
+        Zones.update(zone._id, { $set: { fullscreen: !!value } })
+    },
 
-  getCenter(zone) {
-    return {
-      x: zone.x1 + (zone.x2 - zone.x1) / 2,
-      y: zone.y1 + (zone.y2 - zone.y1) / 2,
-    };
-  },
-
-  sortByNearest(zones, x, y) {
-    // todo: sort using square edges or polygons
-    return zones.sort((zoneA, zoneB) => {
-      const zoneAPosition = getZoneCenter(zoneA);
-      const zoneBPosition = getZoneCenter(zoneB);
-      const zoneADistance = (zoneAPosition[0] - x) ** 2 + (zoneAPosition[1] - y) ** 2;
-      const zoneBDistance = (zoneBPosition[0] - x) ** 2 + (zoneBPosition[1] - y) ** 2;
-
-      return zoneADistance - zoneBDistance;
-    });
-  },
-
-  computePositionFromString(zone, positionName) {
-    const width = zone.x2 - zone.x1;
-    const height = zone.y2 - zone.y1;
-
-    switch (positionName) {
-      case 'top':
+    getCenter(zone) {
         return {
-          x: zone.x1 + width / 2,
-          y: zone.y1,
-        };
-      case 'bottom':
-        return {
-          x: zone.x1 + width / 2,
-          y: zone.y2,
-        };
-      case 'left':
-        return {
-          x: zone.x1,
-          y: zone.y1 + height / 2,
-        };
-      case 'right':
-        return {
-          x: zone.x2,
-          y: zone.y1 + height / 2,
-        };
-      default:
-        break;
-    }
+            x: zone.x1 + (zone.x2 - zone.x1) / 2,
+            y: zone.y1 + (zone.y2 - zone.y1) / 2,
+        }
+    },
 
-    return this.getCenter(zone);
-  },
+    sortByNearest(zones, x, y) {
+        // todo: sort using square edges or polygons
+        return zones.sort((zoneA, zoneB) => {
+            const zoneAPosition = getZoneCenter(zoneA)
+            const zoneBPosition = getZoneCenter(zoneB)
+            const zoneADistance = (zoneAPosition[0] - x) ** 2 + (zoneAPosition[1] - y) ** 2
+            const zoneBDistance = (zoneBPosition[0] - x) ** 2 + (zoneBPosition[1] - y) ** 2
 
-  isUserInSameZone(userA, userB) {
-    return this.currentZone(userA)?._id === this.currentZone(userB)?._id;
-  },
+            return zoneADistance - zoneBDistance
+        })
+    },
 
-  usersInZone(zone, includeCurrentUser = false) {
-    if (!zone) return [];
+    computePositionFromString(zone, positionName) {
+        const width = zone.x2 - zone.x1
+        const height = zone.y2 - zone.y1
 
-    const queryOption = { 'status.online': true, 'profile.levelId': zone.levelId };
-    if (!includeCurrentUser) queryOption._id = { $ne: Meteor.userId() };
-    const users = Meteor.users.find(queryOption).fetch();
+        switch (positionName) {
+            case 'top':
+                return {
+                    x: zone.x1 + width / 2,
+                    y: zone.y1,
+                }
+            case 'bottom':
+                return {
+                    x: zone.x1 + width / 2,
+                    y: zone.y2,
+                }
+            case 'left':
+                return {
+                    x: zone.x1,
+                    y: zone.y1 + height / 2,
+                }
+            case 'right':
+                return {
+                    x: zone.x2,
+                    y: zone.y1 + height / 2,
+                }
+            default:
+                break
+        }
 
-    const usersInZone = [];
-    _.each(users, user => {
-      const { x, y } = user.profile;
-      if (x < zone.x1) return;
-      if (x > zone.x2) return;
-      if (y < zone.y1) return;
-      if (y > zone.y2) return;
+        return this.getCenter(zone)
+    },
 
-      usersInZone.push(user);
-    });
+    isUserInSameZone(userA, userB) {
+        return this.currentZone(userA)?._id === this.currentZone(userB)?._id
+    },
 
-    return usersInZone;
-  },
+    usersInZone(zone, includeCurrentUser = false) {
+        if (!zone) return []
 
-  checkDistances(player) {
-    if (!player) return;
+        const queryOption = {
+            'status.online': true,
+            'profile.levelId': zone.levelId,
+        }
+        if (!includeCurrentUser) queryOption._id = { $ne: Meteor.userId() }
+        const users = Meteor.users.find(queryOption).fetch()
 
-    const availableZones = this.findZonesForPosition({ x: player.x, y: player.y });
+        const usersInZone = []
+        _.each(users, (user) => {
+            const { x, y } = user.profile
+            if (x < zone.x1) return
+            if (x > zone.x2) return
+            if (y < zone.y1) return
+            if (y > zone.y2) return
 
-    if (availableZones.length === this.previousAvailableZones.length && availableZones.every((zone, i) => zone._id === this.previousAvailableZones[i]._id)) return;
+            usersInZone.push(user)
+        })
 
-    const availableZonesId = availableZones.map(zone => zone._id);
-    const previousAvailableZonesId = this.previousAvailableZones.map(zone => zone._id);
-    const zonesLeft = this.previousAvailableZones.filter(zone => !availableZonesId.includes(zone._id));
-    const zonesEntered = availableZones.filter(zone => !previousAvailableZonesId.includes(zone._id));
+        return usersInZone
+    },
 
-    let activeZone;
-    if (zonesEntered.length) activeZone = zonesEntered[zonesEntered.length - 1];
-    else if (this.activeZone && !availableZonesId.includes(this.activeZone._id)) activeZone = availableZones[availableZones.length - 1];
+    checkDistances(player) {
+        if (!player) return
 
-    // set as activate zone + check permissions
-    if (!this.setActiveZone(activeZone)) {
-      lp.notif.error('You cannot access this zone');
-      teleportUserOutsideZone(activeZone);
-      return;
-    }
+        const availableZones = this.findZonesForPosition({
+            x: player.x,
+            y: player.y,
+        })
 
-    // compute zone toaster
-    if (activeZone && !activeZone.hideName) {
-      const name = availableZones.map(z => z.name).filter(Boolean).join(' | ');
-      Session.set('zoneToaster', { name, hasNewContent: this.hasNewContent(activeZone) });
-    }
+        if (
+            availableZones.length === this.previousAvailableZones.length &&
+            availableZones.every((zone, i) => zone._id === this.previousAvailableZones[i]._id)
+        )
+            return
 
-    // notify external modules
-    zonesLeft.forEach(zone => {
-      window.dispatchEvent(new CustomEvent(eventTypes.onZoneLeft, { detail: { zone, newZone: this.activeZone } }));
-      sendEvent('zone-entered', { zone });
-    });
+        const availableZonesId = availableZones.map((zone) => zone._id)
+        const previousAvailableZonesId = this.previousAvailableZones.map((zone) => zone._id)
+        const zonesLeft = this.previousAvailableZones.filter((zone) => !availableZonesId.includes(zone._id))
+        const zonesEntered = availableZones.filter((zone) => !previousAvailableZonesId.includes(zone._id))
 
-    zonesEntered.forEach(zone => {
-      window.dispatchEvent(new CustomEvent(eventTypes.onZoneEntered, { detail: { zone, previousZone: this.activeZone } }));
-      sendEvent('zone-left', { zone });
-    });
+        let activeZone
+        if (zonesEntered.length) activeZone = zonesEntered[zonesEntered.length - 1]
+        else if (this.activeZone && !availableZonesId.includes(this.activeZone._id))
+            activeZone = availableZones[availableZones.length - 1]
 
-    this.previousAvailableZones = availableZones;
-  },
+        // set as activate zone + check permissions
+        if (!this.setActiveZone(activeZone)) {
+            lp.notif.error('You cannot access this zone')
+            teleportUserOutsideZone(activeZone)
+            return
+        }
 
-  setActiveZone(zone) {
-    this.activeZone = zone;
-    if (!zone) return true;
+        // compute zone toaster
+        if (activeZone && !activeZone.hideName) {
+            const name = availableZones
+                .map((z) => z.name)
+                .filter(Boolean)
+                .join(' | ')
+            Session.set('zoneToaster', {
+                name,
+                hasNewContent: this.hasNewContent(activeZone),
+            })
+        }
 
-    try {
-      if (!canAccessZone(zone, Meteor.user())) throw new Error('access-denied');
-    } catch (err) {
-      this.activeZone = undefined;
-      return false;
-    }
+        // notify external modules
+        zonesLeft.forEach((zone) => {
+            window.dispatchEvent(
+                new CustomEvent(eventTypes.onZoneLeft, {
+                    detail: { zone, newZone: this.activeZone },
+                })
+            )
+            sendEvent('zone-entered', { zone })
+        })
 
-    return true;
-  },
+        zonesEntered.forEach((zone) => {
+            window.dispatchEvent(
+                new CustomEvent(eventTypes.onZoneEntered, {
+                    detail: { zone, previousZone: this.activeZone },
+                })
+            )
+            sendEvent('zone-left', { zone })
+        })
 
-  showNewContentIndicator(zone) {
-    this.destroyNewContentIndicator(zone);
+        this.previousAvailableZones = availableZones
+    },
 
-    // use the entity has an indicator, otherwise show an animated area
-    if (zone.entityId) {
-      const entity = Entities.findOne(zone.entityId);
-      if (entity && entityManager.updateEntityFromState(entity, 'on')) return;
-    }
+    setActiveZone(zone) {
+        this.activeZone = zone
+        if (!zone) return true
 
-    const position = this.getCenter(zone);
-    const width = zone.x2 - zone.x1;
-    const height = zone.y2 - zone.y1;
+        try {
+            if (!canAccessZone(zone, Meteor.user())) throw new Error('access-denied')
+        } catch (err) {
+            this.activeZone = undefined
+            return false
+        }
 
-    const sprite = this.scene.add.sprite(position.x, position.y, 'pixel');
-    sprite.setScale(width, height);
-    sprite.alpha = 0.8;
-    sprite.setTint(0xFFBB04);
+        return true
+    },
 
-    const tween = this.scene.tweens.add({
-      targets: sprite,
-      ...zoneAnimations.newContent(width, height),
-    });
+    showNewContentIndicator(zone) {
+        this.destroyNewContentIndicator(zone)
 
-    this.newContentSprites[zone._id] = { sprite, tween };
-  },
+        // use the entity has an indicator, otherwise show an animated area
+        if (zone.entityId) {
+            const entity = Entities.findOne(zone.entityId)
+            if (entity && entityManager.updateEntityFromState(entity, 'on')) return
+        }
 
-  destroyNewContentIndicator(zone) {
-    // reset entity linked's state
-    if (zone.entityId) {
-      const entity = Entities.findOne(zone.entityId);
-      if (entity) entityManager.updateEntityFromState(entity, 'off');
-    }
+        const position = this.getCenter(zone)
+        const width = zone.x2 - zone.x1
+        const height = zone.y2 - zone.y1
 
-    const newContentSprites = this.newContentSprites[zone._id];
-    if (!newContentSprites) return;
+        const sprite = this.scene.add.sprite(position.x, position.y, 'pixel')
+        sprite.setScale(width, height)
+        sprite.alpha = 0.8
+        sprite.setTint(0xffbb04)
 
-    newContentSprites.sprite?.destroy();
-    newContentSprites.tween?.stop();
+        const tween = this.scene.tweens.add({
+            targets: sprite,
+            ...zoneAnimations.newContent(width, height),
+        })
 
-    delete this.newContentSprites[zone._id];
-  },
+        this.newContentSprites[zone._id] = { sprite, tween }
+    },
 
-  checkZoneForNewContent(zone) {
-    if (!this.hasNewContent(zone)) return;
-    this.showNewContentIndicator(zone);
-  },
+    destroyNewContentIndicator(zone) {
+        // reset entity linked's state
+        if (zone.entityId) {
+            const entity = Entities.findOne(zone.entityId)
+            if (entity) entityManager.updateEntityFromState(entity, 'off')
+        }
 
-  hasNewContent(zone) {
-    if (!zone.lastMessageAt || Session.get('messagesChannel') === zone._id) return false;
+        const newContentSprites = this.newContentSprites[zone._id]
+        if (!newContentSprites) return
 
-    const user = Meteor.user({ fields: { zoneLastSeenDates: 1 } });
-    if (!user) return false;
+        newContentSprites.sprite?.destroy()
+        newContentSprites.tween?.stop()
 
-    const zoneLastSeenDates = user.zoneLastSeenDates || {};
-    return zoneLastSeenDates[zone._id] < zone.lastMessageAt;
-  },
+        delete this.newContentSprites[zone._id]
+    },
 
-  isInsideZone(zone, position) {
-    if (position.x < zone.x1) return false;
-    if (position.x > zone.x2) return false;
-    if (position.y < zone.y1) return false;
+    checkZoneForNewContent(zone) {
+        if (!this.hasNewContent(zone)) return
+        this.showNewContentIndicator(zone)
+    },
 
-    return position.y <= zone.y2;
-  },
+    hasNewContent(zone) {
+        if (!zone.lastMessageAt || Session.get('messagesChannel') === zone._id) return false
 
-  findZonesForPosition(position) {
-    const zones = [];
-    this.getZones().forEach(zone => {
-      if (!this.isInsideZone(zone, position)) return;
-      zones.push(zone);
-    });
+        const user = Meteor.user({ fields: { zoneLastSeenDates: 1 } })
+        if (!user) return false
 
-    return zones;
-  },
+        const zoneLastSeenDates = user.zoneLastSeenDates || {}
+        return zoneLastSeenDates[zone._id] < zone.lastMessageAt
+    },
 
-  refreshZoneList() {
-    this.zones = Zones.find().fetch();
-  },
+    isInsideZone(zone, position) {
+        if (position.x < zone.x1) return false
+        if (position.x > zone.x2) return false
+        if (position.y < zone.y1) return false
 
-  getZones() {
-    return this.zones;
-  },
-};
+        return position.y <= zone.y2
+    },
+
+    findZonesForPosition(position) {
+        const zones = []
+        this.getZones().forEach((zone) => {
+            if (!this.isInsideZone(zone, position)) return
+            zones.push(zone)
+        })
+
+        return zones
+    },
+
+    refreshZoneList() {
+        this.zones = Zones.find().fetch()
+    },
+
+    getZones() {
+        return this.zones
+    },
+}

@@ -5,7 +5,7 @@
   "main": ".eslintrc.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --fix --ext .js,.jsx ."
+    "lint": "eslint app/core --fix"
   },
   "repository": {
     "type": "git",
@@ -26,11 +26,14 @@
     "@babel/eslint-plugin": "^7.19.1",
     "babel-eslint": "^10.1.0",
     "editorconfig-checker": "^4.0.2",
+    "eslint": "^8.37.0",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-meteor": "^7.3.0",
-    "eslint": "^8.37.0",
-    "stylelint-config-standard-scss": "^6.1.0",
-    "stylelint": "^14.16.1"
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7",
+    "stylelint": "^14.16.1",
+    "stylelint-config-standard-scss": "^6.1.0"
   }
 }

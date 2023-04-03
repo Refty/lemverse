@@ -1,21 +1,21 @@
 const meetingRoom = {
-  enabled: true,
+    enabled: true,
 
-  setMeetingRoomService(service) {
-    this.service = service;
-  },
+    setMeetingRoomService(service) {
+        this.service = service
+    },
 
-  getMeetingRoomService() {
-    return this.service;
-  },
+    getMeetingRoomService() {
+        return this.service
+    },
 
-  isOpen() {
-    return this.service?.isOpen();
-  },
+    isOpen() {
+        return this.service?.isOpen()
+    },
 
-  isEnabled() {
-    return this.enabled;
-  },
-};
+    isEnabled() {
+        return this.enabled
+    },
+}
 
-export default meetingRoom;
+export default meetingRoom

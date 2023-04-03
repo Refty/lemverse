@@ -1,3 +1,3 @@
 Meteor.startup(() => {
-  Messages.createIndex({ channel: 1 }, { name: 'channel_1' });
-});
+    Messages.createIndex({ channel: 1 }, { name: 'channel_1' })
+})

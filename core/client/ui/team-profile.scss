@@ -1,21 +1,21 @@
 .team-profile {
-  .content {
-    display: flex;
-    flex-direction: column;
-    padding: 0 30px;
+    .content {
+        display: flex;
+        flex-direction: column;
+        padding: 0 30px;
 
-    .logo {
-      margin: 30px auto 15px;
-      text-align: center;
+        .logo {
+            margin: 30px auto 15px;
+            text-align: center;
 
-      img {
-        width: 250px;
-        max-height: 150px;
-      }
+            img {
+                width: 250px;
+                max-height: 150px;
+            }
+        }
+
+        p {
+            line-height: 1.7rem;
+        }
     }
-
-    p {
-      line-height: 1.7rem;
-    }
-  }
 }

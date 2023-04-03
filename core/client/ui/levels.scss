@@ -1,119 +1,119 @@
 .levels {
-  height: 100%;
-
-  .container {
-    display: flex;
-    flex-direction: column;
     height: 100%;
-  }
 
-  .h2 {
-    font-size: 12pt;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    text-align: center;
-
-    &:first-of-type {
-      margin-top: 0;
-    }
-  }
-
-  .loading {
-    background-color: black;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    color: white;
-
-    & img {
-      width: 128px;
-      height: 128px;
-      margin-bottom: 20px;
-    }
-  }
-
-  .tabs {
-    position: sticky;
-    padding: 0;
-    display: flex;
-    margin: 0 auto;
-    width: 100%;
-    top: 0;
-    background: #eceff3;
-
-    >button {
-      display: block;
-      flex: 1;
-      text-align: center;
-      background: none;
-      border: 0;
-      appearance: none;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      padding: 10px 0;
-
-      &.active,
-      &:hover {
-        border-bottom: 2px solid #0078e7;
-        color: #0078e7;
-      }
-
-      &.active {
-        font-weight: bold;
-      }
-    }
-  }
-
-  .levels-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    overflow: auto;
-    max-height: 100%;
-
-    li {
-      width: 100%;
-
-      button {
-        width: 100%;
-        appearance: none;
-        background: none;
-        border: 0;
+    .container {
         display: flex;
-        padding: 10px 5px;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #0078e7;
-          color: white;
-        }
-
-        span {
-          pointer-events: none;
-          flex: 1;
-
-          &.left {
-            text-align: left;
-          }
-
-          &.small {
-            flex: 0.25;
-          }
-        }
-      }
+        flex-direction: column;
+        height: 100%;
     }
-  }
 
-  .request-access {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    overflow: auto;
-    max-height: 100%;
-    text-align: center;
-    width: 100%;
-  }
+    .h2 {
+        font-size: 12pt;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        text-align: center;
+
+        &:first-of-type {
+            margin-top: 0;
+        }
+    }
+
+    .loading {
+        background-color: black;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: white;
+
+        & img {
+            width: 128px;
+            height: 128px;
+            margin-bottom: 20px;
+        }
+    }
+
+    .tabs {
+        position: sticky;
+        padding: 0;
+        display: flex;
+        margin: 0 auto;
+        width: 100%;
+        top: 0;
+        background: #eceff3;
+
+        > button {
+            display: block;
+            flex: 1;
+            text-align: center;
+            background: none;
+            border: 0;
+            appearance: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            padding: 10px 0;
+
+            &.active,
+            &:hover {
+                border-bottom: 2px solid #0078e7;
+                color: #0078e7;
+            }
+
+            &.active {
+                font-weight: bold;
+            }
+        }
+    }
+
+    .levels-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        overflow: auto;
+        max-height: 100%;
+
+        li {
+            width: 100%;
+
+            button {
+                width: 100%;
+                appearance: none;
+                background: none;
+                border: 0;
+                display: flex;
+                padding: 10px 5px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #0078e7;
+                    color: white;
+                }
+
+                span {
+                    pointer-events: none;
+                    flex: 1;
+
+                    &.left {
+                        text-align: left;
+                    }
+
+                    &.small {
+                        flex: 0.25;
+                    }
+                }
+            }
+        }
+    }
+
+    .request-access {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        overflow: auto;
+        max-height: 100%;
+        text-align: center;
+        width: 100%;
+    }
 }

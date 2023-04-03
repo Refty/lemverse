@@ -1,171 +1,171 @@
-@import "../_variables";
+@import '../_variables';
 
 $button-color: #00c800;
 $background-color: #38383a;
 
 .form-account {
-  position: fixed;
-  width: auto;
-  min-height: 150px;
-  color: white;
-  border-radius: 1rem;
-  background-color: $background-color;
-  text-align: center;
-  z-index: 50;
-  opacity: 0;
-  transition: opacity 0.15s;
-  left: 0;
-  right: 0;
-  bottom: 0;
+    position: fixed;
+    width: auto;
+    min-height: 150px;
+    color: white;
+    border-radius: 1rem;
+    background-color: $background-color;
+    text-align: center;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.15s;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-  &.visible {
-    opacity: 1;
-    overflow: hidden;
-  }
-
-  .title {
-    padding: 0;
-  }
-
-  .step {
-    margin: 15px;
-
-    p {
-      line-height: 25px;
-      font-size: 0.9rem;
-
-      &.tos {
-        font-size: 9pt;
-        margin: 0;
-        line-height: 20px;
-
-        a {
-          color: white;
-        }
-      }
+    &.visible {
+        opacity: 1;
+        overflow: hidden;
     }
 
-    form {
-      max-width: 380px;
-      margin: 0 auto;
+    .title {
+        padding: 0;
+    }
 
-      .group-field {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-        z-index: 50;
+    .step {
+        margin: 15px;
 
-        label {
-          flex-grow: 1;
-          font-weight: bold;
+        p {
+            line-height: 25px;
+            font-size: 0.9rem;
+
+            &.tos {
+                font-size: 9pt;
+                margin: 0;
+                line-height: 20px;
+
+                a {
+                    color: white;
+                }
+            }
         }
 
-        input {
-          flex-grow: 1;
-          background-color: white;
-          border-radius: $radius;
-          z-index: 51;
-          border: 0;
-          min-width: 250px;
-          padding: 0 5px;
-          height: 30px;
+        form {
+            max-width: 380px;
+            margin: 0 auto;
+
+            .group-field {
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+                z-index: 50;
+
+                label {
+                    flex-grow: 1;
+                    font-weight: bold;
+                }
+
+                input {
+                    flex-grow: 1;
+                    background-color: white;
+                    border-radius: $radius;
+                    z-index: 51;
+                    border: 0;
+                    min-width: 250px;
+                    padding: 0 5px;
+                    height: 30px;
+                }
+            }
         }
-      }
-    }
 
-    button.submit {
-      border: none;
-      background-color: $button-color;
-      border-radius: $radius;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 0.9rem;
-      color: white;
-      cursor: pointer;
+        button.submit {
+            border: none;
+            background-color: $button-color;
+            border-radius: $radius;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
 
-      &:hover,
-      &:focus {
-        background-color: lighten($button-color, 5%);
-        color: white;
-      }
+            &:hover,
+            &:focus {
+                background-color: lighten($button-color, 5%);
+                color: white;
+            }
 
-      &:disabled {
-        background-color: hsl(0deg, 0%, 63%);
-        color: white;
-        cursor: not-allowed;
-      }
-    }
-
-    .link {
-      background: none;
-      border: 0;
-      color: darken(white, 5%);
-      font-size: 0.8rem;
-      text-decoration: underline;
-      cursor: pointer;
-
-      &:hover,
-      &:focus {
-        color: white;
-      }
-    }
-
-    button.js-previous-step {
-      color: white;
-      position: absolute;
-      top: 50%;
-      left: 15px;
-      font-size: 33pt;
-      background: none;
-      border: 0;
-      transform: translate(0, -50%);
-      cursor: pointer;
-
-      &:hover,
-      &:focus {
-        color: darken($text-color, 5%);
-      }
-    }
-  }
-
-  .bottom {
-    background-color: darken($background-color, 5%);
-    padding: 15px;
-
-    .link {
-      color: white;
-      text-decoration: none;
-
-      &:hover {
-        color: $lem-color-5;
-      }
-    }
-
-    &.buttons-group {
-      display: flex;
-      gap: 10px;
-      justify-content: space-around;
-      padding: 15px 15px;
-      flex-wrap: wrap;
-
-      button {
-        margin: 0;
-        width: fit-content;
-
-        &:hover {
-          filter: brightness(120%);
+            &:disabled {
+                background-color: hsl(0deg, 0%, 63%);
+                color: white;
+                cursor: not-allowed;
+            }
         }
-      }
+
+        .link {
+            background: none;
+            border: 0;
+            color: darken(white, 5%);
+            font-size: 0.8rem;
+            text-decoration: underline;
+            cursor: pointer;
+
+            &:hover,
+            &:focus {
+                color: white;
+            }
+        }
+
+        button.js-previous-step {
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            font-size: 33pt;
+            background: none;
+            border: 0;
+            transform: translate(0, -50%);
+            cursor: pointer;
+
+            &:hover,
+            &:focus {
+                color: darken($text-color, 5%);
+            }
+        }
     }
-  }
+
+    .bottom {
+        background-color: darken($background-color, 5%);
+        padding: 15px;
+
+        .link {
+            color: white;
+            text-decoration: none;
+
+            &:hover {
+                color: $lem-color-5;
+            }
+        }
+
+        &.buttons-group {
+            display: flex;
+            gap: 10px;
+            justify-content: space-around;
+            padding: 15px;
+            flex-wrap: wrap;
+
+            button {
+                margin: 0;
+                width: fit-content;
+
+                &:hover {
+                    filter: brightness(120%);
+                }
+            }
+        }
+    }
 }
 
 @media screen and (min-width: 640px) {
-  .form-account {
-    left: 50%;
-    bottom: 15px;
-    transform: translate(-50%, 0);
-    max-width: 650px;
-    min-width: 520px;
-  }
+    .form-account {
+        left: 50%;
+        bottom: 15px;
+        transform: translate(-50%, 0);
+        max-width: 650px;
+        min-width: 520px;
+    }
 }

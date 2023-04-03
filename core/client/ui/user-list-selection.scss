@@ -1,75 +1,75 @@
-@import "../_variables";
+@import '../_variables';
 
 .user-list-selection {
-  display: flex;
-  flex-direction: column;
-  user-select: none;
-  overflow: hidden;
-  height: 100%;
-
-  >div {
-    width: 100%;
-    display: flex;
-
-    button.js-submit {
-      margin: 10px auto;
-      width: 97%;
-    }
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    font-size: 0.9rem;
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    user-select: none;
+    overflow: hidden;
     height: 100%;
 
-    li.empty {
-      text-align: center;
-      margin: 15px;
+    > div {
+        width: 100%;
+        display: flex;
+
+        button.js-submit {
+            margin: 10px auto;
+            width: 97%;
+        }
     }
 
-    .user {
-      margin: 2px 5px;
-      padding: 0 5px;
-      border-radius: 5px;
-      line-height: 26px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      cursor: pointer;
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        font-size: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        height: 100%;
 
-      &:hover {
-        background-color: darken($main-color, 5%);
-      }
-
-      &.selected {
-        background-color: rgba(var(--secondary-color), 0.35);
-
-        &:hover {
-          background-color: rgba(var(--secondary-color), 0.5);
-        }
-      }
-
-      .avatar-viewer {
-        width: 30px;
-        height: 35px;
-        margin-right: 5px;
-
-        .character-body-part-container {
-          transform: scale(0.4) translate(-24px, -70px);
+        li.empty {
+            text-align: center;
+            margin: 15px;
         }
 
-        .avatar::before {
-          bottom: 4px;
-          right: 4px;
-          width: 6px;
-          height: 6px;
+        .user {
+            margin: 2px 5px;
+            padding: 0 5px;
+            border-radius: 5px;
+            line-height: 26px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            cursor: pointer;
+
+            &:hover {
+                background-color: darken($main-color, 5%);
+            }
+
+            &.selected {
+                background-color: rgba(var(--secondary-color), 0.35);
+
+                &:hover {
+                    background-color: rgba(var(--secondary-color), 0.5);
+                }
+            }
+
+            .avatar-viewer {
+                width: 30px;
+                height: 35px;
+                margin-right: 5px;
+
+                .character-body-part-container {
+                    transform: scale(0.4) translate(-24px, -70px);
+                }
+
+                .avatar::before {
+                    bottom: 4px;
+                    right: 4px;
+                    width: 6px;
+                    height: 6px;
+                }
+            }
         }
-      }
     }
-  }
 }
