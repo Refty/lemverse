@@ -12,7 +12,18 @@ module.exports = {
         sourceType: 'module',
         requireConfigFile: false,
     },
-    rules: {},
+    rules: {
+        'meteor/no-session': 'off',
+        'import/no-unresolved': 0,
+        'no-empty': ['error', { allowEmptyCatch: true }],
+        'no-console': 0,
+        'func-names': 0,
+        'no-param-reassign': 0,
+        'no-eval': 0,
+        'no-bitwise': 0,
+        'no-plusplus': 0,
+        'no-underscore-dangle': 0,
+    },
     globals: {
         // Meteor
         AccountsGuest: 'readonly',

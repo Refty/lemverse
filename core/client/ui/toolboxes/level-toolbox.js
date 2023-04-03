@@ -6,7 +6,7 @@ const checkLevelName = (value) => {
     if (value.length < 3) throw new Error("Level's name must be at least 2 characters")
 }
 
-const updateLevel = (name, spawnPosition, hide = false, featuresPermissions) => {
+const updateLevel = (name, spawnPosition, hide = false, featuresPermissions = {}) => {
     try {
         checkLevelName(name)
     } catch (e) {

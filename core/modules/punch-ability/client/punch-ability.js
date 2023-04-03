@@ -1,5 +1,6 @@
 import audioManager from '../../../client/audio-manager'
 import { randomFloatInRange, canUseLevelFeature } from '../../../lib/misc'
+import networkManager from '../../../client/network-manager'
 
 const playPunchAnimation = () => {
     userManager.scene.cameras.main.shake(250, 0.015, 0.02)

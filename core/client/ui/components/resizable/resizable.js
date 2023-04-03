@@ -221,7 +221,8 @@ Template.resizable.events({
         const containerId = `.${Template.instance().data.id}`
         const resizable = document.querySelector(containerId)
 
-        Session.get('screenSide') === 'right' ? Session.set('screenSide', 'left') : Session.set('screenSide', 'right')
+        if (Session.get('screenSide') === 'right') Session.set('screenSide', 'left')
+        else Session.set('screenSide', 'right')
 
         moveToSideScreen(resizable)
 
