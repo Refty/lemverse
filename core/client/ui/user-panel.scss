@@ -9,9 +9,11 @@
 
     @include media-max('phone-down') {
         display: block;
+
         &.displaynone {
             display: none;
         }
+
         &.videoactive {
             display: none !important;
         }
@@ -70,14 +72,14 @@
         transition: transform 0.5s;
 
         &.visible {
-            transform: translate(0px);
+            transform: translate(0);
         }
 
         &.videoActive {
             transform: translate(240px);
 
             &.visible {
-                transform: translate(0px);
+                transform: translate(0);
             }
         }
     }
@@ -129,6 +131,7 @@
 
             @include media-max('phone-down') {
                 justify-content: space-evenly;
+
                 .button.screen,
                 .js-show-messaging-interface {
                     display: none;
@@ -180,7 +183,7 @@
                     left: 13px;
                     transform: rotate(62deg);
                     pointer-events: none;
-                    text-shadow: 0px 0px 3px #eff1f6;
+                    text-shadow: 0 0 3px #eff1f6;
                 }
             }
         }

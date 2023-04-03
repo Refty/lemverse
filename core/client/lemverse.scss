@@ -59,10 +59,7 @@ hr.separator {
 
 #game {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    inset: 0;
 
     > div {
         z-index: 3;
@@ -72,10 +69,7 @@ hr.separator {
 
     > canvas {
         position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
+        inset: 0;
         z-index: 1;
     }
 }
@@ -144,7 +138,7 @@ hr.separator {
 
     > .simulation > #gameModules {
         position: absolute;
-        left: 0px;
+        left: 0;
         right: initial;
         width: var(--game-modules-adaptative-size, 50%);
     }
@@ -152,7 +146,7 @@ hr.separator {
     &.dockToTheLeft > .simulation {
         > #gameModules {
             left: initial;
-            right: 0px;
+            right: 0;
         }
     }
 }
@@ -273,6 +267,7 @@ button.js-notifications {
     from {
         border-color: $light-orange;
     }
+
     to {
         border-color: darken($light-orange, 10%);
     }
@@ -282,6 +277,7 @@ button.js-notifications {
     from {
         background-color: $light-orange;
     }
+
     to {
         background-color: darken($light-orange, 10%);
     }
@@ -290,6 +286,7 @@ button.js-notifications {
 /* width */
 ::-webkit-scrollbar {
     width: 5px;
+
     &:hover {
         display: block;
     }

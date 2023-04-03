@@ -1,8 +1,9 @@
 @import '../_variables';
+
 .js-fullscreen-close {
     position: fixed;
-    right: 0px;
-    top: 0px;
+    right: 0;
+    top: 0;
     appearance: none;
     background: none;
     border: 0;
@@ -166,10 +167,7 @@
     video.fullscreen,
     img.fullscreen {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         width: calc(100% - 400px);
         height: 100%;
         border: none;
@@ -187,11 +185,11 @@
 
 @keyframes spin {
     0% {
-        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
     }
 
     100% {
-        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
     }
 }
 

@@ -25,14 +25,14 @@ $button-text-color: white;
         flex-direction: row;
         border-radius: 0 0 $radius $radius;
         background-color: rgba($main-color, 1);
-        box-shadow: 0px 0 15px $main-color;
+        box-shadow: 0 0 15px $main-color;
         width: 100%;
         overflow: hidden;
 
         input,
         textarea,
         button {
-            -webkit-appearance: none;
+            appearance: none;
             background-color: transparent;
             border: 0;
 
