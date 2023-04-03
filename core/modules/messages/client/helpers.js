@@ -16,9 +16,6 @@ const channelIdToChannelName = (channelId, showUserList = false) => {
     if (channelId.includes('zon_')) {
         return Zones.findOne(channelId)?.name || 'Zone'
     }
-    if (channelId.includes('qst_')) {
-        return 'Quest'
-    }
 
     const userIds = channelId.split(';')
     if (showUserList) {

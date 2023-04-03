@@ -378,8 +378,6 @@ class DataCache {
 
 const getChannelType = (channelId) => {
     switch (channelId?.split('_')[0]) {
-        case 'qst':
-            return 'quest'
         case 'zon':
             return 'zone'
         case 'lvl':
