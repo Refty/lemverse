@@ -1,224 +1,224 @@
-@import "../_variables";
+@import '../_variables';
 
 .js-openpanel {
-  position: absolute;
-  z-index: 40;
-  bottom: 10px;
-  right: 10px;
-  display: none;
+    position: absolute;
+    z-index: 40;
+    bottom: 10px;
+    right: 10px;
+    display: none;
 
-  @include media-max("phone-down") {
-    display: block;
-    &.displaynone {
-      display: none;
-    }
-    &.videoactive {
-      display: none !important;
-    }
-  }
-
-  .js-stream-me {
-    position: relative;
-    width: 53px;
-    height: 53px;
-    background-color: rgba($main-color, 0.9);
-    border-radius: 15px;
-    z-index: 30;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    transition: all 0.15s linear;
-    overflow: hidden;
-
-    .buttons {
-      position: absolute;
-      bottom: 8px;
-      left: 0;
-      right: 0;
-      display: flex;
-      gap: 7px;
-      justify-content: center;
-
-      .button {
-        position: relative;
-        background-color: lighten($main-color, 75%);
-        height: 36px;
-        width: 36px;
-        box-sizing: content-box;
-        padding: 0;
-        margin: 0;
-        border-radius: $radius;
-        color: $main-color;
-
-        svg {
-          fill: $main-color;
-          transform: translateY(2px) scale(0.95);
+    @include media-max('phone-down') {
+        display: block;
+        &.displaynone {
+            display: none;
         }
-      }
+        &.videoactive {
+            display: none !important;
+        }
     }
-  }
+
+    .js-stream-me {
+        position: relative;
+        width: 53px;
+        height: 53px;
+        background-color: rgba($main-color, 0.9);
+        border-radius: 15px;
+        z-index: 30;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        transition: all 0.15s linear;
+        overflow: hidden;
+
+        .buttons {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 7px;
+            justify-content: center;
+
+            .button {
+                position: relative;
+                background-color: lighten($main-color, 75%);
+                height: 36px;
+                width: 36px;
+                box-sizing: content-box;
+                padding: 0;
+                margin: 0;
+                border-radius: $radius;
+                color: $main-color;
+
+                svg {
+                    fill: $main-color;
+                    transform: translateY(2px) scale(0.95);
+                }
+            }
+        }
+    }
 }
 
 .user-panel {
-  position: fixed;
-  z-index: 50;
-  bottom: 10px;
-  right: 10px;
+    position: fixed;
+    z-index: 50;
+    bottom: 10px;
+    right: 10px;
 
-  @include media-max("phone-down") {
-    transform: translate(300px);
-    transition: transform 0.5s;
+    @include media-max('phone-down') {
+        transform: translate(300px);
+        transition: transform 0.5s;
 
-    &.visible {
-      transform: translate(0px);
-    }
-
-    &.videoActive {
-      transform: translate(240px);
-
-      &.visible {
-        transform: translate(0px);
-      }
-    }
-  }
-
-  .js-stream-me {
-    position: relative;
-    width: 280px;
-    height: 53px;
-    background-color: rgba($main-color, 0.9);
-    border-radius: 15px;
-    z-index: 30;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    transition: all 0.15s linear;
-    overflow: hidden;
-
-    &.active {
-      width: 280px;
-      height: 180px;
-      background-color: rgba($main-color, 1);
-
-      .buttons button:not(.active) {
-        opacity: 0.5;
-      }
-    }
-
-    video {
-      width: 100%;
-      height: 180px;
-      border-radius: 10px;
-      display: none;
-      object-fit: cover;
-      transform: scale(-1, 1);
-    }
-
-    &.active-video video {
-      display: block;
-    }
-
-    .buttons {
-      position: absolute;
-      bottom: 8px;
-      left: 0;
-      right: 0;
-      display: flex;
-      gap: 7px;
-      justify-content: center;
-
-      @include media-max("phone-down") {
-        justify-content: space-evenly;
-        .button.screen,
-        .js-show-messaging-interface {
-          display: none;
+        &.visible {
+            transform: translate(0px);
         }
-      }
 
-      .separator {
-        color: #d2d5e0;
-        transform: translateY(5px);
-      }
+        &.videoActive {
+            transform: translate(240px);
 
-      .button {
+            &.visible {
+                transform: translate(0px);
+            }
+        }
+    }
+
+    .js-stream-me {
         position: relative;
-        background-color: lighten($main-color, 75%);
-        height: 36px;
-        width: 36px;
-        box-sizing: content-box;
-        padding: 0;
-        margin: 0;
-        border-radius: $radius;
-        color: $main-color;
-
-        svg {
-          fill: $main-color;
-          transform: translateY(2px) scale(0.95);
-        }
+        width: 280px;
+        height: 53px;
+        background-color: rgba($main-color, 0.9);
+        border-radius: 15px;
+        z-index: 30;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        transition: all 0.15s linear;
+        overflow: hidden;
 
         &.active {
-          background-color: var(--primary-color);
+            width: 280px;
+            height: 180px;
+            background-color: rgba($main-color, 1);
+
+            .buttons button:not(.active) {
+                opacity: 0.5;
+            }
         }
 
-        &:disabled {
-          background-color: hsl(0deg, 0%, 63%);
+        video {
+            width: 100%;
+            height: 180px;
+            border-radius: 10px;
+            display: none;
+            object-fit: cover;
+            transform: scale(-1, 1);
         }
 
-        @media (hover: hover) {
-          &:hover {
-            background-color: var(--primary-color-lighten-20);
-          }
+        &.active-video video {
+            display: block;
         }
 
-        &:not(.active):nth-child(-n + 3)::before {
-          content: "\\";
-          position: absolute;
-          color: $main-color;
-          z-index: 1000;
-          font-size: 1.8rem;
-          top: 1px;
-          left: 13px;
-          transform: rotate(62deg);
-          pointer-events: none;
-          text-shadow: 0px 0px 3px #eff1f6;
+        .buttons {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 7px;
+            justify-content: center;
+
+            @include media-max('phone-down') {
+                justify-content: space-evenly;
+                .button.screen,
+                .js-show-messaging-interface {
+                    display: none;
+                }
+            }
+
+            .separator {
+                color: #d2d5e0;
+                transform: translateY(5px);
+            }
+
+            .button {
+                position: relative;
+                background-color: lighten($main-color, 75%);
+                height: 36px;
+                width: 36px;
+                box-sizing: content-box;
+                padding: 0;
+                margin: 0;
+                border-radius: $radius;
+                color: $main-color;
+
+                svg {
+                    fill: $main-color;
+                    transform: translateY(2px) scale(0.95);
+                }
+
+                &.active {
+                    background-color: var(--primary-color);
+                }
+
+                &:disabled {
+                    background-color: hsl(0deg, 0%, 63%);
+                }
+
+                @media (hover: hover) {
+                    &:hover {
+                        background-color: var(--primary-color-lighten-20);
+                    }
+                }
+
+                &:not(.active):nth-child(-n + 3)::before {
+                    content: '\\';
+                    position: absolute;
+                    color: $main-color;
+                    z-index: 1000;
+                    font-size: 1.8rem;
+                    top: 1px;
+                    left: 13px;
+                    transform: rotate(62deg);
+                    pointer-events: none;
+                    text-shadow: 0px 0px 3px #eff1f6;
+                }
+            }
         }
-      }
     }
-  }
 
-  .js-stream-screen-me {
-    display: none;
-    position: absolute;
-    bottom: 25px;
-    right: 16px;
-    width: 340px;
-    height: 200px;
-    background-color: #292929;
-    background-image: url("loader-white.gif");
-    background-size: 30%;
-    background-position: 50%;
-    background-repeat: no-repeat;
-    border-radius: 15px;
-    overflow: hidden;
-    z-index: 28;
+    .js-stream-screen-me {
+        display: none;
+        position: absolute;
+        bottom: 25px;
+        right: 16px;
+        width: 340px;
+        height: 200px;
+        background-color: #292929;
+        background-image: url('loader-white.gif');
+        background-size: 30%;
+        background-position: 50%;
+        background-repeat: no-repeat;
+        border-radius: 15px;
+        overflow: hidden;
+        z-index: 28;
 
-    &.active {
-      display: block;
+        &.active {
+            display: block;
+        }
+
+        video {
+            width: 100%;
+            object-fit: fill;
+            height: 100%;
+            display: none;
+
+            &.active {
+                display: block;
+            }
+        }
     }
-
-    video {
-      width: 100%;
-      object-fit: fill;
-      height: 100%;
-      display: none;
-
-      &.active {
-        display: block;
-      }
-    }
-  }
 }
 
 .displaynone {
-  display: none !important;
+    display: none !important;
 }

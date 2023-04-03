@@ -1,105 +1,105 @@
-@import "../../_variables";
+@import '../../_variables';
 
 .tileset-toolbox {
-  padding: 0 10px 10px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  > :first-child {
+    padding: 0 10px 10px;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    overflow: auto;
     gap: 10px;
-  }
-
-  .tileset-selector {
-    height: 24px;
-    max-height: 24px;
-    min-height: 24px;
-  }
-
-  .marker {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 1px solid black;
-    pointer-events: none;
-  }
-
-  .tileset-toolbox-img {
-    position: relative;
-    overflow: scroll;
-
-    img {
-      image-rendering: pixelated;
-    }
-  }
-
-  .js-tilesets-select {
-    width: 100%;
-  }
-
-  .tileData {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    border: 1px solid #4C566A;
-    color: #4C566A;
-    background-color: white;
-    border-radius: 4px;
-    padding: 4px;
-
-    &.has-collision {
-      border-color: rgba($lem-color-7, 0.5);
-      background-color: rgba($lem-color-7, 0.2);
-      color: $lem-color-7;
-      font-weight: bold;
-    }
-  }
-
-  .hovered-tiles {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .tileset-toolbox-erase {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    width: 80%;
-    margin: 0 auto;
-
-    .button {
-      width: 45px;
-      height: 30px;
-      padding: 0 8px;
-      line-height: 29px;
-      font-size: 0.9rem;
-
-      &.active {
-        background-color: rgb(78, 87, 106);
-        color: white;
-      }
-    }
-  }
-
-  .tileset-toolbox-info {
-    height: 20px;
-    font-size: 0.9rem;
-    color: white;
-    text-align: center;
 
     > :first-child {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: auto;
+        gap: 10px;
     }
-  }
+
+    .tileset-selector {
+        height: 24px;
+        max-height: 24px;
+        min-height: 24px;
+    }
+
+    .marker {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: 1px solid black;
+        pointer-events: none;
+    }
+
+    .tileset-toolbox-img {
+        position: relative;
+        overflow: scroll;
+
+        img {
+            image-rendering: pixelated;
+        }
+    }
+
+    .js-tilesets-select {
+        width: 100%;
+    }
+
+    .tileData {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        border: 1px solid #4c566a;
+        color: #4c566a;
+        background-color: white;
+        border-radius: 4px;
+        padding: 4px;
+
+        &.has-collision {
+            border-color: rgba($lem-color-7, 0.5);
+            background-color: rgba($lem-color-7, 0.2);
+            color: $lem-color-7;
+            font-weight: bold;
+        }
+    }
+
+    .hovered-tiles {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .tileset-toolbox-erase {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        width: 80%;
+        margin: 0 auto;
+
+        .button {
+            width: 45px;
+            height: 30px;
+            padding: 0 8px;
+            line-height: 29px;
+            font-size: 0.9rem;
+
+            &.active {
+                background-color: rgb(78, 87, 106);
+                color: white;
+            }
+        }
+    }
+
+    .tileset-toolbox-info {
+        height: 20px;
+        font-size: 0.9rem;
+        color: white;
+        text-align: center;
+
+        > :first-child {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+    }
 }

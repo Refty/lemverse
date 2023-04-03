@@ -1,8 +1,8 @@
-const fields = { name: 1, description: 1, thumbnail: 1 };
+const fields = { name: 1, description: 1, thumbnail: 1 }
 
 Meteor.publish('items', function (itemIds) {
-  check(itemIds, [String]);
-  if (!this.userId) return '';
+    check(itemIds, [String])
+    if (!this.userId) return ''
 
-  return Items.find({ _id: { $in: itemIds } }, { fields });
-});
+    return Items.find({ _id: { $in: itemIds } }, { fields })
+})

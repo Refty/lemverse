@@ -1,86 +1,86 @@
-@import "../_variables";
+@import '../_variables';
 
 $frame-width: 47px;
 $frame-height: 85px;
 
 .avatar-viewer {
-  cursor: pointer;
-  position: relative;
-  width: $frame-width;
-  height: $frame-height;
+    cursor: pointer;
+    position: relative;
+    width: $frame-width;
+    height: $frame-height;
 
-  .username {
-    transform: translateX(-50%);
-    position: absolute;
-    top: -35px;
-    left: 50%;
-    background-color: rgba($main-color, 0.9);
-    text-align: center;
-    padding: 5px 10px;
-    color: $main-text-color;
-    border-radius: $radius;
-    opacity: 0;
-    transition: opacity 0.2s linear;
-    z-index: 10;
-    pointer-events: none;
-    display: block;
-    white-space: nowrap;
-  }
-
-  &.show-status {
-    .avatar::before {
-      display: block;
-    }
-  }
-
-  &:hover {
     .username {
-      opacity: 1;
-    }
-  }
-
-  .avatar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-
-    &::before {
-      display: none;
-      content: "";
-      border-radius: 50%;
-      bottom: 0;
-      right: 0;
-      background-color: $light-red;
-      border: 2px solid rgba(255, 255, 255, 0.9);
-      width: 8px;
-      height: 8px;
-      position: absolute;
-      z-index: 5;
-    }
-
-    &.online::before {
-      background-color: var(--secondary-color);
-    }
-
-    .character-body-part-container {
-      pointer-events: none;
-      position: absolute;
-      margin: 0;
-      width: $frame-width;
-      height: $frame-height;
-      overflow: hidden;
-
-      .character-body-part {
-        display: block;
+        transform: translateX(-50%);
         position: absolute;
-        top: -200px;
-        left: -865px;
-        margin: 0;
-        image-rendering: pixelated;
-      }
+        top: -35px;
+        left: 50%;
+        background-color: rgba($main-color, 0.9);
+        text-align: center;
+        padding: 5px 10px;
+        color: $main-text-color;
+        border-radius: $radius;
+        opacity: 0;
+        transition: opacity 0.2s linear;
+        z-index: 10;
+        pointer-events: none;
+        display: block;
+        white-space: nowrap;
     }
-  }
+
+    &.show-status {
+        .avatar::before {
+            display: block;
+        }
+    }
+
+    &:hover {
+        .username {
+            opacity: 1;
+        }
+    }
+
+    .avatar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+
+        &::before {
+            display: none;
+            content: '';
+            border-radius: 50%;
+            bottom: 0;
+            right: 0;
+            background-color: $light-red;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            width: 8px;
+            height: 8px;
+            position: absolute;
+            z-index: 5;
+        }
+
+        &.online::before {
+            background-color: var(--secondary-color);
+        }
+
+        .character-body-part-container {
+            pointer-events: none;
+            position: absolute;
+            margin: 0;
+            width: $frame-width;
+            height: $frame-height;
+            overflow: hidden;
+
+            .character-body-part {
+                display: block;
+                position: absolute;
+                top: -200px;
+                left: -865px;
+                margin: 0;
+                image-rendering: pixelated;
+            }
+        }
+    }
 }

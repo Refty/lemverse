@@ -1,128 +1,128 @@
-@import "../../../client/variables";
+@import '../../../client/variables';
 
 $inventory-item-size: 80px;
 
 .inventory {
-  height: 100%;
-  color: #4f4f4f;
+    height: 100%;
+    color: #4f4f4f;
 
-  >p {
-    text-align: center;
-  }
+    > p {
+        text-align: center;
+    }
 
-  .items {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0.5rem;
+    .items {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0.5rem;
 
-    .inventory-item {
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      height: $inventory-item-size;
-      width: $inventory-item-size;
-      margin: 5px;
-      background-color: darken($main-color, 3%);
-      border: 2px solid lighten($main-color, 10%);
-      color: #4e5869;
-      border-radius: 8px;
-      overflow: hidden;
-      justify-content: center;
-      align-items: center;
+        .inventory-item {
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            height: $inventory-item-size;
+            width: $inventory-item-size;
+            margin: 5px;
+            background-color: darken($main-color, 3%);
+            border: 2px solid lighten($main-color, 10%);
+            color: #4e5869;
+            border-radius: 8px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
 
-      &:hover {
-        background-color: lighten($main-color, 10%);
-        border: 2px solid darken($main-color, 3%);
-      }
+            &:hover {
+                background-color: lighten($main-color, 10%);
+                border: 2px solid darken($main-color, 3%);
+            }
 
-      .thumbnail {
-        max-width: 90%;
-        width: 90%;
-        height: 90%;
-        object-fit: scale-down;
-      }
+            .thumbnail {
+                max-width: 90%;
+                width: 90%;
+                height: 90%;
+                object-fit: scale-down;
+            }
 
-      .amount {
+            .amount {
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+                font-weight: bold;
+                text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+                color: white;
+            }
+        }
+    }
+
+    .inventory-item-panel {
         position: absolute;
-        bottom: 5px;
-        right: 5px;
-        font-weight: bold;
-        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-        color: white;
-      }
-    }
-  }
-
-  .inventory-item-panel {
-    position: absolute;
-    display: flex;
-    flex-wrap: nowrap;
-    height: 35px;
-    margin: 0;
-    padding: 10px;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    background-color: $main-color;
-    transition: height 0.15s linear;
-
-    &.show {
-      height: 120px;
-    }
-
-    .item-not-selected-message {
-      padding: 0;
-      margin: 0;
-      width: 100%;
-      text-align: center;
-      font-size: 0.95rem;
-      color: $main-text-color;
-    }
-
-    >div:first-child {
-      position: relative;
-      width: 100px;
-      height: 100px;
-      margin-right: 10px;
-      border-radius: 8px;
-      overflow: hidden;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: scale-down;
-      }
-
-      .amount {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        font-weight: bold;
-        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-        color: white;
-      }
-    }
-
-    .item-description {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      color: $main-text-color;
-
-      .name {
-        display: block;
-        font-size: 1.1rem;
-        font-weight: bold;
-        margin-bottom: 7px;
-      }
-
-      .description {
-        display: block;
-        flex-grow: 1;
-        font-size: 0.8rem;
-        padding: 0;
+        display: flex;
+        flex-wrap: nowrap;
+        height: 35px;
         margin: 0;
-      }
+        padding: 10px;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        background-color: $main-color;
+        transition: height 0.15s linear;
+
+        &.show {
+            height: 120px;
+        }
+
+        .item-not-selected-message {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.95rem;
+            color: $main-text-color;
+        }
+
+        > div:first-child {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-right: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: scale-down;
+            }
+
+            .amount {
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+                font-weight: bold;
+                text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+                color: white;
+            }
+        }
+
+        .item-description {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            color: $main-text-color;
+
+            .name {
+                display: block;
+                font-size: 1.1rem;
+                font-weight: bold;
+                margin-bottom: 7px;
+            }
+
+            .description {
+                display: block;
+                flex-grow: 1;
+                font-size: 0.8rem;
+                padding: 0;
+                margin: 0;
+            }
+        }
     }
-  }
 }

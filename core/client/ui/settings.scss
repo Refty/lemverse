@@ -1,121 +1,120 @@
-@import "../_variables";
+@import '../_variables';
 
 div.settings {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  padding: 0;
-
-  @include media-max("phone-down") {
-    --menu-width: 40px;
-    display: grid;
-    grid-template-columns: var(--menu-width) calc(100vw - var(--menu-width));
-  }
-
-  .menu {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 255px;
-    min-width: 255px;
-    padding: 25px 16px 10px;
-    background-color: $new-dark-primary;
+    flex-direction: row;
+    height: 100%;
+    padding: 0;
 
-    @include media-max("phone-down") {
-      min-width: initial;
-      width: 100%;
-      height: 100vh;
-      padding-right: 0px;
-      padding-left: 0px;
+    @include media-max('phone-down') {
+        --menu-width: 40px;
+        display: grid;
+        grid-template-columns: var(--menu-width) calc(100vw - var(--menu-width));
     }
 
-    .title {
-      font-size: 20px;
-      font-weight: 600;
-      text-align: left;
-      margin: 0;
+    .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 255px;
+        min-width: 255px;
+        padding: 25px 16px 10px;
+        background-color: $new-dark-primary;
 
-      @include media-max("phone-down") {
-        width: 100%;
-        text-align: center;
-      }
-    }
-
-    .menu-entries {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      list-style: none;
-
-      margin: 0;
-      padding: 0;
-
-      li {
-        .button {
-          display: flex;
-          flex-direction: row;
-          gap: 10px;
-          align-items: center;
-          padding: 0.5em 0.5rem;
-          background-color: transparent;
-          text-align: left;
-
-          @include media-max("phone-down") {
+        @include media-max('phone-down') {
+            min-width: initial;
+            width: 100%;
+            height: 100vh;
             padding-right: 0px;
             padding-left: 0px;
-            justify-content: center;
-            background-color: lighten($main-color, 15%);
-            border-top-right-radius: 0px;
-            border-bottom-right-radius: 0px;
-          }
-
-
-          svg {
-            transform: scale(0.9);
-          }
-
-          &:hover {
-            background-color: lighten($main-color, 15%);
-          }
         }
 
-        &.logout {
-          margin-top: auto;
-          button {
-            color: $new-red;
-          }
-        }
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: left;
+            margin: 0;
 
-        &.selected {
-          button {
-            background-color: var(--primary-color);
-            color: #211d2c;
-          }
-
-          &:hover {
-            button {
-              background-color: var(--primary-color);
+            @include media-max('phone-down') {
+                width: 100%;
+                text-align: center;
             }
-          }
         }
-      }
+
+        .menu-entries {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            list-style: none;
+
+            margin: 0;
+            padding: 0;
+
+            li {
+                .button {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 10px;
+                    align-items: center;
+                    padding: 0.5em 0.5rem;
+                    background-color: transparent;
+                    text-align: left;
+
+                    @include media-max('phone-down') {
+                        padding-right: 0px;
+                        padding-left: 0px;
+                        justify-content: center;
+                        background-color: lighten($main-color, 15%);
+                        border-top-right-radius: 0px;
+                        border-bottom-right-radius: 0px;
+                    }
+
+                    svg {
+                        transform: scale(0.9);
+                    }
+
+                    &:hover {
+                        background-color: lighten($main-color, 15%);
+                    }
+                }
+
+                &.logout {
+                    margin-top: auto;
+                    button {
+                        color: $new-red;
+                    }
+                }
+
+                &.selected {
+                    button {
+                        background-color: var(--primary-color);
+                        color: #211d2c;
+                    }
+
+                    &:hover {
+                        button {
+                            background-color: var(--primary-color);
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
 
-  .highlight {
-    background-color: $light-red;
-  }
+    .highlight {
+        background-color: $light-red;
+    }
 
-  .container {
-    padding: 10px 20px;
-  }
+    .container {
+        padding: 10px 20px;
+    }
 
-  video {
-    display: block;
-    min-height: 200px;
-    width: 100%;
-    margin: 5px auto 0;
-    background-color: #333;
-    transform: scaleX(-1);
-  }
+    video {
+        display: block;
+        min-height: 200px;
+        width: 100%;
+        margin: 5px auto 0;
+        background-color: #333;
+        transform: scaleX(-1);
+    }
 }

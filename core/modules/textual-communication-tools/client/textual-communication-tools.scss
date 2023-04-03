@@ -1,28 +1,28 @@
 .two-cols-modules {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(calc(-50% - 120px));
-  width: 70%;
-  min-width: 750px;
-  max-width: 1000px;
-  height: 500px;
-  display: flex;
-  gap: 10px;
-  flex-direction: row;
-  align-items: stretch;
-  z-index: 100;
-  opacity: 1;
-  pointer-events: none;
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(calc(-50% - 120px));
+    width: 70%;
+    min-width: 750px;
+    max-width: 1000px;
+    height: 500px;
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+    align-items: stretch;
+    z-index: 100;
+    opacity: 1;
+    pointer-events: none;
 
-  .right-content {
-    position: relative;
-    width: 100%;
-  }
-
-  &.show {
-    > * {
-      pointer-events: all;
+    .right-content {
+        position: relative;
+        width: 100%;
     }
-  }
+
+    &.show {
+        > * {
+            pointer-events: all;
+        }
+    }
 }

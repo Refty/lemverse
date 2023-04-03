@@ -1,5 +1,5 @@
 Meteor.publish('notifications', function () {
-  if (!this.userId) return undefined;
+    if (!this.userId) return undefined
 
-  return Notifications.find({ userId: this.userId });
-});
+    return Notifications.find({ userId: this.userId })
+})

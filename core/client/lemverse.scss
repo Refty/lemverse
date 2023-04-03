@@ -1,314 +1,313 @@
-@import "_variables";
+@import '_variables';
 
 :root {
-  --edit-border-size: 1rem;
-  --edit-border-radius: 1rem;
-  scrollbar-color: rgba(255,255,255,.15) rgba(0,0,0,.25);
+    --edit-border-size: 1rem;
+    --edit-border-radius: 1rem;
+    scrollbar-color: rgba(255, 255, 255, 0.15) rgba(0, 0, 0, 0.25);
 }
 
 input:focus,
 textarea:focus,
 select:focus,
 button:focus {
-  outline: none;
+    outline: none;
 }
 
 hr.separator {
-  border: 0;
-  height: 1px;
-  background: white;
-  opacity: 0.7;
-  width: 100%;
-  margin: 25px 0;
+    border: 0;
+    height: 1px;
+    background: white;
+    opacity: 0.7;
+    width: 100%;
+    margin: 25px 0;
 }
 
 .nipple {
-  z-index: 40 !important;
+    z-index: 40 !important;
 }
 
 .lemverse {
-  display: flex;
+    display: flex;
 
-  .simulation {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    flex-basis: 100%;
-    -webkit-app-region: drag;
-  }
-
-  &.loading {
-    #game {
-      /* Hide pop-ins during loading */
-      >div {
-        opacity: 0 !important;
-      }
+    .simulation {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        flex-basis: 100%;
+        -webkit-app-region: drag;
     }
-  }
 
-  &.edit {
-    -webkit-app-region: no-drag;
-
-    > *:not(.edit-toolbox):not(.simulation):not(.modal-container) {
-      display: none;
+    &.loading {
+        #game {
+            /* Hide pop-ins during loading */
+            > div {
+                opacity: 0 !important;
+            }
+        }
     }
-  }
+
+    &.edit {
+        -webkit-app-region: no-drag;
+
+        > *:not(.edit-toolbox, .simulation, .modal-container) {
+            display: none;
+        }
+    }
 }
 
 #game {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  >div {
-    z-index: 3;
-    opacity: 1;
-    transition: opacity 0.25s;
-  }
-
-  >canvas {
     position: absolute;
     top: 0;
-    left: 0;
     bottom: 0;
+    left: 0;
     right: 0;
-    z-index: 1;
-  }
+
+    > div {
+        z-index: 3;
+        opacity: 1;
+        transition: opacity 0.25s;
+    }
+
+    > canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 1;
+    }
 }
 
 .meet {
-  height: 100%;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.25s;
-  z-index: 100;
-  pointer-events: none;
-  background-color: #474747;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 100;
+    pointer-events: none;
+    background-color: #474747;
 
-  &.show {
-    visibility: visible;
-    pointer-events: all;
-    opacity: 1;
-  }
+    &.show {
+        visibility: visible;
+        pointer-events: all;
+        opacity: 1;
+    }
 
-  &.fullscreen {
-    left: 25%;
-  }
+    &.fullscreen {
+        left: 25%;
+    }
 }
 
 #webpage {
-  width: 100%;
-  top: 0;
-  height: 100%;
-  z-index: 3;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.25s;
-  background-color: white;
-  pointer-events: none;
-
-  &.show {
-    visibility: visible;
-    pointer-events: all;
-    opacity: 1;
-  }
-
-  iframe {
     width: 100%;
+    top: 0;
     height: 100%;
-    border: 0;
-  }
+    z-index: 3;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s;
+    background-color: white;
+    pointer-events: none;
+
+    &.show {
+        visibility: visible;
+        pointer-events: all;
+        opacity: 1;
+    }
+
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
 }
 
 .js-streams {
-  position: absolute;
-  right: 0;
-  max-height: calc(100vh - 200px);
-  overflow-y: scroll;
+    position: absolute;
+    right: 0;
+    max-height: calc(100vh - 200px);
+    overflow-y: scroll;
 
-  video:not(.fullscreen) {
-    object-fit: cover;
-  }
+    video:not(.fullscreen) {
+        object-fit: cover;
+    }
 }
 
 .lemverse.screen-splitted {
-  .js-streams,
-  .user-panel {
-    right: initial;
-    left: 0;
-  }
-
-  > .simulation > #gameModules {
-    position: absolute;
-    left: 0px;
-    right: initial;
-    width: var(--game-modules-adaptative-size, 50%);
-  }
-
-  &.dockToTheLeft > .simulation {
-    > #gameModules {
-      left: initial;
-      right: 0px;
+    .js-streams,
+    .user-panel {
+        right: initial;
+        left: 0;
     }
-  }
+
+    > .simulation > #gameModules {
+        position: absolute;
+        left: 0px;
+        right: initial;
+        width: var(--game-modules-adaptative-size, 50%);
+    }
+
+    &.dockToTheLeft > .simulation {
+        > #gameModules {
+            left: initial;
+            right: 0px;
+        }
+    }
 }
 
-
 button.js-notifications {
-  position: absolute;
-  bottom: 90px;
-  left: 30px;
-  padding: 4px 8px !important;
-  font-size: 2.5rem;
-  display: none;
-  z-index: 101;
-  width: 75px;
-  background-color: $light-orange;
-  border: 0;
-  border-radius: $radius;
-  height: 75px;
-  animation: pulse 1s infinite;
-
-  &.visible {
-    display: block;
-  }
-
-  &:hover {
-    background-color: lighten($light-orange, 15%);
-  }
-
-  &::after {
-    content: attr(data-count);
-    color: white;
     position: absolute;
-    bottom: 7px;
-    right: 5px;
-    font-weight: bold;
-    font-size: 1.2rem;
-    background-color: darken($light-red, 10%);
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    line-height: 25px;
-  }
-
-  &[data-count="0"]::after {
+    bottom: 90px;
+    left: 30px;
+    padding: 4px 8px !important;
+    font-size: 2.5rem;
     display: none;
-  }
+    z-index: 101;
+    width: 75px;
+    background-color: $light-orange;
+    border: 0;
+    border-radius: $radius;
+    height: 75px;
+    animation: pulse 1s infinite;
+
+    &.visible {
+        display: block;
+    }
+
+    &:hover {
+        background-color: lighten($light-orange, 15%);
+    }
+
+    &::after {
+        content: attr(data-count);
+        color: white;
+        position: absolute;
+        bottom: 7px;
+        right: 5px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        background-color: darken($light-red, 10%);
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        line-height: 25px;
+    }
+
+    &[data-count='0']::after {
+        display: none;
+    }
 }
 
 .alert {
-  padding: 5px 10px;
-  margin: 20px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  width: max-content;
+    padding: 5px 10px;
+    margin: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: max-content;
 
-  &.warning {
-    color: #8a6d3b;
-    background-color: #fcf8e3;
-    border-color: #faebcc;
-  }
+    &.warning {
+        color: #8a6d3b;
+        background-color: #fcf8e3;
+        border-color: #faebcc;
+    }
 }
 
 #noty_layout__topLeft {
-  z-index: 100;
-  pointer-events: none;
+    z-index: 100;
+    pointer-events: none;
 
-  >* {
-    pointer-events: auto;
-  }
+    > * {
+        pointer-events: auto;
+    }
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba($light-orange, 0.7);
-  }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba($light-orange, 0.7);
+    }
 
-  70% {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 10px rgba($light-orange, 0);
-  }
+    70% {
+        transform: scale(1.2);
+        box-shadow: 0 0 0 10px rgba($light-orange, 0);
+    }
 
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba($light-orange, 0);
-  }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba($light-orange, 0);
+    }
 }
 
 // Override confirm dialog styles
 .swal-modal {
-  background-color: $main-color;
-  color: white;
+    background-color: $main-color;
+    color: white;
 }
 
 .swal-title {
-  color: white;
+    color: white;
 }
 
 .swal-icon--warning__body,
 .swal-icon--warning__dot {
-  animation: background-pulse .75s infinite alternate;
+    animation: background-pulse 0.75s infinite alternate;
 }
 
 .swal-icon--warning {
-  animation: border-pulse .75s infinite alternate;
+    animation: border-pulse 0.75s infinite alternate;
 }
 
 .swal-overlay {
-  background-color: rgba(0, 0, 0, .75);
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
 .swal-button--cancel {
-  background-color: darken($light-blue, 15%);
-  filter: saturate(30%);
-  color: white;
+    background-color: darken($light-blue, 15%);
+    filter: saturate(30%);
+    color: white;
 }
 
 @keyframes border-pulse {
-  from {
-    border-color: $light-orange;
-  }
-  to {
-    border-color: darken($light-orange, 10%);
-  }
+    from {
+        border-color: $light-orange;
+    }
+    to {
+        border-color: darken($light-orange, 10%);
+    }
 }
 
 @keyframes background-pulse {
-  from {
-    background-color: $light-orange;
-  }
-  to {
-    background-color: darken($light-orange, 10%);
-  }
+    from {
+        background-color: $light-orange;
+    }
+    to {
+        background-color: darken($light-orange, 10%);
+    }
 }
 
 /* width */
 ::-webkit-scrollbar {
-  width: 5px;
-  &:hover {
-    display: block;
-  }
+    width: 5px;
+    &:hover {
+        display: block;
+    }
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgba(0,0,0,.25);
-  border-radius: 5px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,.15);
-  border-radius: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,.25);
+    background: rgba(255, 255, 255, 0.25);
 }

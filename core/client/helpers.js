@@ -1,399 +1,435 @@
-import Phaser from 'phaser';
-import meetingRoom from './meeting-room';
-import networkManager from './network-manager';
+import Phaser from 'phaser'
+import meetingRoom from './meeting-room'
+import networkManager from './network-manager'
 
 viewportModes = Object.freeze({
-  fullscreen: 'fullscreen',
-  small: 'small',
-  splitScreen: 'split-screen',
-});
+    fullscreen: 'fullscreen',
+    small: 'small',
+    splitScreen: 'split-screen',
+})
 
 editorModes = Object.freeze({
-  entities: 'entities',
-  tiles: 'tiles',
-  zones: 'zones',
-  level: 'level',
-});
+    entities: 'entities',
+    tiles: 'tiles',
+    zones: 'zones',
+    level: 'level',
+})
 
 eventTypes = Object.freeze({
-  onElementResized: 'onElementResized',
-  onEntityAdded: 'onEntityAdded',
-  onEntityUpdated: 'onEntityUpdated',
-  onEntityRemoved: 'onEntityRemoved',
-  onEntityInteractionStarted: 'onEntityInteractionStarted',
-  onEntityInteractionStopped: 'onEntityInteractionStopped',
-  onLevelLoaded: 'onLevelLoaded',
-  onLevelLoading: 'onLevelLoading',
-  onLevelUnloaded: 'onLevelUnloaded',
-  onMeetStarted: 'onMeetStarted',
-  onMeetEnded: 'onMeetEnded',
-  onMenuOptionSelected: 'onMenuOptionSelected',
-  onMenuOptionUnselected: 'onMenuOptionUnselected',
-  onNotificationClicked: 'onNotificationClicked',
-  onNotificationReceived: 'onNotificationReceived',
-  onPeerDataReceived: 'onPeerDataReceived',
-  onMediaStreamStateChanged: 'onMediaStreamStateChanged',
-  onTileAdded: 'onTileAdded',
-  onTileChanged: 'onTileChanged',
-  onUsersComeCloser: 'onUsersComeCloser',
-  onUsersMovedAway: 'onUsersMovedAway',
-  onViewportUpdated: 'onViewportUpdated',
-  onZoneEntered: 'onZoneEntered',
-  onZoneLeft: 'onZoneLeft',
-  onZoneAdded: 'onZoneAdded',
-  onZoneUpdated: 'onZoneUpdated',
-  onZoneRemoved: 'onZoneRemoved',
-  onPopInEvent: 'pop-in-event',
-  onWorldSceneCreated: 'onWorldSceneCreated',
-  beforeSendingMessage: 'beforeSendingMessage',
-  afterSendingMessage: 'afterSendingMessage',
-  consoleClosed: 'consoleClosed',
-});
+    onElementResized: 'onElementResized',
+    onEntityAdded: 'onEntityAdded',
+    onEntityUpdated: 'onEntityUpdated',
+    onEntityRemoved: 'onEntityRemoved',
+    onEntityInteractionStarted: 'onEntityInteractionStarted',
+    onEntityInteractionStopped: 'onEntityInteractionStopped',
+    onLevelLoaded: 'onLevelLoaded',
+    onLevelLoading: 'onLevelLoading',
+    onLevelUnloaded: 'onLevelUnloaded',
+    onMeetStarted: 'onMeetStarted',
+    onMeetEnded: 'onMeetEnded',
+    onMenuOptionSelected: 'onMenuOptionSelected',
+    onMenuOptionUnselected: 'onMenuOptionUnselected',
+    onNotificationClicked: 'onNotificationClicked',
+    onNotificationReceived: 'onNotificationReceived',
+    onPeerDataReceived: 'onPeerDataReceived',
+    onMediaStreamStateChanged: 'onMediaStreamStateChanged',
+    onTileAdded: 'onTileAdded',
+    onTileChanged: 'onTileChanged',
+    onUsersComeCloser: 'onUsersComeCloser',
+    onUsersMovedAway: 'onUsersMovedAway',
+    onViewportUpdated: 'onViewportUpdated',
+    onZoneEntered: 'onZoneEntered',
+    onZoneLeft: 'onZoneLeft',
+    onZoneAdded: 'onZoneAdded',
+    onZoneUpdated: 'onZoneUpdated',
+    onZoneRemoved: 'onZoneRemoved',
+    onPopInEvent: 'pop-in-event',
+    onWorldSceneCreated: 'onWorldSceneCreated',
+    beforeSendingMessage: 'beforeSendingMessage',
+    afterSendingMessage: 'afterSendingMessage',
+    consoleClosed: 'consoleClosed',
+})
 
 toggleUserProperty = (propertyName, value) => {
-  const user = Meteor.user();
-  if (!user) return;
+    const user = Meteor.user()
+    if (!user) return
 
-  const toggleMicOn = value || (value === undefined && !user.profile.shareAudio);
-  const toggleCamOn = value || (value === undefined && !user.profile.shareVideo);
+    const toggleMicOn = value || (value === undefined && !user.profile.shareAudio)
+    const toggleCamOn = value || (value === undefined && !user.profile.shareVideo)
 
-  if (toggleMicOn || toggleCamOn) {
-    const zone = zoneManager.currentZone();
+    if (toggleMicOn || toggleCamOn) {
+        const zone = zoneManager.currentZone()
 
-    // disable medias switch in meeting
-    if (zone && meetingRoom.isOpen()) {
-      if (propertyName === 'shareAudio' && !zone.unmute) {
-        lp.notif.warning(`Your microphone is only accessible on stage `);
-        return;
-      }
+        // disable medias switch in meeting
+        if (zone && meetingRoom.isOpen()) {
+            if (propertyName === 'shareAudio' && !zone.unmute) {
+                lp.notif.warning(`Your microphone is only accessible on stage `)
+                return
+            }
 
-      if (propertyName === 'shareVideo' && !zone.unhide) {
-        lp.notif.warning(`Your camera is only accessible on stage `);
-        return;
-      }
+            if (propertyName === 'shareVideo' && !zone.unhide) {
+                lp.notif.warning(`Your camera is only accessible on stage `)
+                return
+            }
+        }
+
+        // disable medias switch in focus zones
+        if (zone?.disableCommunications) {
+            lp.notif.warning(`You can't activate your camera and microphone in a focus zone`)
+            return
+        }
     }
 
-    // disable medias switch in focus zones
-    if (zone?.disableCommunications) {
-      lp.notif.warning(`You can't activate your camera and microphone in a focus zone`);
-      return;
-    }
-  }
-
-  if (typeof value === 'boolean') Meteor.users.update(user._id, { $set: { [`profile.${propertyName}`]: !!value } });
-  else Meteor.users.update(user._id, { $set: { [`profile.${propertyName}`]: !user.profile[propertyName] } });
-};
+    if (typeof value === 'boolean')
+        Meteor.users.update(user._id, {
+            $set: { [`profile.${propertyName}`]: !!value },
+        })
+    else
+        Meteor.users.update(user._id, {
+            $set: { [`profile.${propertyName}`]: !user.profile[propertyName] },
+        })
+}
 
 relativePositionToCamera = (position, camera) => {
-  const { worldView, zoom } = camera;
-  return { x: (position.x - worldView.x) * zoom, y: (position.y - worldView.y) * zoom };
-};
+    const { worldView, zoom } = camera
+    return {
+        x: (position.x - worldView.x) * zoom,
+        y: (position.y - worldView.y) * zoom,
+    }
+}
 
 const getSimulationSize = () => {
-  const { canvas } = game;
+    const { canvas } = game
 
-  return {
-    width: canvas.width || window.innerWidth,
-    height: canvas.height || window.innerHeight,
-  };
-};
+    return {
+        width: canvas.width || window.innerWidth,
+        height: canvas.height || window.innerHeight,
+    }
+}
 
 updateViewport = (scene, mode) => {
-  if (typeof mode !== 'string') mode = scene.viewportMode;
+    if (typeof mode !== 'string') mode = scene.viewportMode
 
-  if (meet.lowLevel) return;
+    if (meet.lowLevel) return
 
-  const lemverseTag = document.querySelector('.lemverse');
-  lemverseTag.classList.toggle('screen-splitted', (mode !== viewportModes.fullscreen && Session.get('screenMode') !== 'unlocked'));
-  lemverseTag.classList.toggle('dockToTheLeft', Session.get('screenSide') === 'left');
-  lemverseTag.classList.toggle('dockToTheRight', Session.get('screenSide') === 'right');
+    const lemverseTag = document.querySelector('.lemverse')
+    lemverseTag.classList.toggle(
+        'screen-splitted',
+        mode !== viewportModes.fullscreen && Session.get('screenMode') !== 'unlocked'
+    )
+    lemverseTag.classList.toggle('dockToTheLeft', Session.get('screenSide') === 'left')
+    lemverseTag.classList.toggle('dockToTheRight', Session.get('screenSide') === 'right')
 
-  const { width, height } = getSimulationSize();
-  scene.cameras.main.setViewport(0, 0, width, height);
+    const { width, height } = getSimulationSize()
+    scene.cameras.main.setViewport(0, 0, width, height)
 
-  scene.viewportMode = mode;
+    scene.viewportMode = mode
 
-  const event = new CustomEvent(eventTypes.onViewportUpdated);
-  window.dispatchEvent(event);
-};
+    const event = new CustomEvent(eventTypes.onViewportUpdated)
+    window.dispatchEvent(event)
+}
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
-const formatURL = url => {
-  let formattedURL;
-  try {
-    formattedURL = new URL(url);
-  } catch (err) {
-    return undefined;
-  }
+const formatURL = (url) => {
+    let formattedURL
+    try {
+        formattedURL = new URL(url)
+    } catch (err) {
+        return undefined
+    }
 
-  return formattedURL;
-};
+    return formattedURL
+}
 
-const formatURLs = (text, shortName = false) => text.replace(/(https?:\/\/[^\s]+)/g, url => {
-  const formatedURL = formatURL(url);
-  if (!formatedURL) return url;
+const formatURLs = (text, shortName = false) =>
+    text.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+        const formatedURL = formatURL(url)
+        if (!formatedURL) return url
 
-  let linkName = url;
-  if (shortName) {
-    const name = formatedURL.hostname.replace('www.', '');
-    const lastDot = name.lastIndexOf('.') || name.length;
-    linkName = lastDot === -1 ? name : name.substring(lastDot, 0);
-  }
+        let linkName = url
+        if (shortName) {
+            const name = formatedURL.hostname.replace('www.', '')
+            const lastDot = name.lastIndexOf('.') || name.length
+            linkName = lastDot === -1 ? name : name.substring(lastDot, 0)
+        }
 
-  return `<a href="${formatedURL}" target="_blank" title="${formatedURL}">${linkName}</a>`;
-});
+        return `<a href="${formatedURL}" target="_blank" title="${formatedURL}">${linkName}</a>`
+    })
 
 sendDataToUsers = (type, data, emitterId, userIds = []) => {
-  let targets = [...new Set(userIds)];
-  targets = targets.filter(target => target !== Meteor.userId());
-  if (!targets.length) throw new Error('no-targets');
+    let targets = [...new Set(userIds)]
+    targets = targets.filter((target) => target !== Meteor.userId())
+    if (!targets.length) throw new Error('no-targets')
 
-  return networkManager.sendData(targets, { type, emitter: emitterId, data });
-};
+    return networkManager.sendData(targets, { type, emitter: emitterId, data })
+}
 
 sendDataToUsersInZone = (type, data, emitterId) => {
-  const user = Meteor.user();
-  const usersInZone = zoneManager.usersInZone(zoneManager.currentZone(user));
-  const userInZoneIds = usersInZone.map(u => u._id);
-  if (!userInZoneIds.length) throw new Error('no-targets');
+    const user = Meteor.user()
+    const usersInZone = zoneManager.usersInZone(zoneManager.currentZone(user))
+    const userInZoneIds = usersInZone.map((u) => u._id)
+    if (!userInZoneIds.length) throw new Error('no-targets')
 
-  return networkManager.sendData(userInZoneIds, { type, emitter: emitterId, data });
-};
+    return networkManager.sendData(userInZoneIds, {
+        type,
+        emitter: emitterId,
+        data,
+    })
+}
 
-kebabCase = string => string.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-').toLowerCase();
+kebabCase = (string) =>
+    string
+        .replace(/([a-z])([A-Z])/g, '$1-$2')
+        .replace(/\s+/g, '-')
+        .toLowerCase()
 
 nearUserIdsToString = (includeUser = true) => {
-  const nearUsers = Object.keys(userProximitySensor.nearUsers);
-  if (nearUsers.length && includeUser) nearUsers.push(Meteor.userId());
+    const nearUsers = Object.keys(userProximitySensor.nearUsers)
+    if (nearUsers.length && includeUser) nearUsers.push(Meteor.userId())
 
-  return nearUsers.sort().join(';');
-};
+    return nearUsers.sort().join(';')
+}
 
 createFakeShadow = (scene, x, y, scaleX, scaleY) => {
-  const shadow = scene.add.sprite(x, y, 'circle');
-  shadow.alpha = 0.1;
-  shadow.scaleX = scaleX;
-  shadow.scaleY = scaleY;
-  shadow.setDepth(-1);
-  shadow.setTint(0x000000);
+    const shadow = scene.add.sprite(x, y, 'circle')
+    shadow.alpha = 0.1
+    shadow.scaleX = scaleX
+    shadow.scaleY = scaleY
+    shadow.setDepth(-1)
+    shadow.setTint(0x000000)
 
-  return shadow;
-};
+    return shadow
+}
 
-waitFor = (condition, attempt, delay = 250) => new Promise((resolve, reject) => {
-  let currentAttempt = 0;
-  const waitFunc = () => {
-    currentAttempt++;
-    if (condition()) { resolve(); return; }
-    if (currentAttempt >= attempt) reject(new Error('too many attempt'));
-    else setTimeout(waitFunc, delay);
-  };
+waitFor = (condition, attempt, delay = 250) =>
+    new Promise((resolve, reject) => {
+        let currentAttempt = 0
+        const waitFunc = () => {
+            currentAttempt++
+            if (condition()) {
+                resolve()
+                return
+            }
+            if (currentAttempt >= attempt) reject(new Error('too many attempt'))
+            else setTimeout(waitFunc, delay)
+        }
 
-  waitFunc();
-});
+        waitFunc()
+    })
 
-const replaceTextVars = text => text.replaceAll(/{{\s?[\w\s]*\s?}}/g, element => {
-  const value = element.replace('{{', '').replace('}}', '');
-  const [type] = value.split('_');
+const replaceTextVars = (text) =>
+    text.replaceAll(/{{\s?[\w\s]*\s?}}/g, (element) => {
+        const value = element.replace('{{', '').replace('}}', '')
+        const [type] = value.split('_')
 
-  if (type === 'usr') return Meteor.users.findOne(value)?.profile.name || `User ${value}`;
+        if (type === 'usr') return Meteor.users.findOne(value)?.profile.name || `User ${value}`
 
-  return element;
-});
+        return element
+    })
 
-generateRandomAvatarURLForUser = user => Meteor.settings.public.peer.avatarAPI
-  .replace('[user_id]', encodeURI(user._id || 'guest'))
-  .replace('[user_name]', encodeURI(user.profile.name || 'guest'))
-  .replace('[user_avatar]', encodeURI(user.profile.avatar || 'cat'));
+generateRandomAvatarURLForUser = (user) =>
+    Meteor.settings.public.peer.avatarAPI
+        .replace('[user_id]', encodeURI(user._id || 'guest'))
+        .replace('[user_name]', encodeURI(user.profile.name || 'guest'))
+        .replace('[user_avatar]', encodeURI(user.profile.avatar || 'cat'))
 
 sendEvent = (command, data = {}) => {
-  window.parent.postMessage(JSON.parse(JSON.stringify({ command, ...data })), Meteor.settings.public.lp.website);
-};
+    window.parent.postMessage(JSON.parse(JSON.stringify({ command, ...data })), Meteor.settings.public.lp.website)
+}
 
-destroyVideoSource = video => {
-  if (!video) return;
-  video.pause();
-  video.src = '';
-  video.load();
-};
+destroyVideoSource = (video) => {
+    if (!video) return
+    video.pause()
+    video.src = ''
+    video.load()
+}
 
 const addToSession = (key, modules) => {
-  const loadedModules = Session.get(key) || [];
+    const loadedModules = Session.get(key) || []
 
-  modules.forEach(module => {
-    const moduleAlreadyExists = loadedModules.find(loadedModule => {
-      // todo: reduce algorithm complexity
-      if (module.id) return loadedModule.id === module.id;
-      return loadedModule === module;
-    });
+    modules.forEach((module) => {
+        const moduleAlreadyExists = loadedModules.find((loadedModule) => {
+            // todo: reduce algorithm complexity
+            if (module.id) return loadedModule.id === module.id
+            return loadedModule === module
+        })
 
-    if (!moduleAlreadyExists) loadedModules.push(module);
-  });
+        if (!moduleAlreadyExists) loadedModules.push(module)
+    })
 
-  Session.set(key, loadedModules);
-};
+    Session.set(key, loadedModules)
+}
 
 const moduleType = {
-  GENERIC: 'modules',
-  MAIN: 'mainModules',
-  GAME: 'gameModules',
-  TEAM: 'teamModules',
-  USER_LIST: 'userListModules',
-  RADIAL_MENU: 'radialMenuModules',
-};
+    GENERIC: 'modules',
+    MAIN: 'mainModules',
+    GAME: 'gameModules',
+    TEAM: 'teamModules',
+    USER_LIST: 'userListModules',
+    RADIAL_MENU: 'radialMenuModules',
+}
 
 // reset previously loaded modules
-Object.values(moduleType).forEach(module => Session.set(module, []));
+Object.values(moduleType).forEach((module) => Session.set(module, []))
 
 registerModules = (modules, type = moduleType.GENERIC) => {
-  if (!Object.values(moduleType).includes(type)) throw new Error(`Invalid module type ${type}`);
+    if (!Object.values(moduleType).includes(type)) throw new Error(`Invalid module type ${type}`)
 
-  addToSession(type, modules);
-};
+    addToSession(type, modules)
+}
 
-const allowPhaserMouseInputs = () => !Session.get('editor') && !Session.get('console');
+const allowPhaserMouseInputs = () => !Session.get('editor') && !Session.get('console')
 
 // To avoid bugs related to network latency we accept a distance greater than that which launches a call to limit false negatives behaviors
-const canAnswerCall = user => {
-  if (userProximitySensor.isUserNear(user)) return true;
+const canAnswerCall = (user) => {
+    if (userProximitySensor.isUserNear(user)) return true
 
-  const callDistanceThreshold = Meteor.settings.public.character.callDistanceThreshold || 300;
-  const otherUser = Meteor.users.findOne(user._id, { fields: { 'profile.x': 1, 'profile.y': 1 } });
+    const callDistanceThreshold = Meteor.settings.public.character.callDistanceThreshold || 300
+    const otherUser = Meteor.users.findOne(user._id, {
+        fields: { 'profile.x': 1, 'profile.y': 1 },
+    })
 
-  return userProximitySensor.distance(Meteor.user(), otherUser) <= callDistanceThreshold;
-};
+    return userProximitySensor.distance(Meteor.user(), otherUser) <= callDistanceThreshold
+}
 
-const toggleUIInputs = value => {
-  hotkeys.setScope(value ? scopes.form : scopes.player);
-  game?.scene.keys.WorldScene?.enableKeyboard(!value, false);
-};
+const toggleUIInputs = (value) => {
+    hotkeys.setScope(value ? scopes.form : scopes.player)
+    game?.scene.keys.WorldScene?.enableKeyboard(!value, false)
+}
 
 const generateEntityThumbnail = (entity, thumbnailMaxSize = 35) => {
-  if (entity.thumbnail) {
-    const filesRoute = Meteor.settings.public.files.route;
-    const [x, y, w, h] = entity.thumbnail.rect;
-    const url = `${filesRoute}/${entity.thumbnail.fileId}`;
+    if (entity.thumbnail) {
+        const filesRoute = Meteor.settings.public.files.route
+        const [x, y, w, h] = entity.thumbnail.rect
+        const url = `${filesRoute}/${entity.thumbnail.fileId}`
 
-    const maxSize = Math.max(w, h);
-    const ratio = thumbnailMaxSize / maxSize;
+        const maxSize = Math.max(w, h)
+        const ratio = thumbnailMaxSize / maxSize
 
-    return `background-image: url("./${url}"); background-position: -${x}px -${y}px; width: ${w}px; height: ${h}px; transform: scale(${ratio});`;
-  }
+        return `background-image: url("./${url}"); background-position: -${x}px -${y}px; width: ${w}px; height: ${h}px; transform: scale(${ratio});`
+    }
 
-  const spriteURL = entity.gameObject?.sprite?.path;
-  if (spriteURL) return `background-image: url("${spriteURL}"); background-size: contain; width: 100%; height: 100%;`;
+    const spriteURL = entity.gameObject?.sprite?.path
+    if (spriteURL) return `background-image: url("${spriteURL}"); background-size: contain; width: 100%; height: 100%;`
 
-  return `background-image: url("lemverse.png"); background-size: contain; width: 100%; height: 100%;`;
-};
+    return `background-image: url("lemverse.png"); background-size: contain; width: 100%; height: 100%;`
+}
 
-const meteorCallWithPromise = (method, ...args) => new Promise((resolve, reject) => {
-  Meteor.call(method, ...args, (err, result) => {
-    if (err) reject(err);
-    else resolve(result);
-  });
-});
+const meteorCallWithPromise = (method, ...args) =>
+    new Promise((resolve, reject) => {
+        Meteor.call(method, ...args, (err, result) => {
+            if (err) reject(err)
+            else resolve(result)
+        })
+    })
 
-const nearestDuration = duration => {
-  const message = [];
-  message.push(lp.s.lpad(moment.duration(duration).asHours() | 0, 2, '0'));
-  message.push(lp.s.lpad(moment.duration(duration).minutes(), 2, '0'));
-  message.push(lp.s.lpad(moment.duration(duration).seconds(), 2, '0'));
+const nearestDuration = (duration) => {
+    const message = []
+    message.push(lp.s.lpad(moment.duration(duration).asHours() | 0, 2, '0'))
+    message.push(lp.s.lpad(moment.duration(duration).minutes(), 2, '0'))
+    message.push(lp.s.lpad(moment.duration(duration).seconds(), 2, '0'))
 
-  return message.join(':');
-};
+    return message.join(':')
+}
 
-const setReaction = reaction => {
-  if (reaction) {
-    Meteor.call('analyticsReaction', { reaction });
-    Meteor.users.update(Meteor.userId(), { $set: { 'profile.reaction': reaction } });
-  } else Meteor.users.update(Meteor.userId(), { $unset: { 'profile.reaction': 1 } });
-};
+const setReaction = (reaction) => {
+    if (reaction) {
+        Meteor.call('analyticsReaction', { reaction })
+        Meteor.users.update(Meteor.userId(), {
+            $set: { 'profile.reaction': reaction },
+        })
+    } else
+        Meteor.users.update(Meteor.userId(), {
+            $unset: { 'profile.reaction': 1 },
+        })
+}
 
-const textDirectionToVector = direction => {
-  if (direction === 'left') return Phaser.Math.Vector2.LEFT;
-  if (direction === 'right') return Phaser.Math.Vector2.RIGHT;
-  if (direction === 'up') return Phaser.Math.Vector2.UP;
-  if (direction === 'down') return Phaser.Math.Vector2.DOWN;
+const textDirectionToVector = (direction) => {
+    if (direction === 'left') return Phaser.Math.Vector2.LEFT
+    if (direction === 'right') return Phaser.Math.Vector2.RIGHT
+    if (direction === 'up') return Phaser.Math.Vector2.UP
+    if (direction === 'down') return Phaser.Math.Vector2.DOWN
 
-  return Phaser.Math.Vector2.ZERO;
-};
+    return Phaser.Math.Vector2.ZERO
+}
 
-const vectorToTextDirection = vector => {
-  if (Math.abs(vector.x) > Math.abs(vector.y)) {
-    if (vector.x <= -1) return 'left';
-    else if (vector.x >= 1) return 'right';
-  }
+const vectorToTextDirection = (vector) => {
+    if (Math.abs(vector.x) > Math.abs(vector.y)) {
+        if (vector.x <= -1) return 'left'
+        if (vector.x >= 1) return 'right'
+    }
 
-  if (vector.y <= -1) return 'up';
-  else if (vector.y >= 1) return 'down';
+    if (vector.y <= -1) return 'up'
+    if (vector.y >= 1) return 'down'
 
-  return undefined;
-};
+    return undefined
+}
 
-const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+const isMobile = () => window.matchMedia('(pointer: coarse)').matches
 
-const filesURL = `${Meteor.settings.public.lp.website}${Meteor.settings.public.files.route}/`;
+const filesURL = `${Meteor.settings.public.lp.website}${Meteor.settings.public.files.route}/`
 
-const getHslFromHex = H => {
-  // Convert hex to RGB first
-  let r = 0; let g = 0; let b = 0;
+const getHslFromHex = (H) => {
+    // Convert hex to RGB first
+    let r = 0
+    let g = 0
+    let b = 0
 
-  if (H.length === 4) {
-    r = `0x${H[1]}${H[1]}`;
-    g = `0x${H[2]}${H[2]}`;
-    b = `0x${H[3]}${H[3]}`;
-  } else if (H.length === 7) {
-    r = `0x${H[1]}${H[2]}`;
-    g = `0x${H[3]}${H[4]}`;
-    b = `0x${H[5]}${H[6]}`;
-  }
-  // Then to HSL
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const cmin = Math.min(r, g, b);
-  const cmax = Math.max(r, g, b);
-  const delta = cmax - cmin;
-  let h = 0;
-  let s = 0;
-  let l = 0;
+    if (H.length === 4) {
+        r = `0x${H[1]}${H[1]}`
+        g = `0x${H[2]}${H[2]}`
+        b = `0x${H[3]}${H[3]}`
+    } else if (H.length === 7) {
+        r = `0x${H[1]}${H[2]}`
+        g = `0x${H[3]}${H[4]}`
+        b = `0x${H[5]}${H[6]}`
+    }
+    // Then to HSL
+    r /= 255
+    g /= 255
+    b /= 255
+    const cmin = Math.min(r, g, b)
+    const cmax = Math.max(r, g, b)
+    const delta = cmax - cmin
+    let h = 0
+    let s = 0
+    let l = 0
 
-  if (delta === 0) h = 0;
-  else if (cmax === r) h = ((g - b) / delta) % 6;
-  else if (cmax === g) h = (b - r) / delta + 2;
-  else h = (r - g) / delta + 4;
+    if (delta === 0) h = 0
+    else if (cmax === r) h = ((g - b) / delta) % 6
+    else if (cmax === g) h = (b - r) / delta + 2
+    else h = (r - g) / delta + 4
 
-  h = Math.round(h * 60);
+    h = Math.round(h * 60)
 
-  if (h < 0) h += 360;
+    if (h < 0) h += 360
 
-  l = (cmax + cmin) / 2;
-  s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-  s = +(s * 100).toFixed(1);
-  l = +(l * 100).toFixed(1);
+    l = (cmax + cmin) / 2
+    s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1))
+    s = +(s * 100).toFixed(1)
+    l = +(l * 100).toFixed(1)
 
-  return { h, s, l };
-};
+    return { h, s, l }
+}
 
 export {
-  allowPhaserMouseInputs,
-  canAnswerCall,
-  clamp,
-  filesURL,
-  formatURL,
-  formatURLs,
-  generateEntityThumbnail,
-  getHslFromHex,
-  getSimulationSize,
-  isMobile,
-  meteorCallWithPromise,
-  nearestDuration,
-  replaceTextVars,
-  setReaction,
-  textDirectionToVector,
-  toggleUIInputs,
-  vectorToTextDirection,
-
-  moduleType,
-};
+    allowPhaserMouseInputs,
+    canAnswerCall,
+    clamp,
+    filesURL,
+    formatURL,
+    formatURLs,
+    generateEntityThumbnail,
+    getHslFromHex,
+    getSimulationSize,
+    isMobile,
+    meteorCallWithPromise,
+    nearestDuration,
+    replaceTextVars,
+    setReaction,
+    textDirectionToVector,
+    toggleUIInputs,
+    vectorToTextDirection,
+    moduleType,
+}

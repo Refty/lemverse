@@ -1,41 +1,41 @@
-@import "../../_variables";
+@import '../../_variables';
 
 .entity-toolbox {
-  padding: 10px;
-  color: white;
+    padding: 10px;
+    color: white;
 
-  hr {
-    margin: 10px;
-  }
-
-  ul {
-    max-height: 65vh;
-    overflow-y: auto;
-  }
-
-  .entity-list {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-
-    .entity {
-      display: block;
-      padding: 4px 10px;
-      font-size: 0.9rem;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #E5E9F0;
-        color: $main-color;
-      }
+    hr {
+        margin: 10px;
     }
-  }
 
-  .create-entity-from-file {
-    text-align: center;
-
-    input[type="file"] {
-      display: none;
+    ul {
+        max-height: 65vh;
+        overflow-y: auto;
     }
-  }
+
+    .entity-list {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+
+        .entity {
+            display: block;
+            padding: 4px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #e5e9f0;
+                color: $main-color;
+            }
+        }
+    }
+
+    .create-entity-from-file {
+        text-align: center;
+
+        input[type='file'] {
+            display: none;
+        }
+    }
 }

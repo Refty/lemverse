@@ -1,92 +1,101 @@
 userProximitySensor = {
-  nearUsers: {},
-  nearDistance: Meteor.settings.public.character.sensorNearDistance,
-  farDistance: Meteor.settings.public.character.sensorFarDistance,
+    nearUsers: {},
+    nearDistance: Meteor.settings.public.character.sensorNearDistance,
+    farDistance: Meteor.settings.public.character.sensorFarDistance,
 
-  checkDistances(user, otherUsers) {
-    otherUsers.forEach(otherUser => this.checkDistance(user, otherUser));
-  },
+    checkDistances(user, otherUsers) {
+        otherUsers.forEach((otherUser) => this.checkDistance(user, otherUser))
+    },
 
-  checkDistance(user, otherUser) {
-    if (user._id === otherUser._id) return;
+    checkDistance(user, otherUser) {
+        if (user._id === otherUser._id) return
 
-    const distance = this.distance(user, otherUser);
-    if (distance < this.nearDistance) this.addNearUser(otherUser);
-    else if (distance > this.farDistance) this.removeNearUser(otherUser);
-  },
+        const distance = this.distance(user, otherUser)
+        if (distance < this.nearDistance) this.addNearUser(otherUser)
+        else if (distance > this.farDistance) this.removeNearUser(otherUser)
+    },
 
-  distance(user, otherUser) {
-    const { x: userX, y: userY } = user.profile;
-    const { x, y } = otherUser.profile;
+    distance(user, otherUser) {
+        const { x: userX, y: userY } = user.profile
+        const { x, y } = otherUser.profile
 
-    return Math.hypot(x - userX, y - userY);
-  },
+        return Math.hypot(x - userX, y - userY)
+    },
 
-  addNearUser(user) {
-    const userAlreadyNear = this.isUserNear(user);
-    this.nearUsers[user._id] = user;
+    addNearUser(user) {
+        const userAlreadyNear = this.isUserNear(user)
+        this.nearUsers[user._id] = user
 
-    if (!userAlreadyNear) window.dispatchEvent(new CustomEvent(eventTypes.onUsersComeCloser, { detail: { users: [user] } }));
-  },
+        if (!userAlreadyNear)
+            window.dispatchEvent(
+                new CustomEvent(eventTypes.onUsersComeCloser, {
+                    detail: { users: [user] },
+                })
+            )
+    },
 
-  removeNearUser(user) {
-    if (!this.isUserNear(user)) return;
+    removeNearUser(user) {
+        if (!this.isUserNear(user)) return
 
-    delete this.nearUsers[user._id];
+        delete this.nearUsers[user._id]
 
-    window.dispatchEvent(new CustomEvent(eventTypes.onUsersMovedAway, { detail: { users: [user] } }));
-  },
+        window.dispatchEvent(
+            new CustomEvent(eventTypes.onUsersMovedAway, {
+                detail: { users: [user] },
+            })
+        )
+    },
 
-  callProximityStartedForAllNearUsers() {
-    const users = Object.values(this.nearUsers);
-    if (!users.length) return;
+    callProximityStartedForAllNearUsers() {
+        const users = Object.values(this.nearUsers)
+        if (!users.length) return
 
-    window.dispatchEvent(new CustomEvent(eventTypes.onUsersComeCloser, { detail: { users } }));
-  },
+        window.dispatchEvent(new CustomEvent(eventTypes.onUsersComeCloser, { detail: { users } }))
+    },
 
-  callProximityEndedForAllNearUsers() {
-    const users = Object.values(this.nearUsers);
-    if (!users.length) return;
+    callProximityEndedForAllNearUsers() {
+        const users = Object.values(this.nearUsers)
+        if (!users.length) return
 
-    window.dispatchEvent(new CustomEvent(eventTypes.onUsersMovedAway, { detail: { users } }));
-    this.nearUsers = {};
-  },
+        window.dispatchEvent(new CustomEvent(eventTypes.onUsersMovedAway, { detail: { users } }))
+        this.nearUsers = {}
+    },
 
-  isUserNear(user) {
-    return this.nearUsers[user._id] !== undefined;
-  },
+    isUserNear(user) {
+        return this.nearUsers[user._id] !== undefined
+    },
 
-  isNearSomeone() {
-    return this.nearUsersCount() > 0;
-  },
+    isNearSomeone() {
+        return this.nearUsersCount() > 0
+    },
 
-  nearNonGuestUsers() {
-    return Object.values(this.nearUsers).filter(user => !user.profile.guest);
-  },
+    nearNonGuestUsers() {
+        return Object.values(this.nearUsers).filter((user) => !user.profile.guest)
+    },
 
-  filterNearUsers(userIds) {
-    return Object.keys(this.nearUsers).filter(userId => userIds.includes(userId));
-  },
+    filterNearUsers(userIds) {
+        return Object.keys(this.nearUsers).filter((userId) => userIds.includes(userId))
+    },
 
-  nearUsersCount() {
-    return Object.keys(this.nearUsers).length;
-  },
+    nearUsersCount() {
+        return Object.keys(this.nearUsers).length
+    },
 
-  nearestUser(user) {
-    const nearUsers = Object.values(this.nearUsers);
-    if (!nearUsers.length) return undefined;
+    nearestUser(user) {
+        const nearUsers = Object.values(this.nearUsers)
+        if (!nearUsers.length) return undefined
 
-    let nearestDistance = Infinity;
-    let nearestUser;
+        let nearestDistance = Infinity
+        let nearestUser
 
-    nearUsers.forEach(nearUser => {
-      const distance = this.distance(user, nearUser);
-      if (distance > nearestDistance) return;
+        nearUsers.forEach((nearUser) => {
+            const distance = this.distance(user, nearUser)
+            if (distance > nearestDistance) return
 
-      nearestUser = nearUser;
-      nearestDistance = distance;
-    });
+            nearestUser = nearUser
+            nearestDistance = distance
+        })
 
-    return nearestUser;
-  },
-};
+        return nearestUser
+    },
+}

@@ -1,59 +1,59 @@
-@import "../../../client/variables";
+@import '../../../client/variables';
 
 .messages-channel-selector {
-  position: relative;
-  display: none;
-  flex-direction: column;
-  width: 240px;
-  min-width: 240px;
-  background-color: rgba($main-color, 0.95);
-  border-radius: $radius;
-  height: 100%;
-  pointer-events: none;
-
-  &.show {
-    display: block;
-    pointer-events: all;
-  }
-
-  .title {
-    cursor: default;
-    color: $main-text-color;
-    text-align: center;
-    padding: 16px 0;
-    margin: 0;
-    font-size: 1.1rem;
-    background-color: $main-color;
+    position: relative;
+    display: none;
+    flex-direction: column;
+    width: 240px;
+    min-width: 240px;
+    background-color: rgba($main-color, 0.95);
     border-radius: $radius;
-  }
+    height: 100%;
+    pointer-events: none;
 
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-
-    li {
-      cursor: pointer;
-      display: flex;
-      flex-direction: row;
-      color: $main-text-color;
-      padding: 10px 5px;
-      transition: all linear 0.15s;
-      position: relative;
-      border-left: 5px solid transparent;
-      font-size: 0.9rem;
-      align-items: center;
-
-      &:hover {
-        background: lighten($main-color, 10%);
-      }
-
-      &.selected {
-        background-color: $light-yellow;
-        color: $main-color;
-        font-weight: bold;
-        border-left: 5px solid darken($light-yellow, 20%);
-      }
+    &.show {
+        display: block;
+        pointer-events: all;
     }
-  }
+
+    .title {
+        cursor: default;
+        color: $main-text-color;
+        text-align: center;
+        padding: 16px 0;
+        margin: 0;
+        font-size: 1.1rem;
+        background-color: $main-color;
+        border-radius: $radius;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+
+        li {
+            cursor: pointer;
+            display: flex;
+            flex-direction: row;
+            color: $main-text-color;
+            padding: 10px 5px;
+            transition: all linear 0.15s;
+            position: relative;
+            border-left: 5px solid transparent;
+            font-size: 0.9rem;
+            align-items: center;
+
+            &:hover {
+                background: lighten($main-color, 10%);
+            }
+
+            &.selected {
+                background-color: $light-yellow;
+                color: $main-color;
+                font-weight: bold;
+                border-left: 5px solid darken($light-yellow, 20%);
+            }
+        }
+    }
 }

@@ -1,206 +1,206 @@
-@import "../_variables";
+@import '../_variables';
 .js-fullscreen-close {
-  position: fixed;
-  right: 0px;
-  top: 0px;
-  appearance: none;
-  background: none;
-  border: 0;
-  cursor: pointer;
-  font-size: 1.55rem;
-  font-weight: 700;
-  line-height: 1;
-  opacity: 0.8;
-  color: white;
-  padding: 8px;
-  display: none;
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.8;
+    color: white;
+    padding: 8px;
+    display: none;
 
-  &.visible {
-    display: block;
-  }
+    &.visible {
+        display: block;
+    }
 }
 
 .stream {
-  z-index: 5;
-  background-color: $main-color;
-  border-radius: 10px;
-  border: 2px solid rgba($main-color, 0.1);
-  margin: 5px;
-  position: relative;
-  overflow: hidden;
-  transition: border 0.25s linear;
-  width: 320px;
-  height: 240px;
-
-  @include media-max("phone-down") {
-    width: 160px;
-    height: 120px;
-  }
-
-  &.talking {
-    border: 2px solid var(--secondary-color);
-  }
-
-  &::before {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-  }
-
-  &[data-state="calling"]::before {
-    content: "Calling…";
-  }
-
-  &[data-state="media-error"]::before {
-    content: "Media error 😢";
-  }
-
-  &:hover {
-    border: 2px solid black;
-  }
-
-  .stream-name {
-    position: absolute;
-    left: 5px;
-    top: 5px;
-    background-color: rgba($main-color, 0.75);
-    border-radius: 4px;
-    padding: 3px 10px;
-    z-index: 10;
-    color: #e5e4e7;
-  }
-
-  img,
-  video {
-    pointer-events: none;
-  }
-
-  .webcam {
+    z-index: 5;
+    background-color: $main-color;
+    border-radius: 10px;
+    border: 2px solid rgba($main-color, 0.1);
+    margin: 5px;
+    position: relative;
+    overflow: hidden;
+    transition: border 0.25s linear;
     width: 320px;
     height: 240px;
-    cursor: pointer;
 
-    @include media-max("phone-down") {
-      width: 160px;
-      height: 120px;
+    @include media-max('phone-down') {
+        width: 160px;
+        height: 120px;
     }
 
-    .mute {
-      position: absolute;
-      z-index: 10;
-      top: 5px;
-      right: 35px;
-      font-size: 24px;
+    &.talking {
+        border: 2px solid var(--secondary-color);
+    }
 
-      div:nth-child(1) {
+    &::before {
         position: absolute;
-        z-index: 11;
-      }
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+    }
 
-      div:nth-child(2) {
+    &[data-state='calling']::before {
+        content: 'Calling…';
+    }
+
+    &[data-state='media-error']::before {
+        content: 'Media error 😢';
+    }
+
+    &:hover {
+        border: 2px solid black;
+    }
+
+    .stream-name {
         position: absolute;
-        z-index: 12;
-        transform: scale(0.65);
-      }
+        left: 5px;
+        top: 5px;
+        background-color: rgba($main-color, 0.75);
+        border-radius: 4px;
+        padding: 3px 10px;
+        z-index: 10;
+        color: #e5e4e7;
     }
 
     img,
     video {
-      width: 320px;
-      height: 240px;
-      position: absolute;
-      background-color: #292929;
-      background-image: url("loader-white.gif");
-      background-size: inherit;
-      background-repeat: no-repeat;
-      background-position: center;
-
-      @include media-max("phone-down") {
-        width: 160px;
-        height: 120px;
-      }
+        pointer-events: none;
     }
 
-    img {
-      z-index: 8;
-      cursor: default;
+    .webcam {
+        width: 320px;
+        height: 240px;
+        cursor: pointer;
+
+        @include media-max('phone-down') {
+            width: 160px;
+            height: 120px;
+        }
+
+        .mute {
+            position: absolute;
+            z-index: 10;
+            top: 5px;
+            right: 35px;
+            font-size: 24px;
+
+            div:nth-child(1) {
+                position: absolute;
+                z-index: 11;
+            }
+
+            div:nth-child(2) {
+                position: absolute;
+                z-index: 12;
+                transform: scale(0.65);
+            }
+        }
+
+        img,
+        video {
+            width: 320px;
+            height: 240px;
+            position: absolute;
+            background-color: #292929;
+            background-image: url('loader-white.gif');
+            background-size: inherit;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            @include media-max('phone-down') {
+                width: 160px;
+                height: 120px;
+            }
+        }
+
+        img {
+            z-index: 8;
+            cursor: default;
+        }
     }
-  }
 
-  .screenshare {
-    cursor: pointer;
-    width: 128px;
-    height: 72px;
-    z-index: 12;
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    border: 2px solid white;
-    background-color: #292929;
-    box-sizing: content-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    .screenshare {
+        cursor: pointer;
+        width: 128px;
+        height: 72px;
+        z-index: 12;
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        border: 2px solid white;
+        background-color: #292929;
+        box-sizing: content-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-    &:hover {
-      border: 2px solid black;
+        &:hover {
+            border: 2px solid black;
+        }
+
+        video {
+            width: 128px;
+            height: 72px;
+            background-color: #292929;
+            background-image: url('loader-white.gif');
+            background-size: 50%;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            &.fullscreen {
+                background-size: initial;
+            }
+        }
     }
 
-    video {
-      width: 128px;
-      height: 72px;
-      background-color: #292929;
-      background-image: url("loader-white.gif");
-      background-size: 50%;
-      background-repeat: no-repeat;
-      background-position: center;
+    video.fullscreen,
+    img.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: calc(100% - 400px);
+        height: 100%;
+        border: none;
+        background-color: #292929;
+        border-radius: 0;
+        margin: 0;
+        pointer-events: all;
+        cursor: pointer;
 
-      &.fullscreen {
-        background-size: initial;
-      }
+        @include media-max('phone-down') {
+            width: 100%;
+        }
     }
-  }
-
-  video.fullscreen,
-  img.fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: calc(100% - 400px);
-    height: 100%;
-    border: none;
-    background-color: #292929;
-    border-radius: 0;
-    margin: 0;
-    pointer-events: all;
-    cursor: pointer;
-
-    @include media-max("phone-down") {
-      width: 100%;
-    }
-  }
 }
 
 @keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
 
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
 
-  100% {
-    transform: rotate(360deg);
-  }
+    100% {
+        transform: rotate(360deg);
+    }
 }

@@ -1,17 +1,8 @@
 <template name="textualCommunicationTools">
-  {{#if canUseModule}}
+    {{#if canUseModule}}
     <div class="two-cols-modules {{#if show}}show{{/if}}">
-      <div class="left-content">
-        {{#if useGenericChat}}
-          {{> messagesChannelSelector}}
-        {{/if}}
-        {{> questsList}}
-      </div>
-      <div class="right-content">
-        {{> questToolbar}}
-        {{> messagesList}}
-        {{> console}}
-      </div>
+        <div class="left-content">{{#if useGenericChat}} {{> messagesChannelSelector}} {{/if}} {{> questsList}}</div>
+        <div class="right-content">{{> questToolbar}} {{> messagesList}} {{> console}}</div>
     </div>
-  {{/if}}
+    {{/if}}
 </template>

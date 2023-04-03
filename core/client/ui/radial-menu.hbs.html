@@ -1,23 +1,24 @@
 <template name="radialMenuOption">
-  <div style="top: {{y}}px; left: {{x}}px;" data-shortcut="{{shortcutLabel}}"
-    class="{{#if state}}{{#if isActive state}}on{{else}}off{{/if}}{{/if}}">
-    <button type="button" class="js-menu-item">{{icon}}</button>
-  </div>
+    <div
+        style="top: {{y}}px; left: {{x}}px;"
+        data-shortcut="{{shortcutLabel}}"
+        class="{{#if state}}{{#if isActive state}}on{{else}}off{{/if}}{{/if}}"
+    >
+        <button type="button" class="js-menu-item">{{icon}}</button>
+    </div>
 </template>
 
 <template name="radialMenu">
-  <div class="radial-menu-container" style="top: {{position.y}}px; left: {{position.x}}px;">
-    <div class="radial-menu {{#if showShortcuts}}show-shortcuts{{/if}} {{#if open}}show{{/if}}">
-      <span class="username">{{username}}</span>
-      <ul>
-        {{#each option in options}}
-        <li>
-          {{> radialMenuOption option}}
-        </li>
-        {{/each}}
-      </ul>
-      <div class="label {{#if label}}show{{/if}}">{{label}}</div>
-      <div class="background"></div>
+    <div class="radial-menu-container" style="top: {{position.y}}px; left: {{position.x}}px;">
+        <div class="radial-menu {{#if showShortcuts}}show-shortcuts{{/if}} {{#if open}}show{{/if}}">
+            <span class="username">{{username}}</span>
+            <ul>
+                {{#each option in options}}
+                <li>{{> radialMenuOption option}}</li>
+                {{/each}}
+            </ul>
+            <div class="label {{#if label}}show{{/if}}">{{label}}</div>
+            <div class="background"></div>
+        </div>
     </div>
-  </div>
 </template>

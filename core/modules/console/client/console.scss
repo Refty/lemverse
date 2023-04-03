@@ -1,111 +1,111 @@
-@import "../../../client/variables";
+@import '../../../client/variables';
 
 $form-text-color: white;
 $button-text-color: white;
 
 .console {
-  position: absolute;
-  bottom: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  z-index: 100;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s linear;
-
-  &.show {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  form {
-    display: flex;
-    flex-direction: row;
-    border-radius: 0 0 $radius $radius;
-    background-color: rgba($main-color, 1);
-    box-shadow: 0px 0 15px $main-color;
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    z-index: 100;
     overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s linear;
 
-    input,
-    textarea,
-    button {
-      -webkit-appearance: none;
-      background-color: transparent;
-      border: 0;
+    &.show {
+        opacity: 1;
+        pointer-events: all;
+    }
 
-      &.js-command-input {
+    form {
+        display: flex;
+        flex-direction: row;
+        border-radius: 0 0 $radius $radius;
+        background-color: rgba($main-color, 1);
+        box-shadow: 0px 0 15px $main-color;
         width: 100%;
-        padding: 15px 5px 5px;
-        color: $form-text-color;
-        font-weight: bold;
-        font-size: 13pt;
-        resize: vertical;
-        height: 50px;
-        max-height: 200px;
-        min-height: 50px;
+        overflow: hidden;
 
-        &.disabled {
-          background-color: $new-dark-secondary;
-          padding-left: 20px;
-          font-style: italic;
+        input,
+        textarea,
+        button {
+            -webkit-appearance: none;
+            background-color: transparent;
+            border: 0;
+
+            &.js-command-input {
+                width: 100%;
+                padding: 15px 5px 5px;
+                color: $form-text-color;
+                font-weight: bold;
+                font-size: 13pt;
+                resize: vertical;
+                height: 50px;
+                max-height: 200px;
+                min-height: 50px;
+
+                &.disabled {
+                    background-color: $new-dark-secondary;
+                    padding-left: 20px;
+                    font-style: italic;
+                }
+            }
         }
-      }
+
+        .js-button-add-file {
+            background-color: rgba($main-color, 0.95);
+            color: $button-text-color;
+            width: 60px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: darken(rgba($main-color, 0.95), 5%);
+            }
+        }
+
+        .console-file {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .console-file + label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background-color: rgba($main-color, 0.95);
+            color: $button-text-color;
+            font-size: 13pt;
+            width: 65px;
+            justify-content: center;
+            transition: background-color 0.25s linear;
+
+            &:hover {
+                background-color: darken(rgba($main-color, 0.95), 5%);
+            }
+
+            &.has-content {
+                background-color: var(--secondary-color-darken-10);
+            }
+        }
+
+        .js-button-submit {
+            cursor: pointer;
+            background-color: $light-blue;
+            color: $button-text-color;
+            font-size: 13pt;
+            width: 80px;
+
+            &:hover {
+                background-color: darken($light-blue, 5%);
+            }
+        }
     }
-
-    .js-button-add-file {
-      background-color: rgba($main-color, 0.95);
-      color: $button-text-color;
-      width: 60px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: darken(rgba($main-color, 0.95), 5%);
-      }
-    }
-
-    .console-file {
-      width: 0.1px;
-      height: 0.1px;
-      opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .console-file + label {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      background-color: rgba($main-color, 0.95);
-      color: $button-text-color;
-      font-size: 13pt;
-      width: 65px;
-      justify-content: center;
-      transition: background-color 0.25s linear;
-
-      &:hover {
-        background-color: darken(rgba($main-color, 0.95), 5%);
-      }
-
-      &.has-content {
-        background-color: var(--secondary-color-darken-10);
-      }
-    }
-
-    .js-button-submit {
-      cursor: pointer;
-      background-color: $light-blue;
-      color: $button-text-color;
-      font-size: 13pt;
-      width: 80px;
-
-      &:hover {
-        background-color: darken($light-blue, 5%);
-      }
-    }
-  }
 }
