@@ -92,7 +92,7 @@ Template.entityEditPrefab.events({
         const { key } = values.gameObject.sprite
         const match = key.match(/-(\d+)$/)
         if (match) {
-            values.gameObject.sprite.key = key.replace(/-\d+$/, `-${parseInt(match[1]) + 1}`)
+            values.gameObject.sprite.key = key.replace(/-\d+$/, `-${parseInt(match[1], 10) + 1}`)
         } else {
             values.gameObject.sprite.key = `${key}-1`
         }

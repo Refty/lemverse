@@ -122,7 +122,7 @@ Template.lemverse.onCreated(function () {
         }
     })
 
-    window.addEventListener(eventTypes.onZoneLeft, (event) => {
+    window.addEventListener(eventTypes.onZoneLeft, () => {
         const user = Meteor.user()
         const insideZones = zoneManager.findZonesForPosition({
             x: user.profile.x,

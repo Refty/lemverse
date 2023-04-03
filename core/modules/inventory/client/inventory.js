@@ -1,5 +1,3 @@
-import { moduleType } from '../../../client/helpers'
-
 const dropItemDistance = 45
 
 window.addEventListener('load', () => {
@@ -13,18 +11,6 @@ window.addEventListener('load', () => {
         const { option } = e.detail
         if (option.id === 'open-inventory') toggleModal('inventory')
     })
-
-    // Tracker.autorun(() => {
-    //   const user = Meteor.user({ fields: { guildId: 1 } });
-    //   if (!user || !user.guildId) return;
-
-    //   Tracker.nonreactive(() => {
-    //     registerModules(
-    //       [{ id: 'open-inventory', icon: '📦', shortcut: 73, label: 'Inventory', closeMenu: true, scope: 'me' }],
-    //       moduleType.RADIAL_MENU,
-    //     );
-    //   });
-    // });
 })
 
 Template.inventoryItemPanel.helpers({
