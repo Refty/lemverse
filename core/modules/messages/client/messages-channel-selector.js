@@ -1,4 +1,4 @@
-const show = () => Session.get('console') && !Session.get('quests')
+const show = () => Session.get('console')
 
 const allChannels = () => {
     if (!show()) return []

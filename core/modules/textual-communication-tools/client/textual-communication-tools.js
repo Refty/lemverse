@@ -48,23 +48,6 @@ window.addEventListener('load', () => {
 
         track.stop()
     })
-
-    // Tracker.autorun(() => {
-    //   const user = Meteor.user({ fields: { guildId: 1 } });
-    //   if (!user || !user.guildId) return;
-
-    //   Tracker.nonreactive(() => {
-    //     registerModules(
-    //       [
-    //         { id: 'new-quest', icon: '📜', shortcut: 53, label: 'New task', closeMenu: true, scope: 'other' },
-    //         { id: 'show-quests', icon: '📜', shortcut: 57, order: 42, label: 'Tasks', closeMenu: true, scope: 'me' },
-    //       ],
-    //       moduleType.RADIAL_MENU,
-    //     );
-
-    //     registerModules(['userListQuestButton'], moduleType.USER_LIST);
-    //   });
-    // });
 })
 
 const openMessagingInterface = (channel) => {
@@ -76,12 +59,11 @@ const openMessagingInterface = (channel) => {
 const onMenuOptionSelected = (e) => {
     const { option, user } = e.detail
 
-    if (option.id === 'show-quests') Session.set('quests', { origin: 'menu' })
-    else if (option.id === 'open-console') openConsole(true)
+    if (option.id === 'open-console') openConsole(true)
     else if (option.id === 'send-text' && user && canUseLevelFeature(Meteor.user(), 'sendText', true)) {
         const channel = [user._id, Meteor.userId()].sort().join(';')
         openMessagingInterface(channel)
-    } else if (option.id === 'new-quest' && user) createQuestDraft([user._id], Meteor.userId())
+    }
 }
 
 const onPeerDataReceived = (e) => {
