@@ -1,7 +1,7 @@
 @import '../../_variables';
 
 .entity-editor {
-    .back_btn {
+    .back-btn {
         border: 1px solid white;
         border-radius: 10px;
         width: fit-content;
@@ -9,14 +9,14 @@
         cursor: pointer;
     }
 
-    .switch_ctnr {
+    .switch-ctnr {
         width: 50px;
         height: 20px;
         background-color: grey;
         border-radius: 10px;
         overflow: hidden;
 
-        .switch_anim {
+        .switch-anim {
             transition: margin-left 0.5s ease;
             width: calc(200% - 20px);
             height: 20px;
@@ -27,14 +27,7 @@
                 darken($light-red, 15%) 50%,
                 darken($light-red, 15%) 100%
             );
-            background: -webkit-linear-gradient(
-                0deg,
-                var(--secondary-color-darken-15) 0%,
-                var(--secondary-color-darken-15) 50%,
-                darken($light-red, 15%) 50%,
-                darken($light-red, 15%) 100%
-            );
-            background: -moz-linear-gradient(
+            background: linear-gradient(
                 0deg,
                 var(--secondary-color-darken-15) 0%,
                 var(--secondary-color-darken-15) 50%,
@@ -47,7 +40,7 @@
                 margin-left: calc(-50% - 5px);
             }
 
-            .switch_bullet {
+            .switch-bullet {
                 height: 20px;
                 width: 20px;
                 border-radius: 10px;
@@ -59,10 +52,10 @@
 
     .js-edit-entity-name {
         font-size: 1.2rem;
-        padding: 0px 5px;
+        padding: 0 5px;
         color: white;
         font-weight: bold;
-        margin: 10px 0px;
+        margin: 10px 0;
     }
 
     .entity-form-element {

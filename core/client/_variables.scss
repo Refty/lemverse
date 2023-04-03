@@ -8,6 +8,7 @@
     // #A5E6BA converted to hsl(139, 57%, 77%);
     --primary-color-hs: 139, 57%;
     --primary-color-l: 77%;
+
     // #13C4A3 converted to hsl(169, 82%, 82%);
     --secondary-color-hs: 169, 82%;
     --secondary-color-l: 82%;
@@ -51,12 +52,10 @@ $light-yellow: #ffe19c;
 $light-orange: #ffbb04;
 $main-text-color: #eeebf1;
 $radius: 0.5rem;
-
 $new-yellow: #e7dfc6;
 $new-red: #c73e1d;
 $new-dark-primary: #201d2c;
 $new-dark-secondary: #262837;
-
 $breakpoints: (
     'phone-down': 600px,
     'tablet-up': 768px,
