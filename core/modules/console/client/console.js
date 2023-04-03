@@ -173,7 +173,7 @@ Template.console.helpers({
             fields: { _id: 1, 'profile.levelId': 1, roles: 1 },
         })
 
-        if (!user) return
+        if (!user) return false
 
         const level = currentLevel(user)
 

@@ -550,9 +550,10 @@ EditorScene = new Phaser.Class({
                         }
                     }
 
-                    for (const key in collision) {
+                    Object.keys(collision).forEach((key) => {
                         collision[key] *= entity.gameObject.scale ?? 1
-                    }
+                    })
+
                     collision.x += entity.x
                     collision.y += entity.y
 

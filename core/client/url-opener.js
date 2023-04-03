@@ -28,11 +28,9 @@ const urlOpener = {
     openHtml(html, fullscreen = false, style = {}) {
         const iframe = this.getIframeElement()
         iframe.contentWindow.document.write(html)
-        iframe.style = new String(
-            Object.keys(style)
-                .map((key) => `${key}: ${style[key]}`)
-                .join(';')
-        )
+        iframe.style = Object.keys(style)
+            .map((key) => `${key}: ${style[key]}`)
+            .join(';')
 
         this.getWebpageElement().classList.add('show')
 
@@ -49,11 +47,9 @@ const urlOpener = {
 
         const iframe = this.getIframeElement()
         iframe.src = urlToLoad
-        iframe.style = new String(
-            Object.keys(style)
-                .map((key) => `${key}: ${style[key]}`)
-                .join(';')
-        )
+        iframe.style = Object.keys(style)
+            .map((key) => `${key}: ${style[key]}`)
+            .join(';')
 
         this.getWebpageElement().classList.add('show')
 

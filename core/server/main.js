@@ -55,14 +55,14 @@ Picker.route('/http-bind', (_params, req, res) => {
 
 const envsubst = (object) => {
     if (_.isObject(object)) {
-        for (const key in object) {
+        Object.keys(object).forEach((key) => {
             const value = object[key]
             if (_.isObject(value)) {
                 envsubst(value)
             } else if (_.isString(value) && value.startsWith('$')) {
-                object[key] = process.env[object[key].substring(1)]
+                object[key] = process.env[value.substring(1)]
             }
-        }
+        })
     }
 }
 
