@@ -51,7 +51,7 @@ Template.messagesPopup.onCreated(function () {
                 canHide: true,
             })
 
-            toastMessage.timeoutId = setTimeout(() => removeToast(message._id), 70000)
+            toastMessage.timeoutId = setTimeout(() => removeToast(message._id), 7000)
 
             Session.set('messages', messages)
         },
