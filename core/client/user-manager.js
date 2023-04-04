@@ -423,8 +423,6 @@ userManager = {
                 classList: 'copy',
                 offset: characterPopInOffset,
             })
-
-            if (emitterUserId !== Meteor.userId()) notify(userEmitter, `${userEmitter.profile.name}: ${data}`)
         }
 
         window.dispatchEvent(
