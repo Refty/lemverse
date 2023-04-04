@@ -51,7 +51,7 @@ hr.separator {
     &.edit {
         -webkit-app-region: no-drag;
 
-        > *:not(.edit-toolbox, .simulation, .modal-container) {
+        > *:not(.edit-toolbox):not(.simulation):not(.modal-container) {
             display: none;
         }
     }
