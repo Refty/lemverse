@@ -38,17 +38,24 @@ $z-index: 4;
     opacity: 0;
     pointer-events: none;
 
-    .username {
-        position: absolute;
-        top: -10px;
+    .user-infos {
         text-align: center;
-        width: 100%;
-        display: block;
-        font-size: 1.15rem;
+        width: 250px;
+        gap: 4px;
         font-weight: bold;
         color: white;
         text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
-        transform: translateY(-100%);
+        transform: translate(-10%, -120%);
+        display: flex;
+        flex-direction: column;
+
+        .fullname {
+            font-size: 1.15rem;
+        }
+
+        .headline {
+            font-size: 0.75;
+        }
     }
 
     &.show {
