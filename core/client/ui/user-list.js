@@ -8,7 +8,8 @@ const tabs = Object.freeze({
 const userListTabKey = 'userListTab'
 const userFields = {
     'status.online': 1,
-    'profile.name': 1,
+    'profile.fullName': 1,
+    'profile.baseline': 1,
     'profile.x': 1,
     'profile.y': 1,
     'profile.levelId': 1,
@@ -39,15 +40,15 @@ const users = (mode, guildId) => {
         }
 
     return Meteor.users.find(filters, {
-        sort: { 'profile.name': 1 },
+        sort: { 'profile.fullName': 1 },
         fields: userFields,
     })
 }
 
 const sortUserList = (a, b) => {
     if (a.status.online === b.status.online) {
-        const nameA = (a.profile.name || a.username).toLowerCase()
-        const nameB = (b.profile.name || b.username).toLowerCase()
+        const nameA = (a.profile.fullName || a.username).toLowerCase()
+        const nameB = (b.profile.fullName || b.username).toLowerCase()
 
         return nameA.localeCompare(nameB)
     }
@@ -82,25 +83,6 @@ Template.userListEntry.helpers({
     },
     user() {
         return this.user
-    },
-    zone() {
-        if (!this.user.status.online) return '-'
-        if (this.user.profile.levelId !== Meteor.user({ fields: { 'profile.levelId': 1 } }).profile.levelId)
-            return 'In another level'
-
-        const zone = Zones.findOne(
-            {
-                x1: { $lte: this.user.profile.x },
-                x2: { $gte: this.user.profile.x },
-                y1: { $lte: this.user.profile.y },
-                y2: { $gte: this.user.profile.y },
-            },
-            { fields: { name: 1, hideName: 1 } }
-        )
-
-        if (zone && zone.name && !zone.hideName) return zone.name
-
-        return '-'
     },
 })
 
