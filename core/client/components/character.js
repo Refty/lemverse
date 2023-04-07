@@ -169,8 +169,8 @@ class Character extends Phaser.GameObjects.Container {
         game.scene.getScene('UIScene').updateUserIcon(this.getData('userId'), icon)
     }
 
-    setName(name, baseline, color) {
-        game.scene.getScene('UIScene').updateUserName(this.getData('userId'), name, baseline, color)
+    setName(name, color) {
+        game.scene.getScene('UIScene').updateUserName(this.getData('userId'), name, color)
     }
 
     stopFollow() {

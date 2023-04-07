@@ -7,38 +7,21 @@ const nameStyle = {
     strokeThickness: 3,
 }
 
-const baselineStyle = {
-    ...nameStyle,
-    fontSize: 12,
-}
-
 const defaultTint = 0xffffff
 const defaultColor = '#fff'
-const baselineOffset = 20
 const iconMargin = 3
 
 class CharacterNameText extends Phaser.GameObjects.Container {
-    constructor(scene, name, baseline, color) {
+    constructor(scene, name, color) {
         super(scene)
         this.name = this.createText(name, nameStyle)
         this.nameContainer = new Phaser.GameObjects.Container(scene, 0, 0, [this.name])
-        this.add(this.nameContainer).setBaseline(baseline).setColor(color).setDepth(99999)
+        this.add(this.nameContainer).setColor(color).setDepth(99999)
         scene.add.existing(this)
     }
 
     createText(message, style) {
         return this.scene.make.text({ text: message, style }).setOrigin(0.5)
-    }
-
-    setBaseline(text) {
-        if (!text) return this.destroyBaseline()
-        if (!this.baseline) {
-            this.baseline = this.createText(text, baselineStyle)
-            this.add(this.baseline)
-            this.nameContainer.setY(-baselineOffset)
-        }
-        this.baseline.setText(text)
-        return this
     }
 
     static getStrokeColor(color) {
@@ -58,21 +41,15 @@ class CharacterNameText extends Phaser.GameObjects.Container {
         if (tints) {
             const tint = tints[color] || [defaultTint]
             this.name.setTint(...tint)
-            if (this.baseline) this.baseline.setTint(...tint)
         } else {
             this.name.setColor(color || defaultColor)
             this.name.setStroke(CharacterNameText.getStrokeColor(color), 3)
-            if (this.baseline) {
-                this.baseline.setColor(color)
-                this.baseline.setStroke(CharacterNameText.getStrokeColor(color), 3)
-            }
         }
         return this
     }
 
-    setText(name, baseline) {
+    setText(name) {
         this.name.setText(name)
-        this.setBaseline(baseline)
         this.updateIconPosition()
         return this
     }
@@ -93,15 +70,6 @@ class CharacterNameText extends Phaser.GameObjects.Container {
                 this.nameContainer.add(this.icon)
             })
         }
-    }
-
-    destroyBaseline() {
-        if (this.baseline) {
-            this.nameContainer.setY(0)
-            this.baseline.destroy()
-            this.baseline = undefined
-        }
-        return this
     }
 
     destroyIcon() {

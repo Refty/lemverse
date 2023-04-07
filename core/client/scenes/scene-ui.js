@@ -120,17 +120,17 @@ UIScene = new Phaser.Class({
         this.characterNamesObjects[userId].setIcon(icon)
     },
 
-    updateUserName(userId, name, baseline, color) {
+    updateUserName(userId, name, color) {
         let textInstance = this.characterNamesObjects[userId]
 
         if (!textInstance) {
             const player = userManager.getCharacter(userId)
             if (!player) return
 
-            textInstance = new CharacterNameText(this, name, baseline, color)
+            textInstance = new CharacterNameText(this, name, color)
             textInstance.player = player
             this.characterNamesObjects[userId] = textInstance
-        } else if (textInstance) textInstance.setColor(color).setText(name, baseline)
+        } else if (textInstance) textInstance.setColor(color).setText(name)
     },
 
     destroyUserName(userId) {

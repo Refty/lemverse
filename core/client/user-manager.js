@@ -116,7 +116,7 @@ userManager = {
         const character = this.characters[user._id]
         if (!character) return
 
-        const { x, y, direction, reaction, shareAudio, userMediaError, name, baseline, nameColor } = user.profile
+        const { x, y, direction, reaction, shareAudio, userMediaError, name, nameColor } = user.profile
         const showMutedIndicator = user.profile.guest ? guestAllowed(permissionTypes.talkToUsers) : !shareAudio
 
         // update character instance
@@ -131,7 +131,7 @@ userManager = {
         // is account transformed from guest to user?
         if (!user.profile.guest && oldUser?.profile.guest) {
             character.toggleMouseInteraction(true)
-            character.setName(name, baseline, nameColor)
+            character.setName(name, nameColor)
             if (user.guildId && guild?.icon) character.setIcon(guild.icon)
         }
 
@@ -149,11 +149,8 @@ userManager = {
         }
 
         // update name
-        const nameUpdated =
-            name !== oldUser?.profile.name ||
-            baseline !== oldUser?.profile.baseline ||
-            nameColor !== oldUser?.profile.nameColor
-        if (nameUpdated) character.setName(name, baseline, nameColor)
+        const nameUpdated = name !== oldUser?.profile.name || nameColor !== oldUser?.profile.nameColor
+        if (nameUpdated) character.setName(name, nameColor)
 
         // update guild icon
         if (user.guildId !== oldUser?.guildId) character.setIcon(guild?.icon)
