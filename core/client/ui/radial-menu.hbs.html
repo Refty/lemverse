@@ -11,7 +11,10 @@
 <template name="radialMenu">
     <div class="radial-menu-container" style="top: {{position.y}}px; left: {{position.x}}px;">
         <div class="radial-menu {{#if showShortcuts}}show-shortcuts{{/if}} {{#if open}}show{{/if}}">
-            <span class="username">{{username}}</span>
+            <div class="user-infos">
+                <span class="fullname">{{fullName}}</span>
+                <span class="headline">{{headline}}</span>
+            </div>
             <ul>
                 {{#each option in options}}
                 <li>{{> radialMenuOption option}}</li>
