@@ -1,6 +1,7 @@
 <template name="userListEntry">
     {{> avatarViewer user=user showStatus=true}}
-    <span class="js-profile">{{user.profile.name}}</span>
+    <span class="js-profile">{{user.profile.fullName}}</span>
+    <span class="baseline" title="{{user.profile.baseline}}">{{user.profile.baseline}}</span>
     <div class="guild">
         {{#if guildIcon}}
         <img
@@ -12,9 +13,6 @@
         />
         {{/if}}
         <span class="js-guild">{{or guildName "-"}}</span>
-    </div>
-    <div class="zone">
-        <span>{{zone}}</span>
     </div>
     <div class="actions">{{#each module in modules}} {{> Template.dynamic template=module}} {{/each}}</div>
     <div class="infos">
