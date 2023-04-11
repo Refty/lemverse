@@ -26,6 +26,8 @@ const onZoneEntered = (e) => {
     meetingRoom.setMeetingRoomService(meetingRoomService)
 
     if (!meetingRoomService.api && roomName) {
+        Session.set('isJitsiMeetOpen', true)
+
         const user = Meteor.user()
         if (user.profile.guest && !guestAllowed(permissionType)) {
             lp.notif.warning('You need to create an account to use meeting rooms')
@@ -80,6 +82,7 @@ const onZoneLeft = (e) => {
     }
 
     if (meetingRoomService.api && newZone) updateMeetStates(newZone)
+    Session.set('isJitsiMeetOpen', false)
 }
 
 const onZoneUpdated = (e) => {

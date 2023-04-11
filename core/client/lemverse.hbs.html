@@ -3,8 +3,8 @@
         <div class="simulation">
             <div id="game"></div>
             <div id="gameModules">
-                {{#unless guest}} {{> radialMenu }} {{> userPanel loading=loading}} {{/unless}} {{#each gameModule in
-                gameModules}} {{> Template.dynamic template=gameModule}} {{/each}}
+                {{#unless guest}} {{> radialMenu }} {{#if showUserPanel}} {{> userPanel loading=loading}} {{/if}}
+                {{/unless}} {{#each gameModule in gameModules}} {{> Template.dynamic template=gameModule}} {{/each}}
             </div>
 
             {{# resizable id='resizableMeet' }}

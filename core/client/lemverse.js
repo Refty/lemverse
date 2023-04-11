@@ -562,5 +562,6 @@ Template.lemverse.helpers({
     modules: () => Session.get('modules'),
     mainModules: () => Session.get('mainModules'),
     gameModules: () => Session.get('gameModules'),
+    showUserPanel: () => !Session.get('isJitsiMeetOpen'),
     allowFormLogin: () => Meteor.settings.public.permissions?.allowFormLogin !== false,
 })
