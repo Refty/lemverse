@@ -135,7 +135,7 @@
             }
 
             &.active {
-                background-color: rgba(var(--primary-color), 1);
+                background-color: var(--primary-color);
 
                 .buttons button:not(.active) {
                     opacity: 0.5;
