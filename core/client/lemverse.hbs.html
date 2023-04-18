@@ -1,5 +1,8 @@
 <template name="lemverse">
     <div class="lemverse {{#if neq (Session 'editor') 0}}edit{{/if}} {{#if loading}}loading{{/if}}">
+        <a class="logo" href="{{settings.public.lp.platformURL}}">
+            <img src="{{settings.public.lp.logoURL}}" />
+        </a>
         <div class="simulation">
             <div id="game"></div>
             <div id="gameModules">

@@ -29,6 +29,21 @@ hr.separator {
 .lemverse {
     display: flex;
 
+    .logo {
+        position: absolute;
+        z-index: 2;
+        background-color: rgba($main-color, 0.9);
+        padding: 8px 16px;
+        top: 10px;
+        left: 10px;
+        border-radius: 8px;
+
+        > img {
+            width: 144px;
+            height: 52px;
+        }
+    }
+
     .simulation {
         position: relative;
         width: 100vw;
