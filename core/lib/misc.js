@@ -292,8 +292,8 @@ const levelSpawnPosition = (level) => {
 
     if (!level.spawn) return defaultSpawnPosition
 
-    const x = +level.spawn.x
-    const y = +level.spawn.y
+    const x = parseFloat(level.spawn.x)
+    const y = parseFloat(level.spawn.y)
 
     return {
         x: Number.isNaN(x) ? defaultSpawnPosition.x : x,
