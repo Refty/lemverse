@@ -269,6 +269,7 @@ Meteor.methods({
             featurePermission,
             Match.OneOf(
                 null,
+                {},
                 { shout: String },
                 { globalChat: String },
                 { punch: String },
