@@ -34,6 +34,7 @@ LoadingScene = new Phaser.Class({
         this.background_characters.setAlpha(0.1)
 
         this.logo = this.add.sprite(0, -60, 'logo')
+        this.logo.setScale(2, 2)
         this.text = this.add
             .text(0, 45, `Loading ${Meteor.settings.public.lp.product}…`, {
                 font: '20px Verdana',
