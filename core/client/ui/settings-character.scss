@@ -8,9 +8,11 @@
 .settingsCharacter {
     position: relative;
     display: grid;
-    grid-template:
-        75px auto 100px auto 'preview preview'
+    grid-template-areas:
+        'preview preview'
         'menu    selection';
+    grid-template-columns: 75px auto;
+    grid-template-rows: 100px auto;
     grid-gap: 5px;
     height: 100%;
     width: 100%;
