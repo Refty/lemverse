@@ -149,6 +149,9 @@ meetHighLevel = {
                 disableTileView: !currentZone.unhide,
                 ...configOverwrite,
             },
+            interfaceConfigOverwrite: {
+                SHOW_CHROME_EXTENSION_BANNER: false,
+            },
             roomName: config.roomName,
             jwt: config.token,
         }
