@@ -144,7 +144,7 @@ meetHighLevel = {
                 displayName: user.profile.name,
             },
             configOverwrite: {
-                subject: currentZone.name,
+                subject: currentZone.roomName,
                 startWithAudioMuted: !currentZone.unmute,
                 startWithVideoMuted: !currentZone.unhide,
                 disableTileView: !currentZone.unhide,
