@@ -65,6 +65,10 @@ $breakpoints: (
     'widescreen-up': 1440px,
 );
 
+// Refty colors
+$grey-d: #808080;
+$success-l: #93cf9a;
+
 @mixin media-max($_key) {
     @media screen and (max-width: map-get($breakpoints, $_key)) {
         & {

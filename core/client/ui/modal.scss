@@ -104,6 +104,11 @@
             }
         }
 
+        .fit-modal {
+            height: auto;
+            width: fit-content;
+        }
+
         &.visible {
             .modal-window {
                 opacity: 1;
