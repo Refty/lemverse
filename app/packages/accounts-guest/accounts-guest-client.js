@@ -30,6 +30,8 @@ Meteor.startup(() => {
     if (!Meteor.userId()) {
       if (AccountsGuest.forced === true) {
         Meteor.loginVisitor();
+      } else {
+        window.location.href = Meteor.settings.public.lp.redirectionGuestUrl;
       }
     }
   });
