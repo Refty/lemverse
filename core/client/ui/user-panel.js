@@ -111,12 +111,12 @@ Template.userPanel.events({
     'click .js-openpanel': function (event) {
         event.preventDefault()
         event.stopPropagation()
-        document.querySelector('.user-panel').focus()
+        document.querySelector('.stream-me').focus()
     },
     'click .js-stream-me': function (event) {
         event.preventDefault()
         event.stopPropagation()
-        document.querySelector('.user-panel').focus()
+        document.querySelector('.stream-me').focus()
     },
     'focus .user-panel': function (event) {
         event.currentTarget.classList.toggle('visible', true)
