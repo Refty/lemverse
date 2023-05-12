@@ -17,6 +17,7 @@
     "analytics-node": "^6.2.0",
     "aws-sdk": "^2.1229.0",
     "body-parser": "^1.20.2",
+    "crisp-sdk-web": "^1.0.18",
     "escape-string-regexp": "^5.0.0",
     "fast-json-stable-stringify": "^2.1.0",
     "favicons": "^7.1.1",

@@ -6,6 +6,7 @@ import URLOpener from './url-opener'
 import { guestAllowed, permissionTypes } from '../lib/misc'
 import initSentryClient from './sentry'
 import { usersPollDiff, Polling } from './polling'
+import { Crisp } from 'crisp-sdk-web'
 
 initSentryClient()
 
@@ -93,6 +94,8 @@ Template.lemverse.onCreated(function () {
     Session.set('sceneWorldReady', false)
     Session.set('loading', true)
     Session.set('tilesetsLoaded', false)
+
+    Crisp.configure(Meteor.settings.public.crisp.websiteId || '')
 
     window.addEventListener('dblclick', (e) => {
         if (e.target === document.querySelector('canvas')) sendEvent('toggle-fullscreen')

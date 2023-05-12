@@ -210,6 +210,10 @@
             "tracesSampleRate": 1.0,
             "clientConfig": {},
             "serverConfig": {}
+        },
+
+        "crisp": {
+            "websiteId": ""
         }
     },
 
