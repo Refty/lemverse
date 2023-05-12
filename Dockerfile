@@ -9,6 +9,7 @@ RUN bash $SCRIPTS_FOLDER/build-app-npm-dependencies.sh
 COPY ./app $APP_SOURCE_FOLDER/
 COPY ./core $APP_SOURCE_FOLDER/core/
 
+ENV METEOR_DISABLE_OPTIMISTIC_CACHING=1
 RUN bash $SCRIPTS_FOLDER/build-meteor-bundle.sh
 
 # Use the specific version of Node expected by your Meteor release, per https://docs.meteor.com/changelog.html; this is expected for Meteor 2.5
