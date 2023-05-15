@@ -28,7 +28,7 @@
                 <div class="sources">
                     <div>
                         <button
-                            class="source-button audio {{#if currentUser.profile.shareAudio}}active{{/if}}"
+                            class="source-button audio {{#if and currentUser.profile.shareAudio streamAccepted }}active{{/if}}"
                             type="button"
                         >
                             <div class="warning {{#if streamAccepted}}hide{{/if}}">!</div>
@@ -46,7 +46,7 @@
                             </svg>
                         </button>
                         <button
-                            class="source-button video {{#if currentUser.profile.shareVideo}}active{{/if}}"
+                            class="source-button video {{#if and currentUser.profile.shareVideo streamAccepted }}active{{/if}}"
                             type="button"
                         >
                             <div class="warning {{#if streamAccepted}}hide{{/if}}">!</div>
