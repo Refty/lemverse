@@ -2,7 +2,7 @@ const maxAttempt = 10
 const delayBetweenAttempt = 2000 // in ms
 
 const removeAllFullScreenElement = (ignoredElement) => {
-    document.querySelectorAll('.stream .fullscreen').forEach((stream) => {
+    document.querySelectorAll('.remote-stream .fullscreen').forEach((stream) => {
         if (stream.parentElement !== ignoredElement) stream.classList.remove('fullscreen')
     })
     document.querySelectorAll('.js-fullscreen-close').forEach((elem) => {
@@ -11,7 +11,7 @@ const removeAllFullScreenElement = (ignoredElement) => {
 }
 
 const updatePhaserMouseInputState = () => {
-    const hasStreamInFullScreen = document.querySelectorAll('.stream .fullscreen').length
+    const hasStreamInFullScreen = document.querySelectorAll('.remote-stream .fullscreen').length
     game.scene.getScene('WorldScene')?.enableMouse(!hasStreamInFullScreen)
 }
 
@@ -119,7 +119,7 @@ Template.remoteStream.helpers({
 })
 
 Template.remoteStream.events({
-    'click .stream video, click .stream img': function (event) {
+    'click .remote-stream video, click .remote-stream img': function (event) {
         event.preventDefault()
 
         const { target } = event

@@ -555,7 +555,6 @@ Template.lemverse.onDestroyed(function () {
 })
 
 Template.lemverse.helpers({
-    allRemoteStreamsByUsers: () => peer.remoteStreamsByUsers.get(),
     guest: () => Meteor.user({ fields: { 'profile.guest': 1 } })?.profile.guest,
     onboarding: () =>
         Meteor.settings.public.lp.enableOnboarding &&

@@ -1,0 +1,16 @@
+<template name="stream">
+    <div class="stream-me {{#if videoActive}}videoActive{{/if}}" tabindex="-1">
+        <div class="js-stream-screen-me {{#if screenSharing}}active{{/if}}">
+            <video type="video/mp4" width="340" height="240" autoplay muted></video>
+        </div>
+        <div
+            class="js-stream-me {{#if active}}active{{/if}} {{#if videoActive}}active-video{{/if}}"
+            style="background-image: url('{{avatarURL}}')"
+        >
+            <video type="video/mp4" width="240" height="180" autoplay muted></video>
+        </div>
+    </div>
+    <div class="remote-user {{#if active}}active{{/if}}">
+        {{#each remoteUser in allRemoteStreamsByUsers}} {{> remoteStream remoteUser=remoteUser }} {{/each}}
+    </div>
+</template>

@@ -22,9 +22,7 @@
         {{#if and (and guest (not onboarding)) allowFormLogin}} {{> formAccount visible=loading}} {{else if onboarding}}
         {{> userOnboarding}} {{else if and (not guest not onboarding)}} {{> editToolbox}} {{/if}}
 
-        <div class="js-streams">
-            {{#each remoteUser in allRemoteStreamsByUsers}} {{> remoteStream remoteUser=remoteUser }} {{/each}}
-        </div>
+        <div>{{ > stream }}</div>
 
         {{> messagesPopup}} {{#each mainModule in mainModules}} {{> Template.dynamic template=mainModule}} {{/each}} {{>
         modalContainer }}

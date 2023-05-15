@@ -1,17 +1,5 @@
 <template name="userPanel">
     {{#if displayUserPanel}}
-
-    <div class="stream-me {{#if videoActive}}videoActive{{/if}}" tabindex="-1">
-        <div class="js-stream-screen-me {{#if screenSharing}}active{{/if}}">
-            <video type="video/mp4" width="340" height="240" autoplay muted></video>
-        </div>
-        <div
-            class="js-stream-me {{#if active}}active{{/if}} {{#if videoActive}}active-video{{/if}}"
-            style="background-image: url('{{avatarURL}}')"
-        >
-            <video type="video/mp4" width="240" height="180" autoplay muted></video>
-        </div>
-    </div>
     <div class="user-panel">
         <div class="buttons">
             <button
@@ -103,27 +91,6 @@
                     />
                 </svg>
             </button>
-        </div>
-    </div>
-    <div class="js-openpanel {{#if loading}}displaynone{{/if}} {{#if or videoActive screenSharing}}videoactive{{/if}}">
-        <div class="js-stream-me">
-            <div class="buttons">
-                <button class="button" type="button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        version="1.1"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            d="M 2 4 h 22 v 3 h -22 Z M 2 11 h 22 v 3 h -22 Z M 2 18 h 22 v 3 h -22 Z"
-                            stroke="black"
-                        />
-                    </svg>
-                </button>
-            </div>
         </div>
     </div>
     {{/if}}
