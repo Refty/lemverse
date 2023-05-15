@@ -67,9 +67,9 @@
                 </div>
             </div>
             <div class="source-selects">
-                <div class="{{#if eq videoRecorders.length 0}}hide{{/if}}">
+                <div>
                     <label for="video-source" class="label">Video source</label>
-                    <select name="video-source" id="video-source" class="js-cam-select select">
+                    <select name="video-source" id="video-source" class="js-cam-select select" disabled="{{#if not streamAccepted}}disabled{{/if}}">
                         {{#each videoRecorders}}
                         <option
                             value="{{this.deviceId}}"
@@ -81,9 +81,9 @@
                     </select>
                 </div>
 
-                <div class="{{#if eq audioRecorders.length 0}}hide{{/if}}">
+                <div>
                     <label for="audio-source" class="label">Audio source</label>
-                    <select name="audio-source" id="audio-source" class="js-mic-select select">
+                    <select name="audio-source" id="audio-source" class="js-mic-select select" disabled="{{#if not streamAccepted}}disabled{{/if}}">
                         {{#each audioRecorders}}
                         <option
                             value="{{this.deviceId}}"

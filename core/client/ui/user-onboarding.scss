@@ -197,11 +197,19 @@
     .source-selects {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         gap: 30px;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
 
         .select {
             padding-right: 24px;
             max-width: 250px;
+
+            @media (min-width: 280px) {
+                width: 250px;
+            }
         }
 
         .label {
