@@ -1,5 +1,9 @@
 @import '../_variables';
 
+.modal-container .modal .modal-window .js-modal-close {
+    visibility: hidden;
+}
+
 .permission-modal {
     padding: 10px 24px;
     border-radius: 16px;
