@@ -5,6 +5,21 @@
     border-radius: 16px;
     color: #4f4f4f;
     background-color: white;
+
+    button {
+        cursor: pointer;
+        float: right;
+        color: #2277ff;
+        background-color: #ffffff;
+        border: 0px;
+        padding: 8px;
+        border-radius: 8px;
+
+        &:hover {
+            color: #3c42f2;
+            background-color: #f2f9ff;
+        }
+    }
 }
 
 .onboarding {

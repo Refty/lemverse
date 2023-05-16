@@ -77,6 +77,12 @@ const finishOnboarding = () => {
     lp.notif.success('Enjoy 🚀')
 }
 
+Template.permissionsModal.events({
+    'click .js-dismiss-modal': function () {
+        toggleModal('permissionsModal', 'fit-modal')
+    },
+})
+
 Template.userOnboarding.onCreated(function () {
     bindKeyboards()
 
