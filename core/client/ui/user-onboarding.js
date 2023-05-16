@@ -83,6 +83,18 @@ Template.permissionsModal.events({
     },
 })
 
+Template.permissionsModal.helpers({
+    browserName: () => {
+        const userAgent = navigator.userAgent
+
+        if (userAgent.match(/chrome|chromium|crios/i))
+            return "chrome"
+        if (userAgent.match(/safari/i))
+            return "safari"
+        return "other"
+    },
+})
+
 Template.userOnboarding.onCreated(function () {
     bindKeyboards()
 
