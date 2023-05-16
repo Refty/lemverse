@@ -28,8 +28,8 @@ Meteor.loginVisitor = function (email, callback) {
 Meteor.startup(() => {
   Deps.autorun(() => {
     if (!Meteor.userId()) {
-      if (Meteor.settings.public.lp.redirectionGuestUrl)
-        window.location.href = Meteor.settings.public.lp.redirectionGuestUrl;
+      if (Meteor.settings.public.lp.redirectionGuestURL)
+        window.location.href = Meteor.settings.public.lp.redirectionGuestURL;
       else
         Meteor.loginVisitor();
     }
