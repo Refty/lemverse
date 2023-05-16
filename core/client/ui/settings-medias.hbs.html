@@ -5,7 +5,14 @@
     </div>
     <div class="container media-container">
         <div>
-            <video id="js-video-preview" muted></video>
+            <div class="video-preview">
+                <video id="js-video-preview" muted></video>
+                <div class="audio-meter">
+                    {{#each arrayOfMeter}}
+                    <div class="item {{#if gt audioMeter @index }}item-full{{/if}}"></div>
+                    {{/each}}
+                </div>
+            </div>
             <label for="video-source" class="label">Video source</label>
             <select name="video-source" id="video-source" class="js-cam-select select">
                 {{#each videoRecorders}}

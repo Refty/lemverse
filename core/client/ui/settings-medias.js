@@ -1,5 +1,7 @@
 import { screenShareDefaultConfig } from '../user-streams'
 
+let interval
+
 const updateSettingsStream = async (template) => {
     const constraints = userStreams.getStreamConstraints(streamTypes.main)
     constraints.forceNew = true
@@ -19,11 +21,15 @@ const updateSettingsStream = async (template) => {
     video.onloadedmetadata = () => video.play()
 
     peer.updatePeersStream(stream, streamTypes.main)
+
+    if (interval) clearInterval(interval)
+    interval = userStreams.trackSound(stream, (audioMeter) => template.audioMeter.set(audioMeter))
 }
 
 Template.settingsMedias.onCreated(function () {
     this.audioRecorders = new ReactiveVar([])
     this.videoRecorders = new ReactiveVar([])
+    this.audioMeter = new ReactiveVar([])
     this.deviceChangerListener = () => updateSettingsStream(this)
     updateSettingsStream(this)
 
@@ -72,4 +78,6 @@ Template.settingsMedias.helpers({
     videoRecorders() {
         return Template.instance().videoRecorders.get()
     },
+    arrayOfMeter: () => Array.from({ length: 8 }),
+    audioMeter: () => Template.instance().audioMeter.get(),
 })

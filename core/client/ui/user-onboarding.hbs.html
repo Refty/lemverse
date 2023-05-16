@@ -2,9 +2,98 @@
     <div class="onboarding">
         {{#if eq step 1}}
         <div class="main">
-            <div class="main-title">Activate your camera and microphone to continue</div>
-            <div class="content">
-                <img class="permission-img" src="screenshot-user-media.png" alt="User permission popup" />
+            <div class="main-title">Setup your camera</div>
+            <div class="content step-1">
+                <video
+                    class="video-preview {{#if not currentUser.profile.shareVideo}}hide{{/if}}"
+                    id="js-video-preview"
+                    muted
+                ></video>
+                <div class="camera-disabled">
+                    <svg width="103" height="103" viewBox="0 0 103 103" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            fill-rule="evenodd"
+                            clip-rule="evenodd"
+                            d="M42.072 65.4589C44.7521 67.2758 48.0184 68.3743 51.494 68.3743C60.7066 68.3743 68.2023 60.8112 68.2023 51.5158C68.2023 48.0089 67.1136 44.7133 65.3129 42.0092L60.7485 46.6146C61.5023 48.0512 61.921 49.7413 61.921 51.5158C61.921 57.3043 57.231 62.0365 51.494 62.0365C49.7353 62.0365 48.0602 61.614 46.6365 60.8535L42.072 65.4589ZM79.0899 28.1083C85.1619 33.6856 90.3125 41.2064 94.1651 50.2483C94.5001 51.0511 94.5001 51.9806 94.1651 52.7411C85.2037 73.7826 69.2492 86.3736 51.494 86.3736H51.4521C43.3702 86.3736 35.6232 83.7117 28.7975 78.8528L20.6737 87.0496C20.0456 87.6834 19.2499 87.9792 18.4543 87.9792C17.6587 87.9792 16.8212 87.6834 16.2349 87.0496C15.188 85.9933 15.0205 84.3033 15.858 83.078L15.9837 82.9089L77.9174 20.4185C78.0012 20.334 78.0849 20.2495 78.1268 20.165C78.2105 20.0805 78.2943 19.996 78.3362 19.9115L82.2725 15.9398C83.5287 14.7145 85.4969 14.7145 86.7113 15.9398C87.9675 17.1651 87.9675 19.1932 86.7113 20.4185L79.0899 28.1083ZM34.7552 51.5323C34.7552 52.6309 34.8808 53.7294 35.0483 54.7435L19.5544 70.3766C15.3668 65.4754 11.7237 59.5602 8.83426 52.7576C8.49926 51.9971 8.49926 51.0676 8.83426 50.2648C17.7956 29.2234 33.7501 16.6746 51.4635 16.6746H51.5053C57.4935 16.6746 63.3142 18.1111 68.6743 20.8152L54.6879 34.9274C53.6829 34.7583 52.5941 34.6316 51.5053 34.6316C42.2509 34.6316 34.7552 42.1947 34.7552 51.5323Z"
+                            fill="#808080"
+                        />
+                    </svg>
+                    <p class="camera-disabled-text">Camera disabled</p>
+                </div>
+                <div class="audio-meter">
+                    {{#each arrayOfMeter}}
+                    <div class="item {{#if gt audioMeter @index }}item-full{{/if}}"></div>
+                    {{/each}}
+                </div>
+                <div class="sources">
+                    <div>
+                        <button
+                            class="source-button audio {{#if and currentUser.profile.shareAudio streamAccepted }}active{{/if}}"
+                            type="button"
+                        >
+                            <div class="warning {{#if streamAccepted}}hide{{/if}}">!</div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                version="1.1"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
+                                />
+                            </svg>
+                        </button>
+                        <button
+                            class="source-button video {{#if and currentUser.profile.shareVideo streamAccepted }}active{{/if}}"
+                            type="button"
+                        >
+                            <div class="warning {{#if streamAccepted}}hide{{/if}}">!</div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                version="1.1"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="source-selects">
+                <div>
+                    <label for="video-source" class="label">Video source</label>
+                    <select name="video-source" id="video-source" class="js-cam-select select" disabled="{{#if not streamAccepted}}disabled{{/if}}">
+                        {{#each videoRecorders}}
+                        <option
+                            value="{{this.deviceId}}"
+                            selected="{{eq this.deviceId currentUser.profile.videoRecorder}}"
+                        >
+                            {{this.label}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="audio-source" class="label">Audio source</label>
+                    <select name="audio-source" id="audio-source" class="js-mic-select select" disabled="{{#if not streamAccepted}}disabled{{/if}}">
+                        {{#each audioRecorders}}
+                        <option
+                            value="{{this.deviceId}}"
+                            selected="{{eq this.deviceId currentUser.profile.audioRecorder}}"
+                        >
+                            {{this.label}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
             </div>
             <button
                 disabled="{{#if not streamAccepted}}disabled{{/if}}"
@@ -54,4 +143,23 @@
         {{/if}}
         <div></div>
     </div>
+</template>
+
+<template name="permissionsModal">
+    {{#modal}}
+    <div class="permission-modal">
+        <h3>Camera and microphone are blocked</h3>
+        <p>
+            Refty requires access to your camera and microphone.
+        </p>
+        <p>
+            {{# if eq browserName "safari" }}
+            Click "Safari > Settings… > Websites", toggle the camera and refresh the page.
+            {{ else }}
+            Click the camera blocked icon <svg width="21" height="18" viewBox="0 0 21 18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><path d="M21.75 12V1.5H1.5v21h20.25v-.438a1.991 1.991 0 0 1-1.25.438H12V14a2 2 0 0 1 2-2h7.75z" id="a"/></defs><g transform="translate(-3 -6)"><mask id="b" fill="#fff"><use xlink:href="#a"/></mask><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" fill="#5A5A5A" mask="url(#b)"/><g transform="translate(13.5 13.5)"><rect fill="#DB4437" width="10.5" height="10.5" rx="2"/><path d="M5.25 6.04L3.204 8.086a.559.559 0 0 1-.79-.79L4.46 5.25 2.414 3.204a.559.559 0 0 1 .79-.79L5.25 4.46l2.046-2.046a.559.559 0 0 1 .79.79L6.04 5.25l2.046 2.046a.559.559 0 0 1-.79.79L5.25 6.04z" fill="#FFF"/></g></g></svg> in your browser's address bar, allow the camera and refresh the page.
+            {{/if}}
+        </p>
+        <button class="js-dismiss-modal">Dismiss</button>
+    </div>
+    {{/modal}}
 </template>

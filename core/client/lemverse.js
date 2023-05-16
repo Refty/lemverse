@@ -194,10 +194,11 @@ Template.lemverse.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ fields: { 'profile.shareAudio': 1 } })
+        const user = Meteor.user({ "profile.shareAudio": 1, "profile.guest": 1})
         if (!user) return
         Tracker.nonreactive(async () => {
-            if (userProximitySensor.nearUsersCount() === 0) userStreams.destroyStream(streamTypes.main)
+            if (userProximitySensor.nearUsersCount() === 0 && !user.profile.guest)
+                userStreams.destroyStream(streamTypes.main)
             else if (!user.profile.shareAudio) userStreams.audio(false)
             else if (user.profile.shareAudio) {
                 await userStreams.createStream()
@@ -213,10 +214,11 @@ Template.lemverse.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ fields: { 'profile.shareVideo': 1 } })
+        const user = Meteor.user({ "profile.shareVideo": 1, "profile.guest": 1})
         if (!user) return
         Tracker.nonreactive(async () => {
-            if (userProximitySensor.nearUsersCount() === 0) userStreams.destroyStream(streamTypes.main)
+            if (userProximitySensor.nearUsersCount() === 0 && !user.profile.guest)
+                userStreams.destroyStream(streamTypes.main)
             else if (!user.profile.shareVideo) userStreams.video(false)
             else if (user.profile.shareVideo) {
                 const forceNewStream = userStreams.shouldCreateNewStream(streamTypes.main, true, true)

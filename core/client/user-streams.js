@@ -87,7 +87,8 @@ userStreams = {
                 await waitFor(() => this.streams.main.instance !== undefined, 15, 500)
                 return this.streams.main.instance
             } catch {
-                lp.notif.error(`Unable to access the camera and microphone after few attempts`)
+                if (!Session.get('isOnboarding'))
+                    lp.notif.error(`Unable to access the camera and microphone after few attempts`)
             }
         }
 
@@ -104,7 +105,9 @@ userStreams = {
             if (err.name === 'NotAllowedError') {
                 if (err.message === 'Permission denied by system')
                     lp.notif.warning('Unable to access the camera and microphone')
-                else lp.notif.warning(`You have not authorized your browser to use your camera and microphone 😢`)
+                else {
+                    toggleModal('permissionsModal', 'fit-modal')
+                }
             } else if (err.name === 'OverconstrainedError') {
                 lp.notif.warning('Cameras constraints not supported')
                 debug('requestUserMedia: invalid constraints', constraints)
@@ -285,6 +288,23 @@ userStreams = {
         })
 
         return { mics, cams }
+    },
+
+    trackSound(stream, callback) {
+        const audioContext = new AudioContext()
+        const analyzer = audioContext.createAnalyser()
+        analyzer.fftSize = 512
+        analyzer.smoothingTimeConstant = 0.1
+        const sourceNode = audioContext.createMediaStreamSource(stream)
+        sourceNode.connect(analyzer)
+
+        return setInterval(() => {
+            const frequencyRangeData = new Uint8Array(analyzer.frequencyBinCount)
+            analyzer.getByteFrequencyData(frequencyRangeData)
+            const sum = frequencyRangeData.reduce((p, c) => p + c, 0)
+            const audioMeter = Math.sqrt(sum / frequencyRangeData.length)
+            callback(audioMeter)
+        }, 100)
     },
 }
 
