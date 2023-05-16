@@ -1,339 +1,339 @@
 {
-  "public": {
-    "lp": {
-      "product": "lemverse",
-      "website": "http://localhost:3000",
-      "platformURL": "http://platform.refty.co",
-      "redirectionGuestURL": "",
-      "helpURL": "https://lempire.notion.site/lempire/lemverse-Fire-Escape-920063782c4243f69d85ed0a4f65cac3",
-      "process": "main",
-      "gods": [],
-      "production": false,
-      "staging": false,
-      "enableLogClient": false,
-      "enableOnboarding": false,
-      "logoURL": "https://assets.website-files.com/62b4ba92180b4210cc065959/62b4c09cbc28c2286fc87ed6_Logo.svg",
-      "faviconURL": "https://assets.website-files.com/62b4ba92180b4210cc065959/62bdafd68a5ffb164edbdf51_Favicon%20(1).png",
-      "primaryColor": "#A5E6BA",
-      "secondaryColor": "#13C4A3"
-    },
-
-    "avatarFallback": "lemverse.png",
-
-    "debug": false,
-
-    "defaultReaction": "❤️",
-
-    "zoom": {
-      "default": 1,
-      "min": 0.6,
-      "max": 1.6,
-      "factor": 0.001,
-      "maxDelta": 100,
-      "pinchDelta": 4
-    },
-
-    "peer": {
-      "answerMaxAttempt": 5,
-      "answerDelayBetweenAttempt": 750,
-      "avatarAPI": "https://source.unsplash.com/320x240/?[user_avatar]&sig=[user_id]",
-      "callDelay": 250,
-      "delayBeforeClosingCall": 1000,
-      "sounds": {
-        "hangUp": {
-          "file": "webrtc-out.mp3",
-          "volume": 0.2
+    "public": {
+        "lp": {
+            "product": "lemverse",
+            "website": "http://localhost:3000",
+            "platformURL": "http://platform.refty.co",
+            "redirectionGuestURL": "",
+            "helpURL": "https://lempire.notion.site/lempire/lemverse-Fire-Escape-920063782c4243f69d85ed0a4f65cac3",
+            "process": "main",
+            "gods": [],
+            "production": false,
+            "staging": false,
+            "enableLogClient": false,
+            "enableOnboarding": false,
+            "logoURL": "https://assets.website-files.com/62b4ba92180b4210cc065959/62b4c09cbc28c2286fc87ed6_Logo.svg",
+            "faviconURL": "https://assets.website-files.com/62b4ba92180b4210cc065959/62bdafd68a5ffb164edbdf51_Favicon%20(1).png",
+            "primaryColor": "#A5E6BA",
+            "secondaryColor": "#13C4A3"
         },
-        "incomingCall": {
-          "file": "webrtc-in.mp3",
-          "volume": 0.2
+
+        "avatarFallback": "lemverse.png",
+
+        "debug": false,
+
+        "defaultReaction": "❤️",
+
+        "zoom": {
+            "default": 1,
+            "min": 0.6,
+            "max": 1.6,
+            "factor": 0.001,
+            "maxDelta": 100,
+            "pinchDelta": 4
+        },
+
+        "peer": {
+            "answerMaxAttempt": 5,
+            "answerDelayBetweenAttempt": 750,
+            "avatarAPI": "https://source.unsplash.com/320x240/?[user_avatar]&sig=[user_id]",
+            "callDelay": 250,
+            "delayBeforeClosingCall": 1000,
+            "sounds": {
+                "hangUp": {
+                    "file": "webrtc-out.mp3",
+                    "volume": 0.2
+                },
+                "incomingCall": {
+                    "file": "webrtc-in.mp3",
+                    "volume": 0.2
+                }
+            }
+        },
+
+        "meet": {
+            "serverURL": "meet.jit.si",
+            "roomDefaultName": "lemverse-test",
+            "configOverwrite": {}
+        },
+
+        "character": {
+            "walkSpeed": 180,
+            "runSpeed": 720,
+            "sensorNearDistance": 75,
+            "sensorFarDistance": 85,
+            "nameColors": {
+                "white": ["0xffffff", "0xffffff", "0xffffff", "0xffffff"],
+                "orange": ["0xfc9729", "0xfc9729", "0xf69831", "0xf69831"],
+                "red": ["0xf15739", "0xf15739", "0xee5c3b", "0xee5c3b"],
+                "yellow": ["0xf4c918", "0xf4c918", "0xdbb92a", "0xdbb92a"],
+                "beige": ["0xedc993", "0xedc993", "0xe5bf8a", "0xe5bf8a"],
+                "green": ["0xabdf3a", "0xabdf3a", "0xa1cb44", "0xa1cb44"],
+                "lightGreen": ["0x52d8a2", "0x52d8a2", "0x57cfa0", "0x57cfa0"],
+                "blue": ["0x2394d9", "0x2394d9", "0x3199da", "0x3199da"],
+                "lightBlue": ["0xa4e2fb", "0xa4e2fb", "0xa5dbf0", "0xa5dbf0"],
+                "pink": ["0xe584e1", "0xe584e1", "0xf291f0", "0xf291f0"],
+                "purple": ["0xb558e1", "0xb558e1", "0xfa8ff8", "0xfa8ff8"]
+            }
+        },
+
+        "permissions": {
+            "allowAccountCreation": "all",
+            "allowLevelCreation": true,
+            "allowProfileEdition": true,
+            "allowFormLogin": true,
+            "contactURL": "",
+            "guest": {
+                "changeSkin": false,
+                "talkToUsers": false,
+                "useEntity": false,
+                "useMeetingRoom": false,
+                "useMessaging": false
+            }
+        },
+
+        "passwordless": false,
+
+        "assets": {
+            "character": {
+                "frameWidth": 16,
+                "frameHeight": 32,
+                "formats": {
+                    "w-384": {
+                        "animations": {
+                            "run": {
+                                "up": {
+                                    "frames": [54, 55, 56, 57, 58, 59],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "down": {
+                                    "frames": [66, 67, 68, 69, 70, 71],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "left": {
+                                    "frames": [60, 61, 62, 63, 64, 65],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "right": {
+                                    "frames": [48, 49, 50, 51, 52, 53],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                }
+                            }
+                        }
+                    },
+                    "w-927": {
+                        "animations": {
+                            "run": {
+                                "up": {
+                                    "frames": [120, 121, 122, 123, 124, 125],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "down": {
+                                    "frames": [132, 133, 134, 135, 136, 137],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "left": {
+                                    "frames": [126, 127, 128, 129, 130, 131],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "right": {
+                                    "frames": [114, 115, 116, 117, 118, 119],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                }
+                            }
+                        }
+                    },
+                    "w-896": {
+                        "animations": {
+                            "run": {
+                                "up": {
+                                    "frames": [118, 119, 120, 121, 122, 123],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "down": {
+                                    "frames": [130, 131, 132, 133, 134, 135],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "left": {
+                                    "frames": [124, 125, 126, 127, 128, 129],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                },
+                                "right": {
+                                    "frames": [112, 113, 114, 115, 116, 117],
+                                    "frameRate": 10,
+                                    "repeat": -1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "skins": {
+            "guest": {},
+            "default": {}
+        },
+
+        "templateLevelId": "lvl_iLOVEaLOTlemverse",
+
+        "tos": {
+            "terms": "",
+            "cookies": "",
+            "privacy": ""
+        },
+
+        "files": {
+            "storagePath": "/var/tmp/lemverse",
+            "route": "/api/files"
+        },
+
+        "segmentAnalyticsSettings": {
+            "enable": false,
+            "workspace": "",
+            "writeKey": ""
+        },
+
+        "sentrySettings": {
+            "dsn": "",
+            "tracesSampleRate": 1.0,
+            "clientConfig": {},
+            "serverConfig": {}
         }
-      }
+    },
+
+    "forbiddenIPs": [],
+
+    "defaultLevelId": "lvl_iLOVEaLOTlemverse",
+    "defaultKickLevelId": "lvl_IamINlemverseJAIL",
+
+    "botUserId": "",
+
+    "respawnEnabled": false,
+    "respawnDelay": 480,
+
+    "email": {
+        "from": "The lembot <contact@m.lemverse.com>"
     },
 
     "meet": {
-      "serverURL": "meet.jit.si",
-      "roomDefaultName": "lemverse-test",
-      "configOverwrite": {}
+        "enableAuth": false,
+        "encryptionPassphrase": "meet-dev",
+        "expiresIn": "6h",
+        "identifier": "lemverse"
     },
 
-    "character": {
-      "walkSpeed": 180,
-      "runSpeed": 720,
-      "sensorNearDistance": 75,
-      "sensorFarDistance": 85,
-      "nameColors": {
-        "white": ["0xffffff", "0xffffff", "0xffffff", "0xffffff"],
-        "orange": ["0xfc9729", "0xfc9729", "0xf69831", "0xf69831"],
-        "red": ["0xf15739", "0xf15739", "0xee5c3b", "0xee5c3b"],
-        "yellow": ["0xf4c918", "0xf4c918", "0xdbb92a", "0xdbb92a"],
-        "beige": ["0xedc993", "0xedc993", "0xe5bf8a", "0xe5bf8a"],
-        "green": ["0xabdf3a", "0xabdf3a", "0xa1cb44", "0xa1cb44"],
-        "lightGreen": ["0x52d8a2", "0x52d8a2", "0x57cfa0", "0x57cfa0"],
-        "blue": ["0x2394d9", "0x2394d9", "0x3199da", "0x3199da"],
-        "lightBlue": ["0xa4e2fb", "0xa4e2fb", "0xa5dbf0", "0xa5dbf0"],
-        "pink": ["0xe584e1", "0xe584e1", "0xf291f0", "0xf291f0"],
-        "purple": ["0xb558e1", "0xb558e1", "0xfa8ff8", "0xfa8ff8"]
-      }
-    },
-
-    "permissions": {
-      "allowAccountCreation": "all",
-      "allowLevelCreation": true,
-      "allowProfileEdition": true,
-      "allowFormLogin": true,
-      "contactURL": "",
-      "guest": {
-        "changeSkin": false,
-        "talkToUsers": false,
-        "useEntity": false,
-        "useMeetingRoom": false,
-        "useMessaging": false
-      }
-    },
-
-    "passwordless": false,
-
-    "assets": {
-      "character": {
-        "frameWidth": 16,
-        "frameHeight": 32,
-        "formats": {
-          "w-384": {
-            "animations": {
-              "run": {
-                "up": {
-                  "frames": [54, 55, 56, 57, 58, 59],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "down": {
-                  "frames": [66, 67, 68, 69, 70, 71],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "left": {
-                  "frames": [60, 61, 62, 63, 64, 65],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "right": {
-                  "frames": [48, 49, 50, 51, 52, 53],
-                  "frameRate": 10,
-                  "repeat": -1
-                }
-              }
+    "peer": {
+        "path": "/peer",
+        "client": {
+            "url": "localhost",
+            "port": 7010,
+            "credentialDuration": 86400,
+            "secret": "",
+            "config": {
+                "iceServers": [
+                    {
+                        "urls": "stun:stun.l.google.com:19302"
+                    }
+                ],
+                "iceTransportPolicy": "all",
+                "sdpSemantics": "unified-plan"
             }
-          },
-          "w-927": {
-            "animations": {
-              "run": {
-                "up": {
-                  "frames": [120, 121, 122, 123, 124, 125],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "down": {
-                  "frames": [132, 133, 134, 135, 136, 137],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "left": {
-                  "frames": [126, 127, 128, 129, 130, 131],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "right": {
-                  "frames": [114, 115, 116, 117, 118, 119],
-                  "frameRate": 10,
-                  "repeat": -1
-                }
-              }
-            }
-          },
-          "w-896": {
-            "animations": {
-              "run": {
-                "up": {
-                  "frames": [118, 119, 120, 121, 122, 123],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "down": {
-                  "frames": [130, 131, 132, 133, 134, 135],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "left": {
-                  "frames": [124, 125, 126, 127, 128, 129],
-                  "frameRate": 10,
-                  "repeat": -1
-                },
-                "right": {
-                  "frames": [112, 113, 114, 115, 116, 117],
-                  "frameRate": 10,
-                  "repeat": -1
-                }
-              }
-            }
-          }
+        },
+        "server": {
+            "start": true,
+            "port": 7010,
+            "key": "peerjs",
+            "alive_timeout": 5000,
+            "expire_timeout": 5000,
+            "allow_discovery": true
         }
-      }
     },
 
-    "skins": {
-      "guest": {},
-      "default": {}
+    "s3": {},
+
+    "monti": {
+        "appId": "",
+        "appSecret": "",
+        "options": {
+            "uploadSourceMaps": false
+        }
     },
 
-    "templateLevelId": "lvl_iLOVEaLOTlemverse",
-
-    "tos": {
-      "terms": "",
-      "cookies": "",
-      "privacy": ""
+    "packages": {
+        "service-configuration": {
+            "custom": {
+                "buttonBackgroundColor": "#ea4335",
+                "buttonTextColor": "white",
+                "clientId": "xxxxxxx",
+                "type": "oauth",
+                "custom": true,
+                "hidden": false,
+                "secret": "xxxxxxx",
+                "authUrl": "https://auth.example.org/oauth/authorize",
+                "accessTokenUrl": "https://auth.example.org/oauth/access_token",
+                "identityUrl": "https://auth.example.org/oauth/userinfo",
+                "serverURL": "http://localhost:3000/",
+                "responseType": "code",
+                "loginStyle": "redirect",
+                "scope": "openid",
+                "identity": ["firstName", "lastName"]
+            },
+            "twitter": {
+                "consumerKey": "xxxxxxx",
+                "secret": "xxxxxxx",
+                "type": "oauth",
+                "hidden": false,
+                "custom": false,
+                "loginStyle": "redirect"
+            },
+            "github": {
+                "clientId": "xxxxxxx",
+                "buttonBackgroundColor": "#5880ff",
+                "buttonTextColor": "white",
+                "hidden": false,
+                "type": "oauth",
+                "custom": false,
+                "secret": "xxxxxxx"
+            },
+            "google": {
+                "clientId": "xxxxxxx",
+                "buttonBackgroundColor": "#5880ff",
+                "buttonTextColor": "white",
+                "type": "oauth",
+                "custom": false,
+                "hidden": false,
+                "secret": "xxxxxxx",
+                "loginStyle": "redirect"
+            },
+            "facebook": {
+                "appId": "xxxxxxx",
+                "buttonBackgroundColor": "#5880ff",
+                "buttonTextColor": "white",
+                "type": "oauth",
+                "custom": false,
+                "hidden": false,
+                "secret": "xxxxxxx",
+                "loginStyle": "redirect"
+            }
+        },
+        "email": {
+            "service": "Mailgun",
+            "user": "postmaster@meteor.com",
+            "password": "superDuperPassword"
+        }
     },
 
-    "files": {
-      "storagePath": "/var/tmp/lemverse",
-      "route": "/api/files"
-    },
-
-    "segmentAnalyticsSettings": {
-      "enable": false,
-      "workspace": "",
-      "writeKey": ""
-    },
-
-    "sentrySettings": {
-      "dsn": "",
-      "tracesSampleRate": 1.0,
-      "clientConfig": {},
-      "serverConfig": {}
-    }
-  },
-
-  "forbiddenIPs": [],
-
-  "defaultLevelId": "lvl_iLOVEaLOTlemverse",
-  "defaultKickLevelId": "lvl_IamINlemverseJAIL",
-
-  "botUserId": "",
-
-  "respawnEnabled": false,
-  "respawnDelay": 480,
-
-  "email": {
-    "from": "The lembot <contact@m.lemverse.com>"
-  },
-
-  "meet": {
-    "enableAuth": false,
-    "encryptionPassphrase": "meet-dev",
-    "expiresIn": "6h",
-    "identifier": "lemverse"
-  },
-
-  "peer": {
-    "path": "/peer",
-    "client": {
-      "url": "localhost",
-      "port": 7010,
-      "credentialDuration": 86400,
-      "secret": "",
-      "config": {
-        "iceServers": [
-          {
-            "urls": "stun:stun.l.google.com:19302"
-          }
-        ],
-        "iceTransportPolicy": "all",
-        "sdpSemantics": "unified-plan"
-      }
-    },
-    "server": {
-      "start": true,
-      "port": 7010,
-      "key": "peerjs",
-      "alive_timeout": 5000,
-      "expire_timeout": 5000,
-      "allow_discovery": true
-    }
-  },
-
-  "s3": {},
-
-  "monti": {
-    "appId": "",
-    "appSecret": "",
-    "options": {
-      "uploadSourceMaps": false
-    }
-  },
-
-  "packages": {
-    "service-configuration": {
-      "custom": {
-        "buttonBackgroundColor": "#ea4335",
-        "buttonTextColor": "white",
-        "clientId": "xxxxxxx",
-        "type": "oauth",
-        "custom": true,
-        "hidden": false,
-        "secret": "xxxxxxx",
-        "authUrl": "https://auth.example.org/oauth/authorize",
-        "accessTokenUrl": "https://auth.example.org/oauth/access_token",
-        "identityUrl": "https://auth.example.org/oauth/userinfo",
-        "serverURL": "http://localhost:3000/",
-        "responseType": "code",
-        "loginStyle": "redirect",
-        "scope": "openid",
-        "identity": ["firstName", "lastName"]
-      },
-      "twitter": {
-        "consumerKey": "xxxxxxx",
-        "secret": "xxxxxxx",
-        "type": "oauth",
-        "hidden": false,
-        "custom": false,
-        "loginStyle": "redirect"
-      },
-      "github": {
-        "clientId": "xxxxxxx",
-        "buttonBackgroundColor": "#5880ff",
-        "buttonTextColor": "white",
-        "hidden": false,
-        "type": "oauth",
-        "custom": false,
-        "secret": "xxxxxxx"
-      },
-      "google": {
-        "clientId": "xxxxxxx",
-        "buttonBackgroundColor": "#5880ff",
-        "buttonTextColor": "white",
-        "type": "oauth",
-        "custom": false,
-        "hidden": false,
-        "secret": "xxxxxxx",
-        "loginStyle": "redirect"
-      },
-      "facebook": {
-        "appId": "xxxxxxx",
-        "buttonBackgroundColor": "#5880ff",
-        "buttonTextColor": "white",
-        "type": "oauth",
-        "custom": false,
-        "hidden": false,
-        "secret": "xxxxxxx",
-        "loginStyle": "redirect"
-      }
-    },
-    "email": {
-      "service": "Mailgun",
-      "user": "postmaster@meteor.com",
-      "password": "superDuperPassword"
-    }
-  },
-
-  "services": {}
+    "services": {}
 }
