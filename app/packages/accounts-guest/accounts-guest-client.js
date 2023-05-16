@@ -28,11 +28,10 @@ Meteor.loginVisitor = function (email, callback) {
 Meteor.startup(() => {
   Deps.autorun(() => {
     if (!Meteor.userId()) {
-      if (AccountsGuest.forced === true) {
-        Meteor.loginVisitor();
-      } else {
+      if (Meteor.settings.public.lp.redirectionGuestUrl)
         window.location.href = Meteor.settings.public.lp.redirectionGuestUrl;
-      }
+      else
+        Meteor.loginVisitor();
     }
   });
 });
