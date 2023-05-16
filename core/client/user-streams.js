@@ -87,7 +87,8 @@ userStreams = {
                 await waitFor(() => this.streams.main.instance !== undefined, 15, 500)
                 return this.streams.main.instance
             } catch {
-                lp.notif.error(`Unable to access the camera and microphone after few attempts`)
+                if (!Session.get('isOnboarding'))
+                    lp.notif.error(`Unable to access the camera and microphone after few attempts`)
             }
         }
 

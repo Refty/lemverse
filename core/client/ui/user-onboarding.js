@@ -87,6 +87,11 @@ Template.userOnboarding.onCreated(function () {
     updateSettingsStream(this)
 
     navigator.mediaDevices.addEventListener('devicechange', this.deviceChangerListener)
+    Session.set('isOnboarding', true)
+})
+
+Template.userOnboarding.onDestroyed(function () {
+    Session.set('isOnboarding', null)
 })
 
 Template.userOnboarding.events({
