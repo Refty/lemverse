@@ -89,20 +89,18 @@ Template.userOnboarding.onCreated(function () {
     navigator.mediaDevices.addEventListener('devicechange', this.deviceChangerListener)
 })
 
-Template.userOnboarding.onDestroyed(function () {
-    if (userProximitySensor.nearUsersCount() === 0) userStreams.destroyStream(streamTypes.main)
-    navigator.mediaDevices.removeEventListener('devicechange', this.deviceChangerListener)
-})
-
 Template.userOnboarding.events({
     'click .button': function () {
         const onboardingStep = Session.get('onboardingStep') || 1
 
-        if (onboardingStep === (!isMobile() ? ONBOARDING_LAST_STEP : ONBOARDING_LAST_STEP - 1)) {
-            finishOnboarding()
-        } else {
-            Session.set('onboardingStep', onboardingStep + 1)
+        if (onboardingStep === (!isMobile() ? ONBOARDING_LAST_STEP : ONBOARDING_LAST_STEP - 1))
+            return finishOnboarding()
+        if (onboardingStep === 1) {
+            userStreams.destroyStream(streamTypes.main)
+            clearInterval(interval)
+            navigator.mediaDevices.removeEventListener('devicechange', this.deviceChangerListener)
         }
+        Session.set('onboardingStep', onboardingStep + 1)
     },
     'click .source-button.audio': function (event, templateInstance) {
         event.preventDefault()
