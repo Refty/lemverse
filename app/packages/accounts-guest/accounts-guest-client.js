@@ -28,7 +28,11 @@ Meteor.loginVisitor = function (email, callback) {
 Meteor.startup(() => {
   Deps.autorun(() => {
     if (!Meteor.userId()) {
-      if (Meteor.settings.public.lp.redirectionGuestURL)
+      const params = new URL(window.location.href).searchParams;
+
+      if (Meteor.settings.jwtAuthSecret
+          && Meteor.settings.public.lp.redirectionGuestURL
+          && !params.get('loginToken'))
         window.location.href = Meteor.settings.public.lp.redirectionGuestURL;
       else
         Meteor.loginVisitor();
