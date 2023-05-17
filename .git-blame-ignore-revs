@@ -1,3 +1,6 @@
 # Fix editorconfig-checker errors
 daeeb753eda726f5b2231fba2a23c9ccc8aa513a
 c39bc61424e63b7b9156001b4b5bc714b74a0ff5
+
+# Add prettier + beautify the entire project
+d29c269535329725429255371857e43296698ff9
