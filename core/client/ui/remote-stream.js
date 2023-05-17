@@ -1,20 +1,6 @@
 const maxAttempt = 10
 const delayBetweenAttempt = 2000 // in ms
 
-const removeAllFullScreenElement = (ignoredElement) => {
-    document.querySelectorAll('.remote-stream .fullscreen').forEach((stream) => {
-        if (stream.parentElement !== ignoredElement) stream.classList.remove('fullscreen')
-    })
-    document.querySelectorAll('.js-fullscreen-close').forEach((elem) => {
-        elem.classList.remove('visible')
-    })
-}
-
-const updatePhaserMouseInputState = () => {
-    const hasStreamInFullScreen = document.querySelectorAll('.remote-stream .fullscreen').length
-    game.scene.getScene('WorldScene')?.enableMouse(!hasStreamInFullScreen)
-}
-
 const checkMediaAvailable = (template, type) => {
     const { remoteUser } = template.data
     if (!remoteUser._id) {
@@ -90,6 +76,11 @@ Template.remoteStream.helpers({
     hasScreenStream() {
         return this.remoteUser.screen?.srcObject
     },
+    isWebcamFullScreen: () => {
+        const modal = Session.get('modal')
+
+        return modal?.template === 'fullScreenModal' && modal?.screenType === 'webcam'
+    },
     state() {
         const fields = { 'profile.userMediaError': 1 }
         const user = Meteor.users.findOne(this.remoteUser._id, { fields })
@@ -119,28 +110,24 @@ Template.remoteStream.helpers({
 })
 
 Template.remoteStream.events({
-    'click .remote-stream video, click .remote-stream img': function (event) {
+    'click .js-webcam': function (event) {
         event.preventDefault()
 
-        const { target } = event
-        removeAllFullScreenElement(target)
-        target.classList.toggle('fullscreen')
-        const closeBtn = target.parentElement.querySelector('.js-fullscreen-close')
-        closeBtn?.classList.toggle('visible', target.classList.contains('fullscreen'))
-
-        updatePhaserMouseInputState()
+        Session.set('modal', {
+            template: 'fullScreenModal',
+            classes: 'modal-fit fullscreen-modal',
+            screenType: 'webcam',
+            remoteUser: this.remoteUser,
+        })
     },
-    'click .js-webcam, click .js-screenshare': function (event) {
+    'click .js-screenshare': function (event) {
         event.preventDefault()
-        const { target } = event
 
-        removeAllFullScreenElement(target)
-
-        const child = target.querySelector('video, img')
-        child?.classList.toggle('fullscreen')
-        const closeBtn = target.querySelector('.js-fullscreen-close')
-        closeBtn?.classList.toggle('visible', child?.classList.contains('fullscreen'))
-
-        updatePhaserMouseInputState()
+        Session.set('modal', {
+            template: 'fullScreenModal',
+            classes: 'modal-fit fullscreen-modal',
+            screenType: 'screenshare',
+            remoteUser: this.remoteUser,
+        })
     },
 })

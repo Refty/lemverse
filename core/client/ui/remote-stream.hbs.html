@@ -12,22 +12,30 @@
             {{/unless}} {{#if hasMainStream}} {{> webcam remoteUser=remoteUser}} {{/if}}
         </div>
         {{#if hasScreenStream}}
-        <div class="js-screenshare screenshare">{{> screenshare remoteUser=remoteUser}}</div>
+        <div class="js-screenshare screenshare-minia">{{> screenshare remoteUser=remoteUser}}</div>
         {{/if}}
     </div>
 </template>
 
-<template name="closefullscreen">
-    <button type="button" class="js-fullscreen-close">
-        <span>✖</span>
-    </button>
-</template>
-
 <template name="webcam">
     <video id="webcam-{{_id}}" type="video/mp4" width="320" height="240" autoplay></video>
-    {{> closefullscreen}}
 </template>
+
 <template name="screenshare">
-    <video id="screen-{{_id}}" type="video/mp4" autoplay muted></video>
-    {{> closefullscreen}}
+    <video id="screen-{{remoteUser._id}}" type="video/mp4" autoplay muted></video>
+</template>
+
+<template name="fullScreenModal">
+    {{#modal}}
+    <div class="fullscreen">
+        <div class="fullscreen-background">
+            {{#if eq screenType "screenshare" }} {{> screenshare remoteUser=remoteUser}} {{else if eq screenType
+            "webcam"}} {{> webcam remoteUser=remoteUser}} {{/if}}
+        </div>
+        <div class="main">
+            {{#if eq screenType "screenshare" }} {{> screenshare remoteUser=remoteUser}} {{else if eq screenType
+            "webcam"}} {{> webcam remoteUser=remoteUser}} {{/if}}
+        </div>
+    </div>
+    {{/modal}}
 </template>
