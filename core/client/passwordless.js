@@ -1,5 +1,7 @@
 const checkToken = ({ selector, token }) => {
     if (!token) {
+        if (Meteor.settings.public.lp.redirectionGuestURL)
+            window.location.href = Meteor.settings.public.lp.redirectionGuestURL
         return
     }
     Meteor.passwordlessLoginWithToken(selector, token, () => {
