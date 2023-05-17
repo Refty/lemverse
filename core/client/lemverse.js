@@ -95,7 +95,7 @@ Template.lemverse.onCreated(function () {
     Session.set('loading', true)
     Session.set('tilesetsLoaded', false)
 
-    Crisp.configure(Meteor.settings.public.crisp.websiteId || '')
+    if (Meteor.settings.public.crisp.websiteId) Crisp.configure(Meteor.settings.public.crisp.websiteId)
 
     window.addEventListener('dblclick', (e) => {
         if (e.target === document.querySelector('canvas')) sendEvent('toggle-fullscreen')
@@ -197,7 +197,7 @@ Template.lemverse.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ "profile.shareAudio": 1, "profile.guest": 1})
+        const user = Meteor.user({ 'profile.shareAudio': 1, 'profile.guest': 1 })
         if (!user) return
         Tracker.nonreactive(async () => {
             if (userProximitySensor.nearUsersCount() === 0 && !user.profile.guest)
