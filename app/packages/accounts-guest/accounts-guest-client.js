@@ -31,7 +31,7 @@ Meteor.startup(() => {
       const params = new URL(window.location.href).searchParams;
 
       if (Meteor.settings.public.lp.redirectionGuestURL
-          && !params.get('loginToken'))
+          && !params.get('token'))
         window.location.href = Meteor.settings.public.lp.redirectionGuestURL;
       else
         Meteor.loginVisitor();
