@@ -9,7 +9,7 @@
             </div>
             {{/unless}} {{#unless mediaState.shareVideo}}
             <img src="{{avatar}}" alt="avatar" class="avatar" />
-            {{/unless}} {{#if hasMainStream}} {{> webcam remoteUser=remoteUser}} {{/if}}
+            {{/unless}} {{#if (and hasMainStream (not isWebcamFullScreen))}} {{> webcam remoteUser=remoteUser}} {{/if}}
         </div>
         {{#if hasScreenStream}}
         <div class="js-screenshare screenshare-minia">{{> screenshare remoteUser=remoteUser}}</div>
@@ -18,7 +18,7 @@
 </template>
 
 <template name="webcam">
-    <video id="webcam-{{_id}}" type="video/mp4" width="320" height="240" autoplay></video>
+    <video id="webcam-{{remoteUser._id}}" type="video/mp4" autoplay></video>
 </template>
 
 <template name="screenshare">

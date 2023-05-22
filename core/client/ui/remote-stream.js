@@ -79,7 +79,7 @@ Template.remoteStream.helpers({
     isWebcamFullScreen: () => {
         const modal = Session.get('modal')
 
-        return modal?.template === 'fullScreenModal' && modal?.screenType === 'webcam'
+        return modal?.template === 'fullScreenModal' && modal?.data?.template === 'webcam'
     },
     state() {
         const fields = { 'profile.userMediaError': 1 }
