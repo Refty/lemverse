@@ -7,8 +7,38 @@
     left: 50%;
     transform: translate(-50%, -20%);
     background-color: rgba($main-color, 0.9);
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 10px;
+
+    &.stream-active {
+        left: calc(50% - 140px);
+    }
+
+    @media screen and (max-width: 550px) {
+        bottom: 14px;
+        background-color: rgba($main-color, 0.9);
+        left: unset;
+        transform: unset;
+        right: 100px;
+        padding: 8px;
+    }
+
+    @media screen and (max-width: 700px) {
+        &.stream-active {
+            padding: 6px;
+            background-color: rgba($main-color, 0.4);
+            right: 24px;
+            transform: unset;
+            bottom: 14px;
+            left: unset;
+            z-index: 100;
+        }
+    }
+
+    .separator {
+        color: #d2d5e0;
+        transform: translateY(5px);
+    }
 
     .button {
         position: relative;
@@ -20,6 +50,12 @@
         margin: 0;
         border-radius: $radius;
         color: $main-color;
+
+        @media screen and (max-width: 850px) {
+            height: 26px;
+            width: 26px;
+            padding: 4px;
+        }
 
         svg {
             fill: $main-color;
