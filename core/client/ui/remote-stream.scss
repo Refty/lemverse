@@ -117,9 +117,10 @@
         height: 72px;
         z-index: 12;
         position: absolute;
-        bottom: -2px;
-        right: -2px;
-        border: 2px solid white;
+        border-radius: 6px;
+        bottom: 2px;
+        right: 2px;
+        border: 2px solid var(--primary-color);
         background-color: #292929;
         box-sizing: content-box;
         display: flex;
@@ -127,7 +128,7 @@
         justify-content: center;
 
         &:hover {
-            border: 2px solid black;
+            border: 2px solid var(--secondary-color-darken-20);
         }
 
         video {
@@ -138,6 +139,7 @@
             background-size: 50%;
             background-repeat: no-repeat;
             background-position: center;
+            border-radius: 2px;
         }
     }
 }

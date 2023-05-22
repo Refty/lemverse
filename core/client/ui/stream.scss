@@ -7,19 +7,18 @@
     right: 10px;
     z-index: 50;
     width: 280px;
-    background-color: rgba($main-color, 0.9);
     transform: translateX(110%);
     transition: transform 0.5s ease-out;
-
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: scroll;
 
     video:not(.fullscreen) {
         object-fit: cover;
     }
 
     &.active {
-        //     background-color: rgba($main-color, 1);
         transform: translateX(0);
     }
 }
@@ -29,6 +28,8 @@
 }
 
 .stream-me {
+    transform: translateX(110%);
+    transition: transform 0.5s ease-out;
     position: fixed;
     z-index: 50;
     bottom: 10px;
@@ -51,6 +52,11 @@
         }
     }
 
+    &.active {
+        background-color: rgba($main-color, 1);
+        transform: translateX(0);
+    }
+
     .js-stream-me {
         position: relative;
         width: 280px;
@@ -61,14 +67,7 @@
         background-size: cover;
         background-repeat: no-repeat;
         background-position: 50% 50%;
-        transform: translateX(110%);
-        transition: transform 0.5s ease-out;
         overflow: hidden;
-
-        &.active {
-            background-color: rgba($main-color, 1);
-            transform: translateX(0);
-        }
 
         video {
             width: 100%;
