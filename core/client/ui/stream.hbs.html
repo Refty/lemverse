@@ -3,7 +3,7 @@
         {{#each remoteUser in allRemoteStreamsByUsers}} {{> remoteStream remoteUser=remoteUser }} {{/each}}
     </div>
     <div class="stream-me {{#if active}}active{{/if}}" tabindex="-1">
-        <div class="js-stream-screen-me {{#if screenSharing}}active{{/if}}">
+        <div class="js-stream-screen-me {{#if and screenSharing active}}active{{/if}}">
             <video type="video/mp4" width="340" height="240" autoplay muted></video>
         </div>
         <div class="js-stream-me {{#if videoActive}}active-video{{/if}}" style="background-image: url('{{avatarURL}}')">
