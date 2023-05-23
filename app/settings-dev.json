@@ -229,9 +229,15 @@
 
     "meet": {
         "enableAuth": false,
-        "encryptionPassphrase": "meet-dev",
-        "expiresIn": "6h",
-        "identifier": "lemverse"
+        "everyoneIsModerator": true,
+        "algorithm": "HS256",
+        "encryptionPassphrase": "",
+        "expiresIn": "24h",
+        "notBefore": "0ms",
+        "identifier": "",
+        "iss": "",
+        "keyid": "",
+        "sub": ""
     },
 
     "peer": {

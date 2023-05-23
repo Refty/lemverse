@@ -25,10 +25,8 @@ const computeRoomToken = (user, roomName, moderator = false) => {
     if (user.roles?.admin) group = 'admin'
     else if (moderator) group = 'moderator'
 
-    const { enableAuth, encryptionPassphrase, expiresIn, identifier } = Meteor.settings.meet
+    const { algorithm, enableAuth, encryptionPassphrase, expiresIn, notBefore, keyid, identifier, iss, sub } = Meteor.settings.meet
     if (!enableAuth) return undefined
-
-    const { serverURL } = Meteor.settings.public.meet
 
     return jwt.sign(
         {
@@ -37,17 +35,17 @@ const computeRoomToken = (user, roomName, moderator = false) => {
                     id: user._id,
                     name: user.profile.name,
                     email: user.emails[0].address,
+                    moderator,
                 },
                 group,
             },
             aud: identifier,
-            iss: Meteor.settings.public.lp.product,
-            sub: serverURL,
+            iss: iss || Meteor.settings.public.lp.product,
+            sub: sub || Meteor.settings.public.meet.serverURL,
             room: roomName,
-            moderator,
         },
         encryptionPassphrase,
-        { expiresIn }
+        { algorithm, expiresIn, notBefore, keyid }
     )
 }
 
@@ -74,7 +72,7 @@ Meteor.methods({
             throw new Meteor.Error('not-allowed', 'User not allowed in the zone')
         }
 
-        const moderator = user.roles?.admin || level.guildId === user.guildId
+        const moderator = user.roles?.admin || level.guildId === user.guildId || Meteor.setting.meet.everyoneIsModerator
         const roomName = computeRoomName(zone)
         const token = computeRoomToken(user, roomName, moderator)
 
