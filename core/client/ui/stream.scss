@@ -51,6 +51,7 @@
 
     &.active {
         background-color: rgba($main-color, 1);
+        border-radius: 15px;
         transform: translateX(0);
     }
 
