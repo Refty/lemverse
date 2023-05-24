@@ -106,7 +106,8 @@
 
         .fit-modal {
             height: auto;
-            width: fit-content;
+            width: 80%;
+            max-width: max-content;
         }
 
         &.visible {
