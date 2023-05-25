@@ -52,6 +52,7 @@ Template.screenshare.onDestroyed(function () {
 
 Template.remoteStream.onDestroyed(() => {
     if (!isModalOpen()) game.scene.getScene('WorldScene')?.enableMouse(true)
+    Session.set('modal', null)
 })
 
 Template.remoteStream.onRendered(function () {
