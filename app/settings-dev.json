@@ -42,11 +42,11 @@
             "sounds": {
                 "hangUp": {
                     "file": "webrtc-out.mp3",
-                    "volume": 0.2
+                    "volume": 1
                 },
                 "incomingCall": {
                     "file": "webrtc-in.mp3",
-                    "volume": 0.2
+                    "volume": 1
                 }
             }
         },
