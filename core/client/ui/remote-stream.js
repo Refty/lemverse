@@ -8,24 +8,24 @@ const checkMediaAvailable = (template, type) => {
         return
     }
 
-    const remoteUserIsNear = peer.remoteStreamsByUsers.get().find((usr) => usr._id === remoteUser._id)
-    if (!remoteUserIsNear) {
+    const remoteUserStream = peer.remoteStreamsByUsers.get().find((usr) => usr._id === remoteUser._id)
+    if (!remoteUserStream) {
         log(`Stop retry to get ${remoteUser.name}'s ${type}, ${remoteUser.name} is too far`)
         return
     }
 
-    const source = type === streamTypes.screen ? remoteUser.screen?.srcObject : remoteUser.main?.srcObject
+    const source = type === streamTypes.screen ? remoteUserStream.screen?.srcObject : remoteUserStream.main?.srcObject
     if (source) {
         template.firstNode.srcObject = source
         template.firstNode.play().catch(() => {
             error(
-                `unable to player remote user's media: playback interrupted (${remoteUser._id}) : ${template.attempt}`
+                `unable to player remote user's media: playback interrupted (${remoteUserStream._id}) : ${template.attempt}`
             )
             setTimeout(() => checkMediaAvailable(template, type), delayBetweenAttempt)
         })
     } else if (template.attempt < maxAttempt) {
         template.attempt++
-        log(`Tried to get ${remoteUser.name}'s ${type} and failed, attempt : ${template.attempt}`)
+        log(`Tried to get ${remoteUserStream.name}'s ${type} and failed, attempt : ${template.attempt}`)
         setTimeout(() => checkMediaAvailable(template, type), delayBetweenAttempt)
     } else {
         error(`unable to get user's ${type}`)
