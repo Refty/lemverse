@@ -6,6 +6,7 @@ import URLOpener from './url-opener'
 import { guestAllowed, permissionTypes } from '../lib/misc'
 import initSentryClient from './sentry'
 import { usersPollDiff, Polling } from './polling'
+import { Crisp } from 'crisp-sdk-web'
 
 initSentryClient()
 
@@ -93,6 +94,8 @@ Template.lemverse.onCreated(function () {
     Session.set('sceneWorldReady', false)
     Session.set('loading', true)
     Session.set('tilesetsLoaded', false)
+
+    if (Meteor.settings.public.crisp.websiteId) Crisp.configure(Meteor.settings.public.crisp.websiteId)
 
     window.addEventListener('dblclick', (e) => {
         if (e.target === document.querySelector('canvas')) sendEvent('toggle-fullscreen')
@@ -194,7 +197,7 @@ Template.lemverse.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ "profile.shareAudio": 1, "profile.guest": 1})
+        const user = Meteor.user({ 'profile.shareAudio': 1, 'profile.guest': 1 })
         if (!user) return
         Tracker.nonreactive(async () => {
             if (userProximitySensor.nearUsersCount() === 0 && !user.profile.guest)
@@ -552,7 +555,6 @@ Template.lemverse.onDestroyed(function () {
 })
 
 Template.lemverse.helpers({
-    allRemoteStreamsByUsers: () => peer.remoteStreamsByUsers.get(),
     guest: () => Meteor.user({ fields: { 'profile.guest': 1 } })?.profile.guest,
     onboarding: () =>
         Meteor.settings.public.lp.enableOnboarding &&

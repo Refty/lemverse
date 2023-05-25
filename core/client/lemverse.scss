@@ -6,6 +6,10 @@
     scrollbar-color: rgba(255, 255, 255, 0.15) rgba(0, 0, 0, 0.25);
 }
 
+#crisp-chatbox {
+    z-index: 3;
+}
+
 input:focus,
 textarea:focus,
 select:focus,
@@ -132,20 +136,8 @@ hr.separator {
     }
 }
 
-.js-streams {
-    position: absolute;
-    right: 0;
-    max-height: calc(100vh - 200px);
-    overflow-y: scroll;
-
-    video:not(.fullscreen) {
-        object-fit: cover;
-    }
-}
-
 .lemverse.screen-splitted {
-    .js-streams,
-    .user-panel {
+    .js-streams {
         right: initial;
         left: 0;
     }
