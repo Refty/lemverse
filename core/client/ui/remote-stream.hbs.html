@@ -12,7 +12,7 @@
             {{/unless}} {{#if (and hasMainStream (not isWebcamFullScreen))}} {{> webcam remoteUser=remoteUser}} {{/if}}
         </div>
         {{#if hasScreenStream}}
-        <div class="js-screenshare screenshare-minia">{{> screenshare remoteUser=remoteUser}}</div>
+        <div class="js-screenshare screenshare-preview">{{> screenshare remoteUser=remoteUser}}</div>
         {{/if}}
     </div>
 </template>
