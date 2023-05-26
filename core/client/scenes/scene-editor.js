@@ -165,8 +165,8 @@ EditorScene = new Phaser.Class({
     update() {
         if (!Session.get('editor')) return
 
-        const shiftIsDown = this.keys.shift.isDown
-        const altIsDown = this.keys.alt.isDown
+        const shiftIsDown = hotkeys.isPressed("shift")
+        const altIsDown = hotkeys.isPressed("alt")
         const canvasClicked = this.input.manager.activePointer.downElement?.nodeName === 'CANVAS'
         const { map } = levelManager
 
