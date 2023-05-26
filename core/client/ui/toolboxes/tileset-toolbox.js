@@ -93,7 +93,6 @@ Template.tilesetToolbox.onCreated(() => {
 
 Template.tilesetToolbox.onDestroyed(() => {
     unbindKeyboardShortcuts()
-    Session.set('selectedTilesetId', undefined)
 })
 
 Template.tileData.helpers({

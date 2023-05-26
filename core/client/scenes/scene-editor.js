@@ -682,7 +682,6 @@ EditorScene = new Phaser.Class({
         Session.set('selectedEntityId', undefined)
         Session.set('selectedZoneId', undefined)
         Session.set('selectedTiles', undefined)
-        Session.set('selectedTilesetId', undefined)
         Session.set('selectedZonePoint', undefined)
         this.marker.setVisible(false)
         this.areaSelector.setVisible(false)
