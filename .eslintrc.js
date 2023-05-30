@@ -88,7 +88,6 @@ module.exports = {
         peer: 'writable',
         settings: 'writable',
         meet: 'writable',
-        meetLowLevel: 'writable',
         meetHighLevel: 'writable',
         zoneManager: 'writable',
         notificationMessage: 'writable',

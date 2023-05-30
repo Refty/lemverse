@@ -429,7 +429,7 @@ Template.lemverse.onCreated(function () {
 
             loadUsers(() => {
                 log('loading level: all users loaded')
-                peer.init()
+                // peer.init()
 
                 // Load entities
                 log(`loading level: loading entities`)

@@ -1,26 +1,41 @@
-<template name="meetLowLevelTracks">
-    {{#if sessionMeetLowLevelTracks.length}}
-    <div class="meet-low-level-tracks js-streams {{#if Session 'meetLowLevelFullscreenTrackId'}}fullscreen{{/if}}">
-        {{#each sessionMeetLowLevelTracks}} {{#with track}} {{> meetLowLevelTrack}} {{/with}} {{/each}}
-    </div>
-    {{/if}}
-</template>
-
-<template name="meetLowLevelTrack">
-    {{#if eq getType "audio"}} {{> meetLowLevelAudioTrack}} {{else}} {{> meetLowLevelVideoTrack}} {{/if}}
-</template>
-
-<template name="meetLowLevelAudioTrack">
-    <div id="{{getId}}" class="hide">
-        <audio class="st" autoplay="1" id="{{getId}}" muted="{{isLocal}}"></audio>
-    </div>
-</template>
-
-<template name="meetLowLevelVideoTrack">
-    <div id="{{getId}}" class="stream {{#if eq (Session 'meetLowLevelFullscreenTrackId') getId}}active{{/if}}">
+<template name="remoteVideoTrack">
+    <div class="remote-stream">
         <div class="stream-name">{{name}}</div>
-        <div class="webcam js-fullscreen">
-            <video class="st" autoplay="1"></video>
+        <div class="js-webcam webcam">
+            <!-- {{#unless mediaState.shareAudio}}
+            <div class="mute">
+                <div>🎤</div>
+                <div>❌</div>
+            </div>
+            {{/unless}} {{#unless mediaState.shareVideo}} -->
+            <!-- <img src="{{avatar}}" alt="avatar" class="avatar" /> -->
+
+            <!-- {{/unless}}  -->
+            <video id="{{getId}}" type="video/mp4" autoplay></video>
+            <!-- {{#if (and hasMainStream (not isWebcamFullScreen))}} {{> webcam remoteUser=remoteUser}} {{/if}} -->
+        </div>
+        <!-- {{#if hasScreenStream}}
+        <div class="js-screenshare screenshare-preview">{{> screenshare remoteUser=remoteUser}}</div>
+        {{/if}} -->
+    </div>
+</template>
+
+<template name="remoteAudioTrack">
+    <div class="hide">
+        <audio autoplay="1" id="{{getId}}"></audio>
+    </div>
+</template>
+
+<template name="meetLowLevel">
+    <div class="remote-user {{#if active}}active{{/if}}">
+        {{#each remoteTracks}} {{#if eq getType "audio"}} {{> remoteAudioTrack }} {{else}} {{> remoteVideoTrack}}
+        {{/if}} {{/each}}
+    </div>
+
+    <div class="container-stream-me {{#if active}}active{{/if}}" tabindex="-1">
+        <div class="stream-me {{#if videoActive}}active-video{{/if}}" style="background-image: url('{{avatarURL}}')">
+            <video id="video-stream-me" type="video/mp4" width="240" height="180" autoplay muted></video>
+            <audio id="audio-stream-me" autoplay="1"></audio>
         </div>
     </div>
 </template>
