@@ -20,9 +20,9 @@
         </div>
 
         {{#if and (and guest (not onboarding)) allowFormLogin}} {{> formAccount visible=loading}} {{else if onboarding}}
-        {{> userOnboarding}} {{else if and (not guest not onboarding)}} {{> editToolbox}} {{/if}} {{ > stream }} {{>
-        messagesPopup}} {{#each mainModule in mainModules}} {{> Template.dynamic template=mainModule}} {{/each}} {{>
-        modalContainer }}
+        {{> userOnboarding}} {{else if and (not guest not onboarding)}} {{> editToolbox}} {{/if}} {{> messagesPopup}}
+        {{#each mainModule in mainModules}} {{> Template.dynamic template=mainModule}} {{/each}} {{> modalContainer }}
+        {{> meetLowLevel}}
 
         <div class="modules">{{#each module in modules}} {{> Template.dynamic template=module}} {{/each}}</div>
     </div>
