@@ -101,6 +101,17 @@ Template.remoteVideoTrack.onDestroyed(trackDetach)
  ** MeetLowLevel templates
  */
 
+const updateTrack = (type, tracks) => {
+    if (!Meteor.userId()) return
+
+    const user = Meteor.user({ fields: { 'profile.shareAudio': 1, 'profile.shareVideo': 1 } })
+    const track = tracks.find((t) => t.getType() === type)
+
+    if (!track) return
+    if (type === 'audio') user?.profile?.shareAudio ? track.unmute() : track.mute()
+    else if (type === 'video') user?.profile?.shareVideo ? track.unmute() : track.mute()
+}
+
 const onLocalTracks = (template, tracks) => {
     for (let i = 0; i < tracks.length; i++) {
         if (tracks[i].getType() === 'video') {
@@ -121,8 +132,12 @@ const connect = async (template, name = Meteor.settings.public.meet.roomDefaultN
     template.roomName = 'laaaee'
     meetJs.setLogLevel(meetJs.logLevels.ERROR)
 
-    const _localTracks = await meetJs.createLocalTracks({ devices: ['audio', 'video'] })
-    onLocalTracks(template, _localTracks)
+    await meetJs.createLocalTracks({ devices: ['audio', 'video'] }).then((tracks) => {
+        updateTrack('video', tracks)
+        updateTrack('audio', tracks)
+
+        onLocalTracks(template, tracks)
+    })
 
     template.connection = new meetJs.JitsiConnection(null, null, {
         hosts: {
@@ -193,6 +208,19 @@ Template.meetLowLevel.onCreated(function () {
         if (this.connection) {
             await disconnect(this)
             this.connection = undefined
+        }
+    })
+
+    window.addEventListener(eventTypes.onUserPropertyUpdated, (e) => {
+        const { updatedProperty } = e.detail
+        const localTracks = this.localTracks.get()
+
+        if ((!localTracks && localTracks.length === 0) || !updatedProperty) return
+
+        if (updatedProperty === 'shareAudio') {
+            updateTrack('audio', localTracks)
+        } else if (updatedProperty === 'shareVideo') {
+            updateTrack('video', localTracks)
         }
     })
 })
