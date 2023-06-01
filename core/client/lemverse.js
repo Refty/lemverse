@@ -208,12 +208,6 @@ Template.lemverse.onCreated(function () {
                 await userStreams.createStream()
                 userProximitySensor.callProximityStartedForAllNearUsers()
             }
-
-            if (meetingRoom.isOpen()) {
-                const meetingRoomService = meetingRoom.getMeetingRoomService()
-                if (user.profile.shareAudio) meetingRoomService.unmute()
-                else meetingRoomService.mute()
-            }
         })
     })
 
@@ -229,12 +223,6 @@ Template.lemverse.onCreated(function () {
                 const forceNewStream = userStreams.shouldCreateNewStream(streamTypes.main, true, true)
                 await userStreams.createStream(forceNewStream)
                 userProximitySensor.callProximityStartedForAllNearUsers()
-            }
-
-            if (meetingRoom.isOpen()) {
-                const meetingRoomService = meetingRoom.getMeetingRoomService()
-                if (user.profile.shareVideo) meetingRoomService.unhide()
-                else meetingRoomService.hide()
             }
         })
     })
