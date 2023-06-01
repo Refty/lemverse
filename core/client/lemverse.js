@@ -197,7 +197,8 @@ Template.lemverse.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ 'profile.shareAudio': 1, 'profile.guest': 1 })
+        const user = Meteor.user({ fields: { 'profile.shareVideo': 1, 'profile.guest': 1 } })
+
         if (!user) return
         Tracker.nonreactive(async () => {
             if (userProximitySensor.nearUsersCount() === 0 && !user.profile.guest)
@@ -217,7 +218,8 @@ Template.lemverse.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ 'profile.shareVideo': 1, 'profile.guest': 1 })
+        const user = Meteor.user({ fields: { 'profile.shareVideo': 1, 'profile.guest': 1 } })
+
         if (!user) return
         Tracker.nonreactive(async () => {
             if (userProximitySensor.nearUsersCount() === 0 && !user.profile.guest)
