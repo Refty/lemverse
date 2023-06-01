@@ -2,37 +2,45 @@
     <div class="remote-stream">
         <div class="stream-name">{{name}}</div>
         <div class="js-webcam webcam">
-            <!-- {{#unless mediaState.shareAudio}}
+            <!-- {{#unless isMuted}}
             <div class="mute">
                 <div>🎤</div>
                 <div>❌</div>
             </div>
-            {{/unless}} {{#unless mediaState.shareVideo}} -->
-            <!-- <img src="{{avatar}}" alt="avatar" class="avatar" /> -->
+            {{/unless}} -->
+            <!-- {{#unless isMuted}}
+            <img src="{{avatar}}" alt="avatar" class="avatar" />
 
-            <!-- {{/unless}}  -->
-            <video id="{{getId}}" type="video/mp4" autoplay></video>
+            {{/unless}} -->
+            <video id="{{track.getParticipantId}}-camera" type="video/mp4" autoplay></video>
             <!-- {{#if (and hasMainStream (not isWebcamFullScreen))}} {{> webcam remoteUser=remoteUser}} {{/if}} -->
+            {{#if desktopTrack}} {{> remoteDesktopTrack track=desktopTrack}} {{/if}}
         </div>
-        <!-- {{#if hasScreenStream}}
-        <div class="js-screenshare screenshare-preview">{{> screenshare remoteUser=remoteUser}}</div>
-        {{/if}} -->
+    </div>
+</template>
+
+<template name="remoteDesktopTrack">
+    <div class="js-screenshare screenshare-preview">
+        <video id="{{track.getParticipantId}}-desktop" type="video/mp4" autoplay muted></video>
     </div>
 </template>
 
 <template name="remoteAudioTrack">
     <div class="hide">
-        <audio autoplay="1" id="{{getId}}"></audio>
+        <audio autoplay="1" id="{{track.getParticipantId}}-audio"></audio>
     </div>
 </template>
 
 <template name="meetLowLevel">
     <div class="remote-user {{#if active}}active{{/if}}">
-        {{#each remoteTracks}} {{#if eq getType "audio"}} {{> remoteAudioTrack }} {{else}} {{> remoteVideoTrack}}
-        {{/if}} {{/each}}
+        {{#each tracks in remoteTracks}} {{> remoteAudioTrack track=tracks.audio}} {{> remoteVideoTrack
+        track=tracks.camera desktopTrack=tracks.desktop }} {{/each}}
     </div>
 
     <div class="container-stream-me {{#if active}}active{{/if}}" tabindex="-1">
+        <div class="stream-screen-me {{#if screenSharing}}active{{/if}}">
+            <video id="video-screen-me" type="video/mp4" width="340" height="240" autoplay muted></video>
+        </div>
         <div class="stream-me {{#if videoActive}}active-video{{/if}}" style="background-image: url('{{avatarURL}}')">
             <video id="video-stream-me" type="video/mp4" width="240" height="180" autoplay muted></video>
             <audio id="audio-stream-me" autoplay="1"></audio>

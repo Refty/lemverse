@@ -263,11 +263,11 @@
             width: 100%;
             object-fit: fill;
             height: 100%;
-            display: none;
+            // display: none;
 
-            &.active {
-                display: block;
-            }
+            // &.active {
+            //     display: block;
+            // }
         }
     }
 }

@@ -15,6 +15,13 @@ window.addEventListener('load', () => {
     }
 })
 
+const getTrackId = (track) => `${track.getParticipantId()}-${getTrackType(track)}`
+
+const getTrackType = (track) => {
+    if (track.getType() === 'audio') return 'audio'
+    else if (track.getType() === 'video') return track.getVideoType()
+}
+
 /*
  **  MeetJs events
  */
@@ -22,15 +29,37 @@ const onTrackAdded = (template, track) => {
     // Since we attach local tracks separately, we do not need attach it again
     if (track.isLocal()) return
 
+    const participantId = track.getParticipantId()
     const _remoteTracks = template.remoteTracks.get()
 
-    _remoteTracks.push(track)
-    template.remoteTracks.set(_remoteTracks)
+    if (!_remoteTracks[participantId]) _remoteTracks[participantId] = {}
+
+    if (track.getType() === 'video') {
+        // When receiving a 'desktop' track, Jitsi doesn't immediately set the correct type, leading to confusion with our own tracks.
+        // Initially, a 'desktop' track is classified as a 'camera' type, but after a few seconds, it is eventually updated to a 'desktop' track type.
+        // This inconsistency is quite frustrating, and since we haven't found a suitable solution, it's better to introduce a timeout before setting the track type to 'video'.
+        // Cf: https://community.jitsi.org/t/identifying-new-track-as-desktop/118232/2
+
+        setTimeout(() => {
+            _remoteTracks[participantId][getTrackType(track)] = track
+            template.remoteTracks.set(_remoteTracks)
+        }, 1000)
+    } else {
+        _remoteTracks[participantId][getTrackType(track)] = track
+        template.remoteTracks.set(_remoteTracks)
+    }
 }
 
 const onTrackRemoved = (template, track) => {
-    const _remoteTracks = _.without(template.remoteTracks.get(), track)
-    template.remoteTracks.set(_remoteTracks)
+    const _remoteTracks = template.remoteTracks.get()
+    const participantId = track.getParticipantId()
+
+    if (_remoteTracks[participantId]) {
+        _remoteTracks[participantId][getTrackType(track)] = null
+
+        if (_remoteTracks[participantId].length === 0) delete _remoteTracks[participantId]
+        template.remoteTracks.set(_remoteTracks)
+    }
 }
 
 const onConferenceJoined = () => {
@@ -56,7 +85,7 @@ const onConnectionSuccess = (template) => {
     template.room.on(meetJs.events.conference.CONFERENCE_JOINED, onConferenceJoined)
     template.room.on(meetJs.events.conference.CONFERENCE_LEFT, onConferenceLeft)
     template.room.on(meetJs.events.conference.USER_JOINED, (id) => console.log('user joined!', id))
-    template.room.on(meetJs.events.conference.USER_LEFT, (id) => onsole.log('user left!', id))
+    template.room.on(meetJs.events.conference.USER_LEFT, (id) => console.log('user left!', id))
 
     // Join
     template.room.join()
@@ -72,30 +101,44 @@ const onConnectionFailed = () => {
  ** Video/Audio Track templates
  */
 const trackAttach = () => {
-    const track = Template.currentData()
-    const el = $(`#${track.getId()}`)[0]
+    const { track } = Template.currentData()
+
+    if (!track) return
+    const el = document.getElementById(getTrackId(track))
+
+    if (!el) return
     track.attach(el)
 }
 
 const trackDetach = () => {
-    const track = Template.currentData()
-    track.detach($(`#${track.getId()}`)[0])
+    const { track } = Template.currentData()
+
+    if (!track) return
+    const el = document.getElementById(getTrackId(track))
+
+    if (!el) return
+    track.detach(el)
 }
 
 Template.remoteAudioTrack.onRendered(function () {
-    this.autorun(function () {
-        trackAttach()
-    })
+    this.autorun(() => trackAttach())
 })
-
 Template.remoteVideoTrack.onRendered(function () {
-    this.autorun(function () {
-        trackAttach()
-    })
+    this.autorun(() => trackAttach())
+})
+Template.remoteDesktopTrack.onRendered(function () {
+    this.autorun(() => trackAttach())
 })
 
-Template.remoteAudioTrack.onDestroyed(trackDetach)
-Template.remoteVideoTrack.onDestroyed(trackDetach)
+Template.remoteAudioTrack.onDestroyed(function () {
+    this.autorun(() => trackDetach())
+})
+Template.remoteVideoTrack.onDestroyed(function () {
+    this.autorun(() => trackDetach())
+})
+Template.remoteDesktopTrack.onDestroyed(function () {
+    this.autorun(() => trackDetach())
+})
 
 /*
  ** MeetLowLevel templates
@@ -113,15 +156,15 @@ const updateTrack = (type, tracks) => {
 }
 
 const onLocalTracks = (template, tracks) => {
-    for (let i = 0; i < tracks.length; i++) {
-        if (tracks[i].getType() === 'video') {
+    tracks.forEach((track) => {
+        if (track.getType() === 'video') {
             let videoNode = document.querySelector('#video-stream-me')
-            tracks[i].attach(videoNode)
-        } else {
+            track.attach(videoNode)
+        } else if (track.getType() === 'audio') {
             let audioNode = document.querySelector('#audio-stream-me')
             // tracks[i].attach(audioNode)
         }
-    }
+    })
 
     template.localTracks.set(tracks)
 }
@@ -188,14 +231,14 @@ const disconnect = async (template) => {
     }
 
     template.localTracks.set([])
-    template.remoteTracks.set([])
+    template.remoteTracks.set({})
 
     return await template.connection.disconnect()
 }
 
 Template.meetLowLevel.onCreated(function () {
     this.localTracks = new ReactiveVar([])
-    this.remoteTracks = new ReactiveVar([])
+    this.remoteTracks = new ReactiveVar({})
     this.roomName = ''
     this.connection = undefined
     this.room = undefined
@@ -211,28 +254,57 @@ Template.meetLowLevel.onCreated(function () {
         }
     })
 
-    window.addEventListener(eventTypes.onUserPropertyUpdated, (e) => {
-        const { updatedProperty } = e.detail
+    window.addEventListener(eventTypes.onUserPropertyUpdated, async (e) => {
+        const { propertyName, propertyValue } = e.detail
         const localTracks = this.localTracks.get()
 
-        if ((!localTracks && localTracks.length === 0) || !updatedProperty) return
+        if ((!localTracks && localTracks.length === 0) || !propertyName) return
 
-        if (updatedProperty === 'shareAudio') {
+        if (propertyName === 'shareAudio') {
             updateTrack('audio', localTracks)
-        } else if (updatedProperty === 'shareVideo') {
+        } else if (propertyName === 'shareVideo') {
             updateTrack('video', localTracks)
+        } else if (propertyName === 'shareScreen') {
+            if (propertyValue) {
+                await meetJs.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
+                    const screenNode = document.querySelector('#video-screen-me')
+                    const screenTrack = tracks[0]
+
+                    screenTrack.attach(screenNode)
+                    this.room.addTrack(screenTrack)
+
+                    localTracks.push(screenTrack)
+                    this.localTracks.set(localTracks)
+                })
+            } else {
+                let filteredLocalTracks = localTracks.filter((track) => {
+                    if (track.getType() === 'video' && track.getVideoType() === 'desktop') {
+                        track.dispose()
+                        return false
+                    } else {
+                        return true
+                    }
+                })
+
+                this.localTracks.set(filteredLocalTracks)
+            }
         }
     })
 })
 
 Template.meetLowLevel.helpers({
     active() {
-        return Template.instance().remoteTracks.get().length > 0
+        return Object.keys(Template.instance().remoteTracks.get()).length > 0
     },
     videoActive() {
         return Template.instance().localTracks.get().length > 0
     },
     remoteTracks() {
-        return Template.instance().remoteTracks.get()
+        return Object.values(Template.instance().remoteTracks.get())
+    },
+    screenSharing() {
+        const localTracks = Template.instance().localTracks.get()
+
+        return localTracks?.find((t) => t.getType() === 'video' && t.getVideoType() === 'desktop')
     },
 })
