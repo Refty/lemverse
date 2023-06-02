@@ -6,9 +6,14 @@
     bottom: 0;
     left: 50%;
     transform: translate(-50%, -20%);
-    background-color: rgba($main-color, 0.9);
-    border-radius: 12px;
-    padding: 10px;
+    display: flex;
+    gap: 6px;
+
+    .buttons {
+        background-color: rgba($main-color, 0.9);
+        border-radius: 12px;
+        padding: 10px;
+    }
 
     &.stream-active {
         left: calc(50% - 140px);
@@ -38,6 +43,34 @@
     .separator {
         color: #d2d5e0;
         transform: translateY(5px);
+    }
+
+    .zoom-control {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .button {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 18px;
+            
+            @media (hover: hover) {
+                &:hover {
+                    color: $main-color;
+                }
+            }
+            
+            @media screen and (max-width: 850px) {
+                height: 16px;
+                width: 16px;
+                padding: 0;
+            }
+            
+        }
     }
 
     .button {
@@ -76,7 +109,7 @@
             }
         }
 
-        &:not(.active):nth-child(-n + 3)::before {
+        &.audio:not(.active)::before, &.video:not(.active)::before, &.screen:not(.active)::before {
             content: '\\';
             position: absolute;
             color: $main-color;

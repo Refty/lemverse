@@ -90,6 +90,10 @@
                 </svg>
             </button>
         </div>
+        <div class="buttons zoom-control">
+            <button class="button zoom-in" disabled="{{#if not canZoomIn}}disabled{{/if}}" type="button">+</button>
+            <button class="button zoom-out" disabled="{{#if not canZoomOut}}disabled{{/if}}" type="button">−</button>
+        </div>
     </div>
     {{/if}}
 </template>

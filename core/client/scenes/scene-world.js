@@ -152,11 +152,24 @@ WorldScene = new Phaser.Class({
         )
     },
 
+    canZoomIn() {
+        return this.cameras.main.zoom < zoomConfig.max
+    },
+
+    canZoomOut() {
+        return this.cameras.main.zoom > zoomConfig.min
+    },
+
     zoomDelta(delta) {
         const linearFactor = this.cameras.main.zoom * zoomConfig.factor
         const clampedDelta = clamp(delta, -zoomConfig.maxDelta, zoomConfig.maxDelta)
         const zoom = clamp(this.cameras.main.zoom - clampedDelta * linearFactor, zoomConfig.min, zoomConfig.max)
         this.setClampedZoom(this.cameras.main, zoom)
+        window.dispatchEvent(
+            new CustomEvent(eventTypes.onZoom, {
+                detail: { scene: this },
+            })
+        )
     },
 
     initFromLevel(level) {
