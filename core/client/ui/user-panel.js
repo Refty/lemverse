@@ -81,12 +81,4 @@ Template.userPanel.events({
         event.stopPropagation()
         toggleModal('userList')
     },
-    'focus .user-panel': function (event) {
-        event.currentTarget.classList.toggle('visible', true)
-        document.querySelector('.js-openpanel').classList.toggle('displaynone', true)
-    },
-    'blur .user-panel': function (event) {
-        event.currentTarget.classList.toggle('visible', false)
-        document.querySelector('.js-openpanel').classList.toggle('displaynone', false)
-    },
 })
