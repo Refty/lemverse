@@ -66,7 +66,7 @@ Template.settingsBasic.events({
 
         Object.keys(templateInstance.fieldsUpdated).forEach((id) => {
             const elem = document.querySelector(`[name=${id}]`)
-            elem.value = elem.dataset.oldvalue
+            elem.value = elem.dataset.oldvalue || ''
         })
 
         templateInstance.hasUpdates.set(false)
