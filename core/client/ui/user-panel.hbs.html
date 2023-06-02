@@ -1,7 +1,7 @@
 <template name="userPanel">
     {{#if displayUserPanel}}
     <div class="user-panel {{#if active}}stream-active{{/if}}">
-        <div class="buttons">
+        <div class="buttons actions">
             <button
                 class="button audio {{#if currentUser.profile.shareAudio}}active{{/if}}"
                 disabled="{{#if not canTalkToUser}}disabled{{/if}}"

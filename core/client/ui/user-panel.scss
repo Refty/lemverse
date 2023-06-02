@@ -2,42 +2,77 @@
 
 .user-panel {
     position: absolute;
-    z-index: 50;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, -20%);
+    z-index: 90;
+    bottom: 14px;
+    left: calc(50% - 149px);
     display: flex;
     gap: 6px;
+    transition: all 0.5s ease-out;
+
+    @media screen and (max-width: 1024px) {
+        &.stream-active {
+            left: calc(50% - 294px);
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        &.stream-active {
+            left: unset;
+            right: 22px;
+
+            .buttons {
+                background-color: rgba($main-color, 0.4);
+            }
+            
+            .zoom-control {
+               position: fixed;
+               left:10px;
+               background-color: $main-color;
+            }
+        }
+    }
+
+    @media screen and (max-width: 458px) {
+        .zoom-control {
+            position: fixed;
+            left:10px;
+         }
+    }
+
+    @media screen and (max-width: 400px) {
+        &:not(.stream-active) {
+            left: 20px;
+            align-items: end;
+            gap: 0;
+
+            .buttons.actions {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .separator {
+                display: none;
+            }
+
+            .zoom-control {
+                position: relative;
+            }
+        }
+    }
+
+    @media screen and (max-width: 344px) {
+        &.stream-active {
+            .zoom-control {
+                display: none;
+            }
+        }
+    }
 
     .buttons {
         background-color: rgba($main-color, 0.9);
         border-radius: 12px;
         padding: 10px;
-    }
-
-    &.stream-active {
-        left: calc(50% - 140px);
-    }
-
-    @media screen and (max-width: 550px) {
-        bottom: 14px;
-        background-color: rgba($main-color, 0.9);
-        left: unset;
-        transform: unset;
-        right: 100px;
-        padding: 8px;
-    }
-
-    @media screen and (max-width: 700px) {
-        &.stream-active {
-            padding: 6px;
-            background-color: rgba($main-color, 0.4);
-            right: 24px;
-            transform: unset;
-            bottom: 14px;
-            left: unset;
-            z-index: 100;
-        }
     }
 
     .separator {
