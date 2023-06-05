@@ -2,18 +2,10 @@
     <div class="remote-stream">
         <div class="stream-name">{{name}}</div>
         <div class="js-webcam webcam">
-            <!-- {{#unless isMuted}}
-            <div class="mute">
-                <div>🎤</div>
-                <div>❌</div>
-            </div>
-            {{/unless}} -->
-            <!-- {{#unless isMuted}}
+            {{#if isMuted}}
             <img src="{{avatar}}" alt="avatar" class="avatar" />
-
-            {{/unless}} -->
+            {{/if}}
             <video id="{{track.getParticipantId}}-camera" type="video/mp4" autoplay></video>
-            <!-- {{#if (and hasMainStream (not isWebcamFullScreen))}} {{> webcam remoteUser=remoteUser}} {{/if}} -->
             {{#if desktopTrack}} {{> remoteDesktopTrack track=desktopTrack}} {{/if}}
         </div>
     </div>
@@ -26,7 +18,13 @@
 </template>
 
 <template name="remoteAudioTrack">
-    <div class="hide">
+    <div class="remote-audio">
+        {{#if isMuted}}
+        <div class="mute">
+            <div>🎤</div>
+            <div>❌</div>
+        </div>
+        {{/if}}
         <audio autoplay="1" id="{{track.getParticipantId}}-audio"></audio>
     </div>
 </template>

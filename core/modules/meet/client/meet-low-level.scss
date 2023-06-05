@@ -61,25 +61,6 @@
         height: 100%;
         cursor: pointer;
 
-        .mute {
-            position: absolute;
-            z-index: 10;
-            top: 5px;
-            right: 35px;
-            font-size: 24px;
-
-            div:nth-child(1) {
-                position: absolute;
-                z-index: 11;
-            }
-
-            div:nth-child(2) {
-                position: absolute;
-                z-index: 12;
-                transform: scale(0.65);
-            }
-        }
-
         img,
         video {
             width: 280px;
@@ -127,6 +108,29 @@
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 2px;
+        }
+    }
+}
+
+.remote-audio {
+    position: relative;
+
+    .mute {
+        position: absolute;
+        z-index: 10;
+        top: 5px;
+        right: 35px;
+        font-size: 24px;
+
+        div:nth-child(1) {
+            position: absolute;
+            z-index: 11;
+        }
+
+        div:nth-child(2) {
+            position: absolute;
+            z-index: 12;
+            transform: scale(0.65);
         }
     }
 }
