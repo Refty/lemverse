@@ -41,6 +41,7 @@ eventTypes = Object.freeze({
     onZoneAdded: 'onZoneAdded',
     onZoneUpdated: 'onZoneUpdated',
     onZoneRemoved: 'onZoneRemoved',
+    onZoom: 'onZoom',
     onPopInEvent: 'pop-in-event',
     onWorldSceneCreated: 'onWorldSceneCreated',
     beforeSendingMessage: 'beforeSendingMessage',

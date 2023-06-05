@@ -6,11 +6,19 @@ Template.userPanel.onCreated(function () {
     if (Meteor.settings.public.features?.userPanel?.enabled === false) return
     if (!Meteor.userId()) return
 
+    this.canZoomIn = new ReactiveVar(game ? game.scene.getScene('WorldScene').canZoomIn() : true)
+    this.canZoomOut = new ReactiveVar(game ? game.scene.getScene('WorldScene').canZoomOut() : true)
+
     hotkeys('space', { scope: scopes.player }, () => toggleUserProperty('shareAudio'))
     hotkeys('shift+1', { scope: scopes.player }, () => toggleUserProperty('shareAudio'))
     hotkeys('shift+2', { scope: scopes.player }, () => toggleUserProperty('shareVideo'))
     hotkeys('shift+3', { scope: scopes.player }, () => toggleUserProperty('shareScreen'))
     hotkeys('shift+4', { scope: scopes.player }, () => toggleModal('settingsMain'))
+    this.onZoom = (e) => {
+        this.canZoomIn.set(e.detail.scene.canZoomIn())
+        this.canZoomOut.set(e.detail.scene.canZoomOut())
+    }
+    window.addEventListener(eventTypes.onZoom, this.onZoom)
 })
 
 Template.userPanel.onDestroyed(() => {
@@ -19,6 +27,7 @@ Template.userPanel.onDestroyed(() => {
     hotkeys.unbind('shift+2', scopes.player)
     hotkeys.unbind('shift+3', scopes.player)
     hotkeys.unbind('shift+4', scopes.player)
+    window.removeEventListener(eventTypes.onZoom, this.onZoom)
 })
 
 Template.userPanel.helpers({
@@ -47,6 +56,12 @@ Template.userPanel.helpers({
             !Meteor.user({ fields: { 'profile.guest': 1 } })?.profile.guest ||
             guestAllowed(permissionTypes.useMessaging)
         )
+    },
+    canZoomIn() {
+        return Template.instance().canZoomIn.get()
+    },
+    canZoomOut() {
+        return Template.instance().canZoomOut.get()
     },
 })
 
@@ -80,5 +95,15 @@ Template.userPanel.events({
         event.preventDefault()
         event.stopPropagation()
         toggleModal('userList')
+    },
+    'click .button.zoom-in': function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        game.scene.getScene('WorldScene').zoomDelta(-100)
+    },
+    'click .button.zoom-out': function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        game.scene.getScene('WorldScene').zoomDelta(100)
     },
 })
