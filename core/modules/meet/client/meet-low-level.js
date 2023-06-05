@@ -100,11 +100,21 @@ const onConnectionFailed = () => {
 /*
  ** Video/Audio Track templates
  */
-const trackAttach = () => {
-    const { track } = Template.currentData()
+const trackAttach = (template) => {
+    const { track } = Template.currentData() // Do not replace it to use 'template' props, need use global 'Template' to get the track
 
     if (!track) return
     const el = document.getElementById(getTrackId(track))
+
+    if (template.isMuted) {
+        template.isMuted.set(track.isMuted())
+    }
+
+    track.addEventListener(meetJs.events.track.TRACK_MUTE_CHANGED, (track) => {
+        if (template.isMuted) {
+            template.isMuted.set(track.isMuted())
+        }
+    })
 
     if (!el) return
     track.attach(el)
@@ -120,24 +130,49 @@ const trackDetach = () => {
     track.detach(el)
 }
 
-Template.remoteAudioTrack.onRendered(function () {
-    this.autorun(() => trackAttach())
+Template.remoteVideoTrack.onCreated(function () {
+    this.isMuted = new ReactiveVar(false)
 })
-Template.remoteVideoTrack.onRendered(function () {
-    this.autorun(() => trackAttach())
+Template.remoteAudioTrack.onCreated(function () {
+    this.isMuted = new ReactiveVar(false)
 })
-Template.remoteDesktopTrack.onRendered(function () {
-    this.autorun(() => trackAttach())
+Template.remoteDesktopTrack.onCreated(function () {
+    this.isMuted = new ReactiveVar(false)
 })
 
-Template.remoteAudioTrack.onDestroyed(function () {
+Template.remoteVideoTrack.onRendered(function () {
+    this.autorun(() => trackAttach(this))
+})
+Template.remoteAudioTrack.onRendered(function () {
+    this.autorun(() => trackAttach(this))
+})
+Template.remoteDesktopTrack.onRendered(function () {
+    this.autorun(() => trackAttach(this))
+})
+
+Template.remoteVideoTrack.onDestroyed(function () {
     this.autorun(() => trackDetach())
 })
-Template.remoteVideoTrack.onDestroyed(function () {
+Template.remoteAudioTrack.onDestroyed(function () {
     this.autorun(() => trackDetach())
 })
 Template.remoteDesktopTrack.onDestroyed(function () {
     this.autorun(() => trackDetach())
+})
+
+Template.remoteVideoTrack.helpers({
+    isMuted: () => Template.instance().isMuted.get(),
+    avatar: () =>
+        generateRandomAvatarURLForUser({
+            _id: 'usr_a',
+            profile: { name: 'Guest', avatar: 'cat' },
+        }),
+})
+Template.remoteAudioTrack.helpers({
+    isMuted: () => Template.instance().isMuted.get(),
+})
+Template.remoteDesktopTrack.onDestroyed({
+    isMuted: () => Template.instance().isMuted.get(),
 })
 
 /*
@@ -219,6 +254,8 @@ const connect = async (template, name = Meteor.settings.public.meet.roomDefaultN
 
 const disconnect = async (template) => {
     console.log('DISCONNECT')
+
+    await template.room.leave()
 
     template.connection.removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
     template.connection.removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
