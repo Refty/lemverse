@@ -106,7 +106,7 @@ userStreams = {
                 if (err.message === 'Permission denied by system')
                     lp.notif.warning('Unable to access the camera and microphone')
                 else {
-                    toggleModal('permissionsModal', 'fit-modal')
+                    toggleModal('permissionsModal', 'fit-modal permissions')
                 }
             } else if (err.name === 'OverconstrainedError') {
                 lp.notif.warning('Cameras constraints not supported')
