@@ -30,16 +30,19 @@
 </template>
 
 <template name="meetLowLevel">
-    <div class="remote-user {{#if active}}active{{/if}}">
+    <div class="remote-user {{#if isActive}}active{{/if}}">
         {{#each tracks in remoteTracks}} {{> remoteAudioTrack track=tracks.audio}} {{> remoteVideoTrack
         track=tracks.camera desktopTrack=tracks.desktop }} {{/each}}
     </div>
 
-    <div class="container-stream-me {{#if active}}active{{/if}}" tabindex="-1">
-        <div class="stream-screen-me {{#if screenSharing}}active{{/if}}">
+    <div class="container-stream-me {{#if isActive}}active{{/if}}" tabindex="-1">
+        <div class="stream-screen-me {{#if isSharingScreen}}active{{/if}}">
             <video id="video-screen-me" type="video/mp4" width="340" height="240" autoplay muted></video>
         </div>
-        <div class="stream-me {{#if videoActive}}active-video{{/if}}" style="background-image: url('{{avatarURL}}')">
+        <div
+            class="stream-me {{#if isLocalVideoActive}}active-video{{/if}}"
+            style="background-image: url('{{avatarURL}}')"
+        >
             <video id="video-stream-me" type="video/mp4" width="240" height="180" autoplay muted></video>
             <audio id="audio-stream-me" autoplay="1"></audio>
         </div>
