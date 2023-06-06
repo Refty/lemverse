@@ -172,7 +172,7 @@ Template.remoteVideoTrack.helpers({
 Template.remoteAudioTrack.helpers({
     isMuted: () => Template.instance().isMuted.get(),
 })
-Template.remoteDesktopTrack.onDestroyed({
+Template.remoteDesktopTrack.helpers({
     isMuted: () => Template.instance().isMuted.get(),
 })
 
@@ -315,23 +315,31 @@ Template.meetLowLevel.onCreated(function () {
         } else if (propertyName === 'shareScreen') {
             if (propertyValue) {
                 await meetJs.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
+                    const currentDesktopTrack = localTracks.find((t) => t.getVideoType() === 'desktop')
                     const screenNode = document.querySelector('#video-screen-me')
-                    const screenTrack = tracks[0]
+                    const track = tracks[0] // Since we just ask for desktop, we will only have one item
 
-                    screenTrack.attach(screenNode)
-                    this.room.addTrack(screenTrack)
+                    track.attach(screenNode)
 
-                    localTracks.push(screenTrack)
+                    // If it's the first time we share screen, we should add it to the conference
+                    if (!currentDesktopTrack) {
+                        this.room.addTrack(track)
+                    } else {
+                        // Otherwise, we should replace since because Meet will not trigger 'TRACK_REMOVED' when we dispose the desktop track
+                        this.room.replaceTrack(currentDesktopTrack, track)
+                    }
+
+                    localTracks.push(track)
                     this.localTracks.set(localTracks)
                 })
             } else {
                 let filteredLocalTracks = localTracks.filter((track) => {
-                    if (track.getType() === 'video' && track.getVideoType() === 'desktop') {
+                    // While we remove the desktop track, we dispose it at the same time
+                    if (track.getVideoType() === 'desktop') {
                         track.dispose()
                         return false
-                    } else {
-                        return true
                     }
+                    return true
                 })
 
                 this.localTracks.set(filteredLocalTracks)

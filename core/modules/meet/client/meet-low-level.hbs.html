@@ -12,7 +12,7 @@
 </template>
 
 <template name="remoteDesktopTrack">
-    <div class="js-screenshare screenshare-preview">
+    <div class="js-screenshare screenshare-preview {{#if isMuted}}hide{{/if}}">
         <video id="{{track.getParticipantId}}-desktop" type="video/mp4" autoplay muted></video>
     </div>
 </template>
