@@ -71,6 +71,7 @@ const onConferenceLeft = () => {
 }
 
 const onConnectionSuccess = (template) => {
+    Session.set('meetIsConnected', true)
     template.room = template.connection.initJitsiConference(template.roomName, {})
     const _localTracks = template.localTracks.get()
 
@@ -269,6 +270,7 @@ const disconnect = async (template) => {
 
     template.localTracks.set([])
     template.remoteTracks.set({})
+    Session.set('meetIsConnected', false)
 
     return await template.connection.disconnect()
 }
@@ -276,9 +278,18 @@ const disconnect = async (template) => {
 Template.meetLowLevel.onCreated(function () {
     this.localTracks = new ReactiveVar([])
     this.remoteTracks = new ReactiveVar({})
+    this.avatarURL = new ReactiveVar()
     this.roomName = ''
     this.connection = undefined
     this.room = undefined
+
+    this.autorun(() => {
+        if (!Meteor.userId()) return
+
+        const user = Meteor.user({ fields: { 'profile.avatar': 1 } })
+
+        if (user) this.avatarURL.set(generateRandomAvatarURLForUser(user))
+    })
 
     window.addEventListener(eventTypes.onUsersComeCloser, async (e) => {
         if (!this.connection) await connect(this)
@@ -295,7 +306,7 @@ Template.meetLowLevel.onCreated(function () {
         const { propertyName, propertyValue } = e.detail
         const localTracks = this.localTracks.get()
 
-        if ((!localTracks && localTracks.length === 0) || !propertyName) return
+        if (!localTracks || localTracks.length === 0 || !propertyName) return
 
         if (propertyName === 'shareAudio') {
             updateTrack('audio', localTracks)
@@ -330,16 +341,21 @@ Template.meetLowLevel.onCreated(function () {
 })
 
 Template.meetLowLevel.helpers({
-    active() {
-        return Object.keys(Template.instance().remoteTracks.get()).length > 0
+    avatarURL() {
+        return Template.instance().avatarURL.get()
     },
-    videoActive() {
-        return Template.instance().localTracks.get().length > 0
+    isActive() {
+        return Object.keys(Template.instance().remoteTracks.get()).length > 0
     },
     remoteTracks() {
         return Object.values(Template.instance().remoteTracks.get())
     },
-    screenSharing() {
+    isLocalVideoActive() {
+        const user = Meteor.user({ fields: { 'profile.shareVideo': 1 } })
+
+        return user.profile?.shareVideo && Template.instance().localTracks.get().length > 0
+    },
+    isSharingScreen() {
         const localTracks = Template.instance().localTracks.get()
 
         return localTracks?.find((t) => t.getType() === 'video' && t.getVideoType() === 'desktop')
