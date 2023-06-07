@@ -74,6 +74,10 @@
         }
     }
 
+    &.transparent {
+        background-color: rgba(0, 0, 0, 0);
+    }
+
     &.tooltip {
         color: white;
         background-color: rgba(25, 25, 25, 0.9);
