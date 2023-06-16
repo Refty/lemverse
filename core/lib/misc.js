@@ -103,6 +103,12 @@ const currentLevel = (user) => {
     return Levels.findOne(user.profile.levelId)
 }
 
+const isRoomFull = (zone) => {
+    if (zone.maxUsers === null || zone.maxUsers === undefined) return false
+    const usersInZone = zoneManager.usersInZone(zone)
+    return usersInZone.length >= zone.maxUsers
+}
+
 const canAccessZone = (zone, user) => {
     check([zone._id, user._id], [Match.Id])
 
@@ -407,6 +413,7 @@ export {
     guestAllowed,
     getChannelType,
     isLevelOwner,
+    isRoomFull,
     levelSpawnPosition,
     permissionTypes,
     subscribedUsersToEntity,

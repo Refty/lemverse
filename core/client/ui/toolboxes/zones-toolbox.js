@@ -28,6 +28,7 @@ Template.zonesToolboxProperties.helpers({
         if (!props.name) props.name = ''
         if (!props.url) props.url = ''
         if (!props.adminOnly) props.adminOnly = false
+        if (!props.maxUsers) props.maxUsers = null
         if (!props.teleportEndpoint) props.teleportEndpoint = ''
         if (!props.unmute) props.unmute = false
         if (!props.unhide) props.unhide = false

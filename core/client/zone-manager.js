@@ -1,4 +1,4 @@
-import { canAccessZone } from '../lib/misc'
+import { canAccessZone, isRoomFull } from '../lib/misc'
 
 const getZoneCenter = (zone) => [(zone.x1 + zone.x2) * 0.5, (zone.y1 + zone.y2) * 0.5]
 
@@ -15,9 +15,20 @@ const zoneAnimations = {
     }),
 }
 
-const teleportUserOutsideZone = (zone) => {
-    const [x, y] = zone.teleportEndpoint ? zone.teleportEndpoint.split(',') : [73, 45]
-    userManager.teleportMainUser(+x, +y)
+const teleportUserOutsideZone = (user, zone) => {
+    const direction = user.profile.direction
+    const position = {x: user.profile.x, y: user.profile.y}
+    const offset = 100
+    if (direction === "down") {
+        position.y = zone.y1 - offset
+    } else if (direction === "up") {
+        position.y = zone.y2 + offset
+    } else if (direction === "left") {
+        position.x = zone.x2 + offset
+    } else if (direction === "right") {
+        position.x = zone.x1 - offset
+    }
+    userManager.teleportMainUser(position.x, position.y)
 }
 
 zoneManager = {
@@ -177,8 +188,7 @@ zoneManager = {
 
         // set as activate zone + check permissions
         if (!this.setActiveZone(activeZone)) {
-            lp.notif.error('You cannot access this zone')
-            teleportUserOutsideZone(activeZone)
+            teleportUserOutsideZone(Meteor.user(), activeZone)
             return
         }
 
@@ -220,10 +230,16 @@ zoneManager = {
         this.activeZone = zone
         if (!zone) return true
 
+        if (isRoomFull(zone)) {
+            lp.notif.error('Sorry, the room is full')
+            return false
+        }
+
         try {
             if (!canAccessZone(zone, Meteor.user())) throw new Error('access-denied')
         } catch (err) {
             this.activeZone = undefined
+            lp.notif.error('You cannot access this zone')
             return false
         }
 
