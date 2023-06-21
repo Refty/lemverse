@@ -72,7 +72,7 @@ Meteor.methods({
             throw new Meteor.Error('not-allowed', 'User not allowed in the zone')
         }
 
-        const moderator = user.roles?.admin || level.guildId === user.guildId || Meteor.setting.meet.everyoneIsModerator
+        const moderator = user.roles?.admin || level.guildId === user.guildId || Meteor.settings.meet.everyoneIsModerator
         const roomName = computeRoomName(zone)
         const token = computeRoomToken(user, roomName, moderator)
 
