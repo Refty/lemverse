@@ -1,6 +1,6 @@
 <template name="userListEntry">
     {{> avatarViewer user=user showStatus=true}}
-    <span class="js-profile">{{user.profile.fullName}}</span>
+    <span class="js-profile">{{or user.profile.fullName user.profile.name}}</span>
     <span class="baseline" title="{{user.profile.baseline}}">{{user.profile.baseline}}</span>
     <div class="guild">
         {{#if guildIcon}}

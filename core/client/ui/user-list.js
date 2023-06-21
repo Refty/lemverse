@@ -8,6 +8,7 @@ const tabs = Object.freeze({
 const userListTabKey = 'userListTab'
 const userFields = {
     'status.online': 1,
+    'profile.name': 1,
     'profile.fullName': 1,
     'profile.baseline': 1,
     'profile.x': 1,
