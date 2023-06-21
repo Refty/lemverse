@@ -41,7 +41,7 @@ userManager = {
         this.controlledCharacter = undefined
     },
 
-    onDocumentAdded(user, guild) {
+    onDocumentAdded(user) {
         if (this.characters[user._id]) return null
 
         const { x, y, guest, direction } = user.profile
@@ -55,7 +55,7 @@ userManager = {
             character.playAnimation(characterAnimations.run, 'down', true)
         }
 
-        this.onDocumentUpdated(user, undefined, guild)
+        this.onDocumentUpdated(user, undefined)
 
         return character
     },
@@ -112,7 +112,7 @@ userManager = {
         }
     },
 
-    onDocumentUpdated(user, oldUser, guild) {
+    onDocumentUpdated(user, oldUser) {
         const character = this.characters[user._id]
         if (!character) return
 
@@ -132,7 +132,6 @@ userManager = {
         if (!user.profile.guest && oldUser?.profile.guest) {
             character.toggleMouseInteraction(true)
             character.setName(name, baseline, nameColor)
-            if (user.guildId && guild?.icon) character.setIcon(guild.icon)
         }
 
         // show reactions
@@ -154,9 +153,6 @@ userManager = {
             baseline !== oldUser?.profile.baseline ||
             nameColor !== oldUser?.profile.nameColor
         if (nameUpdated) character.setName(name, baseline, nameColor)
-
-        // update guild icon
-        if (user.guildId !== oldUser?.guildId) character.setIcon(guild?.icon)
 
         const userHasMoved = x !== oldUser?.profile.x || y !== oldUser?.profile.y
         const loggedUser = Meteor.user()

@@ -60,19 +60,13 @@ Meteor.methods({
         if (!zone) throw new Meteor.Error('not-found', 'Zone not found')
         if (!zone.roomName) throw new Meteor.Error('invalid-zone', 'This zone is not a meet zone')
 
-        const level = Levels.findOne(zone.levelId)
-        if (!level) throw new Meteor.Error('not-found', 'Level not found')
-
-        const user = Meteor.user()
-        if (user.profile.levelId !== level._id)
-            throw new Meteor.Error('invalid-action', 'Access from another level deny')
-
+        const user = Meteor.users.findOne()
         if (!canAccessZone(zone, user)) {
             log('computeMeetRoomAccess: user not allowed')
             throw new Meteor.Error('not-allowed', 'User not allowed in the zone')
         }
 
-        const moderator = user.roles?.admin || level.guildId === user.guildId || Meteor.settings.meet.everyoneIsModerator
+        const moderator = user.roles?.admin || Meteor.settings.meet.everyoneIsModerator
         const roomName = computeRoomName(zone)
         const token = computeRoomToken(user, roomName, moderator)
 

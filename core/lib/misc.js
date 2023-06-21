@@ -120,30 +120,7 @@ const canAccessZone = (zone, user) => {
         if (!zone.requiredItems.every((tag) => userItems.includes(tag))) return false
     }
 
-    // verifies that the user is a member of the level guild
-    if (zone.accessRestrictedToGuild) {
-        const level = currentLevel(user)
-        if (!level) throw new Meteor.Error('not-found', 'Level not found')
-        if (!level.guildId)
-            throw new Meteor.Error(
-                'configuration-missing',
-                'Guild not linked to the level. You must link a guild to the level or remove the "accessRestrictedToGuild" attribute'
-            )
-
-        if (level.guildId !== user.guildId) return false
-    }
-
     return true
-}
-
-const canEditGuild = (user, guild) => {
-    check([user._id, guild._id], [Match.Id])
-
-    if (user.roles?.admin) return true
-    if (!user.guildId) return false
-    if (guild.createdBy === user._id) return true
-
-    return user.guildId === guild._id && guild.owners?.includes(user._id) === true
 }
 
 const canEditLevel = (user, level) => {
@@ -169,18 +146,16 @@ const canEditUserPermissions = (user, level) => {
 
 const canModerateLevel = (level, user) => {
     check([user._id, level._id], [Match.Id])
-    return user.roles?.admin || user.guildId === level.guildId
+    return user.roles?.admin
 }
 
 const canModerateUser = (user, otherUser) => {
     check([user._id, otherUser._id], [Match.Id])
 
     if (user._id === otherUser._id) return false
-    if (user.guildId && user.guildId === otherUser.guildId) return false
     if (!user.roles?.admin && otherUser.roles?.admin) return false
     if (user.roles?.admin && !otherUser.roles?.admin) return true
-
-    return !otherUser.guildId
+    return false
 }
 
 const generateGuestSkin = (user) => {
@@ -398,7 +373,6 @@ const getChannelType = (channelId) => {
 export {
     canAccessZone,
     canEditActiveLevel,
-    canEditGuild,
     canEditLevel,
     canEditUserPermissions,
     canModerateLevel,

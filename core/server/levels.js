@@ -106,7 +106,6 @@ createLevel = (options) => {
 
     check(options.templateId, Match.Maybe(Match.Id))
     check(options.name, Match.Maybe(Match.SafeString))
-    check(options.guildId, Match.Maybe(Match.Id))
     check(options.createdBy, Match.Maybe(Match.Id))
 
     const { createdBy, name, templateId } = options
@@ -230,7 +229,6 @@ Meteor.publish('currentLevel', function () {
                 editorUserIds: 1,
                 createdBy: 1,
                 sandbox: 1,
-                guildId: 1,
                 disabled: 1,
                 lastMessageAt: 1,
                 featuresPermissions: 1,

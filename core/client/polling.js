@@ -11,16 +11,14 @@ Meteor.users.findOne = (...args) => {
     return LocalUsers.findOne(...args)
 }
 
-const getGuild = (guilds, id) => (id ? guilds.find((guild) => guild._id === id) : undefined)
-
-const usersPollDiff = (oldUsers, newUsers, guilds, methods) => {
+const usersPollDiff = (oldUsers, newUsers, methods) => {
     newUsers.forEach((newUser) => {
         if (newUser._id === Meteor.userId()) newUser = Meteor.user()
         LocalUsers.upsert({ _id: newUser._id }, { $set: newUser })
         const oldUser = oldUsers.find((user) => user._id === newUser._id)
         if (oldUser && !_.isEqual(oldUser, newUser))
-            methods.changed(newUser, oldUser, getGuild(guilds, newUser.guildId))
-        else if (!oldUser) methods.added(newUser, getGuild(guilds, newUser.guildId))
+            methods.changed(newUser, oldUser)
+        else if (!oldUser) methods.added(newUser)
     })
 
     oldUsers

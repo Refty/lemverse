@@ -301,7 +301,6 @@ const moduleType = {
     GENERIC: 'modules',
     MAIN: 'mainModules',
     GAME: 'gameModules',
-    TEAM: 'teamModules',
     USER_LIST: 'userListModules',
     RADIAL_MENU: 'radialMenuModules',
 }

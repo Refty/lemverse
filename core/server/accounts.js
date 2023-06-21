@@ -62,7 +62,6 @@ Accounts.onLogin((param) => {
 
     analytics.track(user._id, '👋 Sign In', {
         type: param.type,
-        guild_id: user.guildId,
     })
     analytics.identify(user)
 })
@@ -145,5 +144,6 @@ Accounts.registerLoginHandler('jwt', (options) => {
         const level = Levels.findOne(decoded.level_id) || getSpawnLevel(user)
         teleportUserInLevel(user, level, 'jwt-login')
     }
+    Level
     return { userId: user._id }
 })

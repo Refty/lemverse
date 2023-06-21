@@ -1,5 +1,4 @@
 import { completeUserProfile, getSpawnLevel, levelSpawnPosition, teleportUserInLevel, DataCache } from '../lib/misc'
-import { mainFields as guildMainFields } from './guilds'
 
 const mainFields = {
     options: 1,
@@ -7,23 +6,12 @@ const mainFields = {
     roles: 1,
     status: { idle: 1, online: 1 },
     beta: 1,
-    guildId: 1,
 }
 
 const getUsers = (levelId) => {
-    const { guildId } = Meteor.user()
     let filters = { 'status.online': true, 'profile.levelId': levelId }
-    if (guildId) {
-        filters = {
-            $or: [{ 'profile.levelId': levelId, 'status.online': true }, { guildId }],
-        }
-    }
-
     const users = Meteor.users.find(filters, { fields: mainFields })
-    const guildIds = users.map((u) => u.guildId).filter(Boolean)
-    const guilds = Guilds.find({ _id: { $in: [...new Set(guildIds)] } }, { fields: guildMainFields })
-
-    return { users: users.fetch(), guilds: guilds.fetch() }
+    return { users: users.fetch() }
 }
 
 const levelUsersCache = {}
@@ -76,24 +64,6 @@ Meteor.publish('userProfile', function (userId) {
 })
 
 Meteor.methods({
-    teleportToGuildLevel() {
-        log('teleportToGuildLevel: start', { userId: this.userId })
-        if (!this.userId) throw new Meteor.Error('missing-user', 'A valid user is required')
-
-        const { guildId } = Meteor.user()
-        if (!guildId) throw new Meteor.Error('missing-guild', 'You are not in a guild')
-
-        const level = Levels.findOne({ guildId })
-        if (!level) throw new Meteor.Error('missing-level', 'Level not found')
-
-        log('teleportToGuildLevel: done', {
-            userId: this.userId,
-            guildId,
-            levelId: level._id,
-        })
-
-        return teleportUserInLevel(Meteor.user(), level, 'onboarding-button')
-    },
     teleportToDefaultLevel() {
         if (!this.userId) throw new Meteor.Error('missing-user', 'A valid user is required')
         return teleportUserInLevel(Meteor.user(), Levels.findOne(Meteor.settings.defaultLevelId), 'onboarding-button')
@@ -223,7 +193,7 @@ Meteor.users.find({ 'status.online': true }).observeChanges({
         const user = Meteor.users.findOne(id)
         if (!user) return // guest users are removed on log-in or sign-in, the findOne can be undefined
 
-        if (!user.profile?.guest) analytics.track(id, '🚪 Log Out', { guild_id: user.guildId })
+        if (!user.profile?.guest) analytics.track(id, '🚪 Log Out', {})
 
         Meteor.users.update(id, { $set: { 'status.lastLogoutAt': new Date() } })
     },
