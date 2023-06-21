@@ -6,7 +6,7 @@ const checkLevelName = (value) => {
     if (value.length < 3) throw new Error("Level's name must be at least 2 characters")
 }
 
-const updateLevel = (name, spawnPosition, hide = false, featuresPermissions = {}) => {
+const updateLevel = (name, spawnPosition, featuresPermissions = {}) => {
     try {
         checkLevelName(name)
     } catch (e) {
@@ -14,7 +14,7 @@ const updateLevel = (name, spawnPosition, hide = false, featuresPermissions = {}
         return
     }
 
-    Meteor.call('updateLevel', name, spawnPosition, hide, featuresPermissions, (err) => {
+    Meteor.call('updateLevel', name, spawnPosition, featuresPermissions, (err) => {
         if (err) {
             lp.notif.error(err.reason)
             return
@@ -27,7 +27,7 @@ const getFeaturesPermissions = () => currentLevel(Meteor.user()).featuresPermiss
 const updateFeaturePermissionLevel = (permission, event) => {
     const level = currentLevel(Meteor.user())
 
-    updateLevel(level.name, level.spawn, level.hide, {
+    updateLevel(level.name, level.spawn, {
         [permission]: event.target.value,
     })
     event.target.blur()
@@ -42,17 +42,13 @@ Template.levelToolbox.events({
     },
     'blur .js-name': function (event) {
         const level = currentLevel(Meteor.user())
-        updateLevel(event.target.value, level.spawn, level.hide)
-    },
-    'change .js-hidden': function (event) {
-        const level = currentLevel(Meteor.user())
-        updateLevel(level.name, level.spawn, event.target.checked)
+        updateLevel(event.target.value, level.spawn)
     },
     'click .js-spawn-position': function () {
         const user = Meteor.user()
         const level = currentLevel(user)
         const { x, y } = user.profile
-        updateLevel(level.name, { x, y }, level.hide)
+        updateLevel(level.name, { x, y })
     },
     'change .js-voice-amplifier-select': function (event) {
         updateFeaturePermissionLevel('shout', event)
@@ -83,9 +79,6 @@ Template.levelToolbox.events({
 Template.levelToolbox.helpers({
     name() {
         return currentLevel(Meteor.user()).name
-    },
-    hidden() {
-        return currentLevel(Meteor.user()).hide || false
     },
     spawnPosition() {
         const { spawn } = currentLevel(Meteor.user())

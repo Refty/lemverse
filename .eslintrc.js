@@ -74,13 +74,11 @@ module.exports = {
 
         analytics: 'writable',
         game: 'writable',
-        createLevel: 'writable',
         chest: 'writable',
         click: 'writable',
         beep: 'writable',
         buzz: 'writable',
         unlock: 'writable',
-        deleteLevel: 'writable',
         zoom: 'writable',
         selectedTileset: 'writable',
         selectedCharactersPart: 'writable',
