@@ -88,16 +88,4 @@ Entities = lp.collectionRegister('entities', 'ent', [], {
     },
 })
 
-Guilds = lp.collectionRegister('guilds', 'gui', [], {
-    insert(userId) {
-        return Meteor.users.findOne(userId)?.roles?.admin
-    },
-    update(userId) {
-        return Meteor.users.findOne(userId)?.roles?.admin
-    },
-    remove(userId) {
-        return Meteor.users.findOne(userId)?.roles?.admin
-    },
-})
-
 Files = fileSystemAdapter()

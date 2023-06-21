@@ -6,27 +6,12 @@ Template.userProfile.onCreated(function () {
     const { userId } = this.data
     if (!userId) return
 
-    this.guild = new ReactiveVar()
-
     this.subscribe('userProfile', userId, () => {
-        const user = Meteor.users.findOne(userId)
-
-        if (!user.guildId) {
-            this.guild.set(undefined)
-            return
-        }
-
-        Meteor.call('guilds', [user.guildId], (error, guilds) => {
-            if (!guilds.length) return
-            this.guild.set(guilds[0])
-        })
+        Meteor.users.findOne(userId)
     })
 })
 
 Template.userProfile.helpers({
-    guild() {
-        return Template.instance().guild.get()?.name
-    },
     profile() {
         return getUser(Template.instance()).profile
     },

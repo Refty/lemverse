@@ -412,9 +412,9 @@ Template.lemverse.onCreated(function () {
                         })
                         .fetch()
 
-                    usersPollDiff(oldUsers, newUsers, data.guilds, {
-                        added: (user, guild) => userManager.onDocumentAdded(user, guild),
-                        changed: (newUser, oldUser, guild) => userManager.onDocumentUpdated(newUser, oldUser, guild),
+                    usersPollDiff(oldUsers, newUsers, {
+                        added: (user) => userManager.onDocumentAdded(user),
+                        changed: (newUser, oldUser) => userManager.onDocumentUpdated(newUser, oldUser),
                         removed: (user) => {
                             userManager.onDocumentRemoved(user)
                             userProximitySensor.removeNearUser(user)

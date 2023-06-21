@@ -59,7 +59,6 @@ module.exports = {
         Levels: 'writable',
         Files: 'writable',
         Messages: 'writable',
-        Guilds: 'writable',
         Items: 'writable',
         Quests: 'writable',
         canAccessQuest: 'writable',

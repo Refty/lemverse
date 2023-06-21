@@ -17,7 +17,6 @@ analytics = {
 
             // Custom traits
             login_email_address: user.emails[0].address,
-            guild_id: user.guildId,
             mic_permission_state: user.profile.shareAudio,
             camera_permission_state: user.profile.shareVideo,
             screen_permission_state: user.profile.shareScreen,
@@ -39,43 +38,6 @@ analytics = {
         } catch (err) {
             log(`analytics.identify: failed to identify user`, {
                 _id: user._id,
-                err,
-            })
-        }
-    },
-
-    updateGuild(guild, traits, userId) {
-        if (!isEnabled) return
-
-        const groupParams = {
-            groupId: guild._id,
-            traits: {
-                $name: guild.name, // Mixpanel refuses to use the default name property
-
-                // Reserved traits
-                id: guild._id,
-                avatar: guild.logo,
-                description: guild.description,
-                employees: Meteor.users.find({ guildId: guild._id }).count() || 1,
-                name: guild.name,
-                website: guild.website,
-                createdAt: guild.createdAt,
-
-                // Custom traits
-                guild_id: guild._id,
-                ...traits,
-            },
-        }
-
-        if (userId) groupParams.userId = userId
-        else groupParams.anonymousId = 'anonymous'
-
-        try {
-            analyticsInstance.group(groupParams)
-        } catch (err) {
-            log(`analytics.updateGuild: failed to update guild attributes`, {
-                guildId: guild._id,
-                traits,
                 err,
             })
         }
@@ -127,7 +89,6 @@ Meteor.methods({
 
         const user = Meteor.user()
         analytics.track(userId, '💬 Discussion Attend', {
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
             peer_user_id: properties.peerUserId,
             users_attending_count: properties.usersAttendingCount,
@@ -187,7 +148,6 @@ Meteor.methods({
 
         const user = Meteor.user()
         analytics.track(userId, '⌛ Credentials expired', {
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
         })
     },
@@ -204,7 +164,6 @@ Meteor.methods({
         const user = Meteor.user()
         analytics.track(userId, '💬 Discussion End', {
             duration: properties.duration,
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
             peer_user_id: properties.peerUserId,
             users_attending_count: properties.usersAttendingCount,
@@ -221,7 +180,6 @@ Meteor.methods({
 
         const user = Meteor.user()
         analytics.track(userId, '🎤 Conference Attend', {
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
             zone_id: properties.zoneId,
             zone_name: properties.zoneName,
@@ -238,7 +196,6 @@ Meteor.methods({
 
         const user = Meteor.user()
         analytics.track(userId, '🎤 Conference End', {
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
             zone_id: properties.zoneId,
             zone_name: properties.zoneName,
@@ -254,7 +211,6 @@ Meteor.methods({
 
         const user = Meteor.user()
         analytics.track(userId, '😂 Reaction', {
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
             coordinates: [user.profile.x, user.profile.y],
             reaction: properties.reaction,
@@ -266,7 +222,6 @@ Meteor.methods({
 
         const user = Meteor.user()
         analytics.track(userId, '🦵🏻 Kick', {
-            guild_id: user.guildId,
             level_id: user.profile.levelId,
         })
     },
