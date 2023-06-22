@@ -144,6 +144,5 @@ Accounts.registerLoginHandler('jwt', (options) => {
         const level = Levels.findOne(decoded.level_id) || getSpawnLevel(user)
         teleportUserInLevel(user, level, 'jwt-login')
     }
-    Level
     return { userId: user._id }
 })
