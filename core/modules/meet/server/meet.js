@@ -60,7 +60,7 @@ Meteor.methods({
         if (!zone) throw new Meteor.Error('not-found', 'Zone not found')
         if (!zone.roomName) throw new Meteor.Error('invalid-zone', 'This zone is not a meet zone')
 
-        const user = Meteor.users.findOne()
+        const user = Meteor.user()
         if (!canAccessZone(zone, user)) {
             log('computeMeetRoomAccess: user not allowed')
             throw new Meteor.Error('not-allowed', 'User not allowed in the zone')
