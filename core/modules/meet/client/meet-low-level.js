@@ -71,8 +71,8 @@ const onConferenceLeft = () => {
 }
 
 const onConnectionSuccess = (template) => {
-    Session.set('meetIsConnected', true)
-    template.room = template.connection.initJitsiConference(template.roomName, {})
+    console.log('Successfully connected')
+    template.room = template.connection.get().initJitsiConference(template.roomName, {})
     const _localTracks = template.localTracks.get()
 
     // Add local tracks before joining
@@ -218,40 +218,37 @@ const connect = async (template, name = Meteor.settings.public.meet.roomDefaultN
         onLocalTracks(template, tracks)
     })
 
-    template.connection = new meetJs.JitsiConnection(null, null, {
-        hosts: {
-            domain: `8x8.vc`,
-            muc: `conference.8x8.vc`,
-            focus: `focus.8x8.vc`,
-        },
-        serviceUrl: `wss://8x8.vc/xmpp-websocket?room=${template.roomName}`,
-        websocketKeepAliveUrl: `https://8x8.vc/_unlock?room=${template.roomName}`,
+    template.connection.set(
+        new meetJs.JitsiConnection(null, null, {
+            hosts: {
+                domain: DOMAIN,
+                muc: `conference.${DOMAIN}`,
+                focus: `focus.${DOMAIN}`,
+            },
+            serviceUrl: `https://${DOMAIN}/http-bind?room=${'laa'}`,
+            // serviceUrl: `wss://8x8.vc/xmpp-websocket?room=${template.roomName}`,
+            // websocketKeepAliveUrl: `https://8x8.vc/_unlock?room=${template.roomName}`,
 
-        p2p: {
-            enabled: true,
-        },
+            p2p: {
+                enabled: false,
+            },
 
-        logging: {
-            // Default log level
-            defaultLogLevel: 'trace',
+            // logging: {
+            //     // Default log level
+            //     defaultLogLevel: 'trace',
 
-            // The following are too verbose in their logging with the default level
-            'modules/RTC/TraceablePeerConnection.js': 'info',
-            'modules/statistics/CallStats.js': 'info',
-            'modules/xmpp/strophe.util.js': 'log',
-        },
-    })
-
-    template.connection.addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () =>
-        onConnectionSuccess(template)
-    )
-    template.connection.addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
-    template.connection.addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () =>
-        console.log('Connection disconnected')
+            //     // The following are too verbose in their logging with the default level
+            //     'modules/RTC/TraceablePeerConnection.js': 'info',
+            //     'modules/statistics/CallStats.js': 'info',
+            //     'modules/xmpp/strophe.util.js': 'log',
+            // },
+        })
     )
 
-    template.connection.connect()
-}
+    template.connection
+        .get()
+        .addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () => onConnectionSuccess(template))
+    template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
 
 const disconnect = async (template) => {
     console.log('DISCONNECT')
@@ -262,7 +259,8 @@ const disconnect = async (template) => {
     template.connection.removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
     template.connection.removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, disconnect)
 
-    const _localTracks = template.localTracks.get()
+    template.connection.get().connect()
+}
 
     for (let i = 0; i < _localTracks.length; i++) {
         _localTracks[i].dispose()
@@ -272,15 +270,17 @@ const disconnect = async (template) => {
     template.remoteTracks.set({})
     Session.set('meetIsConnected', false)
 
-    return await template.connection.disconnect()
+    await template.connection.get().disconnect()
+    console.log('ON UNDEFINED')
 }
 
 Template.meetLowLevel.onCreated(function () {
     this.localTracks = new ReactiveVar([])
     this.remoteTracks = new ReactiveVar({})
     this.avatarURL = new ReactiveVar()
-    this.roomName = ''
-    this.connection = undefined
+
+    this.roomName = undefined
+    this.connection = new ReactiveVar(undefined)
     this.room = undefined
 
     this.autorun(() => {
@@ -298,7 +298,8 @@ Template.meetLowLevel.onCreated(function () {
     window.addEventListener(eventTypes.onUsersMovedAway, async (e) => {
         if (this.connection) {
             await disconnect(this)
-            this.connection = undefined
+            this.room = undefined
+            this.connection.set(undefined)
         }
     })
 
@@ -353,7 +354,7 @@ Template.meetLowLevel.helpers({
         return Template.instance().avatarURL.get()
     },
     isActive() {
-        return Object.keys(Template.instance().remoteTracks.get()).length > 0
+        return Template.instance().connection.get() !== undefined
     },
     remoteTracks() {
         return Object.values(Template.instance().remoteTracks.get())
