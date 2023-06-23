@@ -1,5 +1,23 @@
 @import '../../../client/variables';
 
+.remote-user {
+    max-height: calc(100vh - 210px);
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 50;
+    width: 280px;
+    overflow-y: scroll;
+
+    video:not(.fullscreen) {
+        object-fit: cover;
+    }
+}
+
+.remote-user::-webkit-scrollbar {
+    display: none;
+}
+
 .remote-stream {
     z-index: 5;
     position: relative;
@@ -12,6 +30,7 @@
     background-position: 50% 50%;
     overflow-x: hidden;
     margin-bottom: 10px;
+    animation: slideIn 0.5s ease-out 1s forwards;
 
     &.talking {
         border: 2px solid var(--secondary-color);
@@ -268,5 +287,14 @@
             //     display: block;
             // }
         }
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(110%);
+    }
+    100% {
+        transform: translateX(0);
     }
 }
