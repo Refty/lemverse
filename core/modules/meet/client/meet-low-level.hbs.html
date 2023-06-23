@@ -30,9 +30,13 @@
 </template>
 
 <template name="meetLowLevel">
-    <div class="remote-user {{#if isActive}}active{{/if}}">
-        {{#each tracks in remoteTracks}} {{> remoteAudioTrack track=tracks.audio}} {{> remoteVideoTrack
-        track=tracks.camera desktopTrack=tracks.desktop }} {{/each}}
+    <div class="remote-users">
+        {{#each tracks in remoteTracks}}
+        <div class="remote-user">
+            {{> remoteAudioTrack track=tracks.audio}} {{> remoteVideoTrack track=tracks.camera
+            desktopTrack=tracks.desktop displayName=tracks.displayName }}
+        </div>
+        {{/each}}
     </div>
 
     <div class="container-stream-me {{#if isActive}}active{{/if}}" tabindex="-1">
