@@ -1,4 +1,4 @@
-import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, getUserName, isLevelOwner } from '../../lib/misc'
+import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, getUserExtendedProfile, isLevelOwner } from '../../lib/misc'
 
 const userFields = {
     'status.online': 1,
@@ -56,6 +56,10 @@ Template.userListEntry.helpers({
 
         return canModerateUser(Meteor.user({ fields: { roles: 1 } }), this.user)
     },
+    showAllBaselines() {
+        const extendedProfile = this.level.featuresPermissions?.extendedProfile
+        return !extendedProfile || extendedProfile === "enabled"
+    },
     levelOwner() {
         if (!this.level) return false
         return isLevelOwner(this.user, this.level)
@@ -67,7 +71,7 @@ Template.userListEntry.helpers({
         return this.user
     },
     name() {
-        return getUserName(this.user)
+        return getUserExtendedProfile(this.user).name
     },
 })
 
@@ -112,6 +116,11 @@ Template.userList.helpers({
         return "Users online"
     },
     users() {
-        return users().fetch().sort(sortUserList)
+        return users().fetch().sort(sortUserList).map(
+            user => {
+                user.profile = getUserExtendedProfile(user)
+                return user
+            }
+        )
     },
 })

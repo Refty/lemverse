@@ -4,7 +4,7 @@ import audioManager from './audio-manager'
 import networkManager from './network-manager'
 import meetingRoom from './meeting-room'
 import { textDirectionToVector, vectorToTextDirection } from './helpers'
-import { guestAllowed, permissionTypes } from '../lib/misc'
+import { getUserExtendedProfile, guestAllowed, permissionTypes } from '../lib/misc'
 
 const defaultUserMediaColorError = '0xd21404'
 const characterPopInOffset = { x: 0, y: -90 }
@@ -116,7 +116,8 @@ userManager = {
         const character = this.characters[user._id]
         if (!character) return
 
-        const { x, y, direction, reaction, shareAudio, userMediaError, name, baseline, nameColor } = user.profile
+        const { x, y, direction, reaction, shareAudio, userMediaError, name, nameColor } = user.profile
+        const { baseline } = getUserExtendedProfile(user)
         const showMutedIndicator = user.profile.guest ? guestAllowed(permissionTypes.talkToUsers) : !shareAudio
 
         // update character instance

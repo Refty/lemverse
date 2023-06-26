@@ -336,13 +336,23 @@ const canUseLevelFeature = (user, featureName, showNotifications = false) => {
     return true
 }
 
-const getUserName = (user) => {
+const getUserExtendedProfile = (user) => {
     if (!user || !user.profile)
-        return undefined
+        return {
+            name: undefined,
+            baseline: undefined,
+        }
 
     if (canUseLevelFeature(user, "extendedProfile") && user.profile.fullName)
-        return user.profile.fullName
-    return user.profile.name
+        return {
+            name: user.profile.fullName,
+            baseline: user.profile.baseline,
+        }
+
+    return {
+        name: user.profile.name,
+        baseline: undefined,
+    }
 }
 
 class DataCache {
@@ -393,7 +403,7 @@ export {
     generateRandomCharacterSkin,
     generateGuestSkin,
     getSpawnLevel,
-    getUserName,
+    getUserExtendedProfile,
     guestAllowed,
     getChannelType,
     isLevelOwner,
