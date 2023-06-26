@@ -28,10 +28,10 @@ Accounts.validateNewUser(() => true)
 Accounts.onLogin((param) => {
     const user = Meteor.users.findOne(param.user._id)
 
-    if (user.meet.roomName) {
+    if (user.profile.meetRoomName) {
         Meteor.users.update(user._id, {
             $unset: {
-                meet: 1,
+                'profile.meetRoomName': 1,
             },
         })
     }

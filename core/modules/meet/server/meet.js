@@ -25,7 +25,8 @@ const computeRoomToken = (user, roomName, moderator = false) => {
     if (user.roles?.admin) group = 'admin'
     else if (moderator) group = 'moderator'
 
-    const { algorithm, enableAuth, encryptionPassphrase, expiresIn, notBefore, keyid, identifier, iss, sub } = Meteor.settings.meet
+    const { algorithm, enableAuth, encryptionPassphrase, expiresIn, notBefore, keyid, identifier, iss, sub } =
+        Meteor.settings.meet
     if (!enableAuth) return undefined
 
     return jwt.sign(
@@ -73,6 +74,26 @@ Meteor.methods({
         log('computeMeetRoomAccess: end', { roomName, token })
 
         return { roomName, token }
+    },
+    computeMeetLowLevelRoomName(usersIds) {
+        if (!this.userId) return undefined
+
+        check(usersIds, Array)
+
+        log('computeMeetLowLevelRoomName: start', { usersIds })
+
+        const meetRoomName = usersIds
+            .sort((a, b) => a.localeCompare(b))
+            .join('-')
+            .toLowerCase()
+
+        Meteor.users.update(Meteor.userId(), {
+            $set: { 'profile.meetRoomName': meetRoomName },
+        })
+
+        log('computeMeetLowLevelRoomName: start', { meetRoomName })
+
+        return meetRoomName
     },
 })
 

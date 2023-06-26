@@ -47,6 +47,7 @@ eventTypes = Object.freeze({
     beforeSendingMessage: 'beforeSendingMessage',
     afterSendingMessage: 'afterSendingMessage',
     consoleClosed: 'consoleClosed',
+    onUserPropertyUpdated: 'onUserPropertyUpdated',
 })
 
 toggleUserProperty = (propertyName, value) => {
@@ -79,14 +80,27 @@ toggleUserProperty = (propertyName, value) => {
         }
     }
 
-    if (typeof value === 'boolean')
+    let propertyValue
+
+    if (typeof value === 'boolean') {
+        propertyValue = !!value
+
         Meteor.users.update(user._id, {
-            $set: { [`profile.${propertyName}`]: !!value },
+            $set: { [`profile.${propertyName}`]: propertyValue },
         })
-    else
+    } else {
+        propertyValue = !user.profile[propertyName]
+
         Meteor.users.update(user._id, {
-            $set: { [`profile.${propertyName}`]: !user.profile[propertyName] },
+            $set: { [`profile.${propertyName}`]: propertyValue },
         })
+    }
+
+    window.dispatchEvent(
+        new CustomEvent(eventTypes.onUserPropertyUpdated, {
+            detail: { propertyName, propertyValue },
+        })
+    )
 }
 
 relativePositionToCamera = (position, camera) => {
