@@ -28,6 +28,14 @@ Accounts.validateNewUser(() => true)
 Accounts.onLogin((param) => {
     const user = Meteor.users.findOne(param.user._id)
 
+    if (user.meet.roomName) {
+        Meteor.users.update(user._id, {
+            $unset: {
+                meet: 1,
+            },
+        })
+    }
+
     log('onLogin: start', {
         userId: user._id,
         ip: param.connection?.httpHeaders?.['x-forwarded-for'],
