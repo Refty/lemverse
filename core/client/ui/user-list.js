@@ -28,15 +28,15 @@ const users = () => {
     }
 
     return Meteor.users.find(filters, {
-        sort: { 'profile.fullName': 1 },
+        sort: { 'profile.name': 1 },
         fields: userFields,
     })
 }
 
 const sortUserList = (a, b) => {
     if (a.status.online === b.status.online) {
-        const nameA = (a.profile.fullName || a.username).toLowerCase()
-        const nameB = (b.profile.fullName || b.username).toLowerCase()
+        const nameA = (a.profile.fullName || a.profile.name || a.username).toLowerCase()
+        const nameB = (b.profile.fullName || b.profile.name || b.username).toLowerCase()
 
         return nameA.localeCompare(nameB)
     }
@@ -65,6 +65,10 @@ Template.userListEntry.helpers({
     },
     user() {
         return this.user
+    },
+    name() {
+        const profile = this.user?.profile
+        return profile?.fullName || profile?.name
     },
 })
 
