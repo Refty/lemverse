@@ -1,4 +1,4 @@
-import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, isLevelOwner } from '../../lib/misc'
+import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, getUserName, isLevelOwner } from '../../lib/misc'
 
 const userFields = {
     'status.online': 1,
@@ -67,8 +67,7 @@ Template.userListEntry.helpers({
         return this.user
     },
     name() {
-        const profile = this.user?.profile
-        return profile?.fullName || profile?.name
+        return getUserName(this.user)
     },
 })
 
