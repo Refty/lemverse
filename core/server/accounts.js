@@ -6,6 +6,7 @@ import {
     completeUserProfile,
     generateGuestSkin,
     teleportUserInLevel,
+    updateUserProfile,
 } from '../lib/misc'
 
 Accounts.onCreateUser((options, user) => {
@@ -140,6 +141,11 @@ Accounts.registerLoginHandler('jwt', (options) => {
     }
     const user = Meteor.users.findOne({ 'emails.address': decoded.sub })
     if (!user) Accounts._handleError('User not found')
+
+    if (decoded.profile) {
+        updateUserProfile(user._id, decoded.profile)
+    }
+
     if (decoded.level_id) {
         const level = Levels.findOne(decoded.level_id) || getSpawnLevel(user)
         teleportUserInLevel(user, level, 'jwt-login')
