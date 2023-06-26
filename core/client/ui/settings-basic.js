@@ -5,7 +5,7 @@ const user = () => Meteor.user()
 const submit = (template) => {
     const fields = template.fieldsUpdated
 
-    Meteor.call('updateUserAccount', fields, (error) => {
+    Meteor.call('updateUserProfile', fields, (error) => {
         if (error) {
             lp.notif.error('An error occured while updating account, please try later')
             return

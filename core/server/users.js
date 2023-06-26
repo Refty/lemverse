@@ -130,7 +130,7 @@ Meteor.methods({
             $unset: { [`zoneMuted.${zoneId}`]: 1 },
         })
     },
-    updateUserAccount(fields) {
+    updateUserProfile(fields) {
         if (!this.userId) return
         check(fields, {
             avatar: Match.Optional(String),
