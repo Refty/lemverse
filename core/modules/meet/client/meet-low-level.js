@@ -1,5 +1,55 @@
 let meetJs
 
+const DOMAIN = '8x8.vc'
+
+const getOptions = (roomName) => ({
+    // Connection
+    hosts: {
+        domain: DOMAIN,
+        muc: `conference.${DOMAIN}`,
+        focus: `focus.${DOMAIN}`,
+    },
+    // serviceUrl: `https://${DOMAIN}/http-bind?room=${'laa'}`,
+    serviceUrl: `wss://${DOMAIN}/xmpp-websocket?room=${roomName}`,
+    websocketKeepAliveUrl: `https://${DOMAIN}/_unlock?room=${roomName}`,
+
+    // Enable Peer-to-Peer for 1-1 calls
+    p2p: {
+        enabled: false,
+    },
+
+    // Video quality / constraints
+    constraints: {
+        video: {
+            height: {
+                ideal: 720,
+                max: 720,
+                min: 180,
+            },
+            width: {
+                ideal: 1280,
+                max: 1280,
+                min: 320,
+            },
+        },
+    },
+    channelLastN: 25,
+
+    // Logging
+    logging: {
+        // Default log level
+        defaultLogLevel: 'trace',
+
+        // The following are too verbose in their logging with the default level
+        'modules/RTC/TraceablePeerConnection.js': 'info',
+        'modules/statistics/CallStats.js': 'info',
+        'modules/xmpp/strophe.util.js': 'log',
+    },
+
+    // End marker, disregard
+    __end: true,
+})
+
 window.addEventListener('load', () => {
     if (!Meteor.settings.public.meet) return
 
@@ -11,7 +61,6 @@ window.addEventListener('load', () => {
 
     scriptLowLevel.onload = () => {
         meetJs = window.JitsiMeetJS
-        meetJs.init()
     }
 })
 
@@ -208,12 +257,11 @@ const onLocalTracks = (template, tracks) => {
 const connect = async (template, name = Meteor.settings.public.meet.roomDefaultName) => {
     console.log('Connection started')
 
-    template.roomName = 'laaaee'
-    meetJs.setLogLevel(meetJs.logLevels.ERROR)
+    if (!template.connection.get()) {
+        const options = getOptions(template.roomName)
 
-    await meetJs.createLocalTracks({ devices: ['audio', 'video'] }).then((tracks) => {
-        updateTrack('video', tracks)
-        updateTrack('audio', tracks)
+        meetJs.init(options)
+        meetJs.setLogLevel(meetJs.logLevels.ERROR)
 
         onLocalTracks(template, tracks)
     })
