@@ -88,11 +88,4 @@ Meteor.methods({
 
         Levels.update(level._id, query)
     },
-
-    increaseLevelVisits(levelId) {
-        if (!this.userId) return
-        check(levelId, Match.Id)
-
-        Levels.update({ _id: levelId, createdBy: { $ne: this.userId } }, { $inc: { visit: 1 } })
-    },
 })
