@@ -75,6 +75,26 @@ Meteor.methods({
 
         return { roomName, token }
     },
+    computeMeetLowLevelRoomName(usersIds) {
+        if (!this.userId) return undefined
+
+        check(usersIds, Array)
+
+        log('computeMeetLowLevelRoomName: start', { usersIds })
+
+        const meetRoomName = usersIds
+            .sort((a, b) => a.localeCompare(b))
+            .join('-')
+            .toLowerCase()
+
+        Meteor.users.update(Meteor.userId(), {
+            $set: { 'profile.meetRoomName': meetRoomName },
+        })
+
+        log('computeMeetLowLevelRoomName: start', { meetRoomName })
+
+        return meetRoomName
+    },
 })
 
 export { computeRoomName, computeRoomToken }

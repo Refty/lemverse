@@ -121,26 +121,30 @@ const onConferenceLeft = () => {
 
 const onConnectionSuccess = (template) => {
     console.log('Successfully connected')
-    template.room = template.connection.get().initJitsiConference(template.roomName, {})
-    const _localTracks = template.localTracks.get()
 
-    // Add local tracks before joining
-    for (let i = 0; i < _localTracks.length; i++) {
-        template.room.addTrack(_localTracks[i])
+    if (!template.room) {
+        template.room = template.connection.get().initJitsiConference(template.roomName, {})
+
+        const _localTracks = template.localTracks.get()
+
+        // Add local tracks before joining
+        for (let i = 0; i < _localTracks.length; i++) {
+            template.room.addTrack(_localTracks[i])
+        }
+
+        // Setup event listeners
+        template.room.on(meetJs.events.conference.TRACK_ADDED, (track) => onTrackAdded(template, track))
+        template.room.on(meetJs.events.conference.TRACK_REMOVED, (track) => onTrackRemoved(template, track))
+        template.room.on(meetJs.events.conference.CONFERENCE_JOINED, onConferenceJoined)
+        template.room.on(meetJs.events.conference.CONFERENCE_LEFT, onConferenceLeft)
+        template.room.on(meetJs.events.conference.USER_JOINED, (id) => console.log('user joined!', id))
+        template.room.on(meetJs.events.conference.USER_LEFT, (id) => console.log('user left!', id))
+
+        // Join
+        template.room.join()
+        template.room.setSenderVideoConstraint(720) // Send at most 720p
+        template.room.setReceiverVideoConstraint(360) // Receive at most 360p for each participant
     }
-
-    // Setup event listeners
-    template.room.on(meetJs.events.conference.TRACK_ADDED, (track) => onTrackAdded(template, track))
-    template.room.on(meetJs.events.conference.TRACK_REMOVED, (track) => onTrackRemoved(template, track))
-    template.room.on(meetJs.events.conference.CONFERENCE_JOINED, onConferenceJoined)
-    template.room.on(meetJs.events.conference.CONFERENCE_LEFT, onConferenceLeft)
-    template.room.on(meetJs.events.conference.USER_JOINED, (id) => console.log('user joined!', id))
-    template.room.on(meetJs.events.conference.USER_LEFT, (id) => console.log('user left!', id))
-
-    // Join
-    template.room.join()
-    template.room.setSenderVideoConstraint(720) // Send at most 720p
-    template.room.setReceiverVideoConstraint(360) // Receive at most 360p for each participant
 }
 
 const onConnectionFailed = () => {
@@ -254,7 +258,7 @@ const onLocalTracks = (template, tracks) => {
     template.localTracks.set(tracks)
 }
 
-const connect = async (template, name = Meteor.settings.public.meet.roomDefaultName) => {
+const connect = async (template) => {
     console.log('Connection started')
 
     if (!template.connection.get()) {
@@ -263,63 +267,58 @@ const connect = async (template, name = Meteor.settings.public.meet.roomDefaultN
         meetJs.init(options)
         meetJs.setLogLevel(meetJs.logLevels.ERROR)
 
-        onLocalTracks(template, tracks)
-    })
+        await meetJs.createLocalTracks({ devices: ['audio', 'video'] }).then((tracks) => {
+            updateTrack('video', tracks)
+            updateTrack('audio', tracks)
 
-    template.connection.set(
-        new meetJs.JitsiConnection(null, null, {
-            hosts: {
-                domain: DOMAIN,
-                muc: `conference.${DOMAIN}`,
-                focus: `focus.${DOMAIN}`,
-            },
-            serviceUrl: `https://${DOMAIN}/http-bind?room=${'laa'}`,
-            // serviceUrl: `wss://8x8.vc/xmpp-websocket?room=${template.roomName}`,
-            // websocketKeepAliveUrl: `https://8x8.vc/_unlock?room=${template.roomName}`,
-
-            p2p: {
-                enabled: false,
-            },
-
-            // logging: {
-            //     // Default log level
-            //     defaultLogLevel: 'trace',
-
-            //     // The following are too verbose in their logging with the default level
-            //     'modules/RTC/TraceablePeerConnection.js': 'info',
-            //     'modules/statistics/CallStats.js': 'info',
-            //     'modules/xmpp/strophe.util.js': 'log',
-            // },
+            onLocalTracks(template, tracks)
         })
-    )
 
-    template.connection
-        .get()
-        .addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () => onConnectionSuccess(template))
-    template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+        template.connection.set(new meetJs.JitsiConnection(null, null, options))
+
+        template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () => {
+            console.log('CONNECTION_ESTABLISHED ')
+
+            onConnectionSuccess(template)
+        })
+        template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+        template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () => {
+            console.log('CONNECTION_DISCONNECTED')
+
+            const _localTracks = template.localTracks.get()
+
+            for (let i = 0; i < _localTracks.length; i++) {
+                _localTracks[i].dispose()
+            }
+
+            template.localTracks.set([])
+            template.remoteTracks.set({})
+            template.usersInCall = []
+        })
+
+        template.connection.get().connect()
+    }
+}
 
 const disconnect = async (template) => {
     console.log('DISCONNECT')
 
-    await template.room.leave()
-
-    template.connection.removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
-    template.connection.removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
-    template.connection.removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, disconnect)
-
-    template.connection.get().connect()
-}
-
-    for (let i = 0; i < _localTracks.length; i++) {
-        _localTracks[i].dispose()
+    if (template.room?.room) {
+        await template.room
+            .leave()
+            .then(() => {
+                console.log('Leave the room')
+            })
+            .catch((err) => {
+                console.log('Error during leaving', err)
+            })
     }
 
-    template.localTracks.set([])
-    template.remoteTracks.set({})
-    Session.set('meetIsConnected', false)
+    template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
+    template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+    template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, disconnect)
 
     await template.connection.get().disconnect()
-    console.log('ON UNDEFINED')
 }
 
 Template.meetLowLevel.onCreated(function () {
@@ -329,7 +328,10 @@ Template.meetLowLevel.onCreated(function () {
 
     this.roomName = undefined
     this.connection = new ReactiveVar(undefined)
+    this.connectionStarted = false
     this.room = undefined
+
+    this.usersIdsInCall = []
 
     this.autorun(() => {
         if (!Meteor.userId()) return
@@ -339,12 +341,51 @@ Template.meetLowLevel.onCreated(function () {
         if (user) this.avatarURL.set(generateRandomAvatarURLForUser(user))
     })
 
-    window.addEventListener(eventTypes.onUsersComeCloser, async (e) => {
-        if (!this.connection) await connect(this)
+    window.addEventListener(eventTypes.onUsersComeCloser, (e) => {
+        const { users } = e.detail
+
+        if (meetJs && !this.connection.get() && !this.connectionStarted) {
+            this.connectionStarted = true
+            let roomName = users[0]?.profile?.meetRoomName
+
+            if (!roomName) {
+                usersIds = users.map((user) => user._id).concat(Meteor.userId())
+
+                Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, roomName) => {
+                    if (!roomName) {
+                        lp.notif.error('Unable to load a room, please try later')
+                        return
+                    }
+
+                    this.roomName = roomName
+                    connect(this)
+                })
+            } else {
+                this.roomName = roomName
+
+                Meteor.users.update(Meteor.userId(), {
+                    $set: { 'profile.meetRoomName': roomName },
+                })
+                connect(this)
+            }
+        }
+
+        users.forEach((user) => {
+            if (!this.usersIdsInCall.includes(user._id)) this.usersIdsInCall.push(user._id)
+        })
     })
 
     window.addEventListener(eventTypes.onUsersMovedAway, async (e) => {
-        if (this.connection) {
+        const { users } = e.detail
+
+        users.forEach((user) => (this.usersIdsInCall = _.without(this.usersIdsInCall, user._id)))
+
+        if (this.connection.get() && this.usersIdsInCall.length === 0) {
+            this.connectionStarted = false
+            Meteor.users.update(Meteor.userId(), {
+                $unset: { 'profile.meetRoomName': 1 },
+            })
+
             await disconnect(this)
             this.room = undefined
             this.connection.set(undefined)
@@ -405,12 +446,14 @@ Template.meetLowLevel.helpers({
         return Template.instance().connection.get() !== undefined
     },
     remoteTracks() {
-        return Object.values(Template.instance().remoteTracks.get())
+        // Check a better way to remove undefined tracks
+        return Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio || track.camera)
     },
     isLocalVideoActive() {
         const user = Meteor.user({ fields: { 'profile.shareVideo': 1 } })
 
-        return user.profile?.shareVideo && Template.instance().localTracks.get().length > 0
+        if (!user || !user.profile) return
+        return user.profile.shareVideo && Template.instance().localTracks.get().length > 0
     },
     isSharingScreen() {
         const localTracks = Template.instance().localTracks.get()
