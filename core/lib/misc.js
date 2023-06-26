@@ -249,6 +249,40 @@ const completeUserProfile = (user, email, name) => {
     return generateRandomCharacterSkin(Meteor.userId(), user.profile.levelId)
 }
 
+const updateUserProfile = (userId, fields) => {
+    check(fields, {
+        avatar: Match.Optional(String),
+        bio: Match.Optional(String),
+        defaultReaction: Match.Optional(String),
+        name: Match.Optional(String),
+        baseline: Match.Optional(String),
+        nameColor: Match.Optional(String),
+        website: Match.Optional(String),
+    })
+
+    const fieldsToUnsetKeys = Object.entries(fields)
+          .filter((field) => !field[1])
+          .map((field) => field[0])
+    const fieldsToSetKeys = Object.entries(fields)
+          .filter((field) => !fieldsToUnsetKeys.includes(field[0]))
+          .map((field) => field[0])
+
+    const fieldsToSet = {}
+    fieldsToSetKeys.forEach((key) => {
+        fieldsToSet[`profile.${key}`] = fields[key]
+    })
+
+    const fieldsToUnset = {}
+    fieldsToUnsetKeys.forEach((key) => {
+        fieldsToUnset[`profile.${key}`] = 1
+    })
+
+    Meteor.users.update(userId, {
+        $set: { ...fieldsToSet },
+        $unset: { ...fieldsToUnset },
+    })
+}
+
 const getSpawnLevel = (user) => {
     const { defaultLevelId } = Meteor.settings
     let level = Levels.findOne(user.profile.levelId || defaultLevelId)
@@ -392,6 +426,7 @@ export {
     permissionTypes,
     subscribedUsersToEntity,
     teleportUserInLevel,
+    updateUserProfile,
     DataCache,
     randomInRange,
     randomFloatInRange,
