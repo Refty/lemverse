@@ -337,8 +337,9 @@ Template.radialMenu.helpers({
     showShortcuts() {
         return Template.instance().showShortcuts.get()
     },
-    fullName() {
-        return menuCurrentUser({ fields: { 'profile.fullName': 1 } })?.profile.fullName
+    name() {
+        const profile = menuCurrentUser({ fields: { 'profile.fullName': 1, 'profile.name': 1 } })?.profile
+        return profile?.fullName || profile?.name
     },
     headline() {
         return menuCurrentUser({ fields: { 'profile.baseline': 1 } })?.profile.baseline
