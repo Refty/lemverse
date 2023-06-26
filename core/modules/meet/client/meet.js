@@ -9,6 +9,30 @@ import toggleResizable from '../../../client/ui/components/resizable/resizable'
 let linkedZoneId
 const permissionType = 'useMeetingRoom'
 
+// https://github.com/jitsi/jitsi-meet/blob/ba2640746937cd01a85dd70f1e17019d55b652d4/config.js#L1015-L1034
+const sounds = [
+    'ASKED_TO_UNMUTE_SOUND',
+    'E2EE_OFF_SOUND',
+    'E2EE_ON_SOUND',
+    'INCOMING_MSG_SOUND',
+    'KNOCKING_PARTICIPANT_SOUND',
+    'LIVE_STREAMING_OFF_SOUND',
+    'LIVE_STREAMING_ON_SOUND',
+    'NO_AUDIO_SIGNAL_SOUND',
+    'NOISY_AUDIO_INPUT_SOUND',
+    'OUTGOING_CALL_EXPIRED_SOUND',
+    'OUTGOING_CALL_REJECTED_SOUND',
+    'OUTGOING_CALL_RINGING_SOUND',
+    'OUTGOING_CALL_START_SOUND',
+    'PARTICIPANT_JOINED_SOUND',
+    'PARTICIPANT_LEFT_SOUND',
+    'RAISE_HAND_SOUND',
+    'REACTION_SOUND',
+    'RECORDING_OFF_SOUND',
+    'RECORDING_ON_SOUND',
+    'TALK_WHILE_MUTED_SOUND',
+]
+
 const updateMeetStates = (zone) => {
     const { unmute, unhide, shareScreen } = zone
 
@@ -147,6 +171,7 @@ meetHighLevel = {
                 subject: currentZone.roomName,
                 startWithAudioMuted: !currentZone.unmute,
                 startWithVideoMuted: !currentZone.unhide,
+                disabledSounds: currentZone.disableSounds ? sounds : [],
                 disableTileView: !currentZone.unhide,
                 ...configOverwrite,
             },
