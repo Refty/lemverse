@@ -151,6 +151,21 @@ const onConnectionFailed = () => {
     console.error('connection failed!')
 }
 
+const onConnectionDisconnected = () => {
+    console.log('CONNECTION_DISCONNECTED')
+
+    const _localTracks = template.localTracks.get()
+
+    for (let i = 0; i < _localTracks.length; i++) {
+        _localTracks[i].dispose()
+    }
+
+    template.localTracks.set([])
+    template.remoteTracks.set({})
+    template.usersInCall = []
+    console.log('ON A DISCO')
+}
+
 /*
  ** Video/Audio Track templates
  */
@@ -282,19 +297,9 @@ const connect = async (template) => {
             onConnectionSuccess(template)
         })
         template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
-        template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () => {
-            console.log('CONNECTION_DISCONNECTED')
-
-            const _localTracks = template.localTracks.get()
-
-            for (let i = 0; i < _localTracks.length; i++) {
-                _localTracks[i].dispose()
-            }
-
-            template.localTracks.set([])
-            template.remoteTracks.set({})
-            template.usersInCall = []
-        })
+        template.connection
+            .get()
+            .addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected)
 
         template.connection.get().connect()
     }
@@ -316,7 +321,9 @@ const disconnect = async (template) => {
 
     template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
     template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
-    template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, disconnect)
+    template.connection
+        .get()
+        .removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected)
 
     await template.connection.get().disconnect()
 }
