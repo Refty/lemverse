@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+    - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - run: docker build --target builder -t lemverse .
+      - run: docker run lemverse tar -cC /opt/bundle/bundle/ programs | tar x
+      - uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: ${{ secrets.SENTRY_ENVIRONMENT }}
+          sourcemaps: programs/server programs/web.browser
