@@ -23,5 +23,4 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
-          environment: ${{ secrets.SENTRY_ENVIRONMENT }}
           sourcemaps: programs/server programs/web.browser
