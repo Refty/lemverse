@@ -137,8 +137,12 @@ WorldScene = new Phaser.Class({
         pinchPlugin.on(
             'pinchstart',
             function () {
-                const nipple = this.nippleManager.get(this.nippleManager.ids[0])
-                nipple.destroy()
+                if (this.nippleManager) {
+                    const nipple = this.nippleManager.get(this.nippleManager.ids[0])
+                    if (nipple) {
+                        nipple.destroy()
+                    }
+                }
             },
             this
         )
