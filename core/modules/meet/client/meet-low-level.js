@@ -119,8 +119,18 @@ const onConferenceLeft = () => {
     console.log('conference left!')
 }
 
+const onUserJoined = (template, userId, participant) => {
+    console.log('user joined!', userId)
+    const _remoteTracks = template.remoteTracks.get()
+
+    if (!_remoteTracks[userId]) _remoteTracks[userId] = {}
+    _remoteTracks[userId].displayName = participant.getDisplayName()
+    template.remoteTracks.set(_remoteTracks)
+}
+
 const onConnectionSuccess = (template) => {
     console.log('Successfully connected')
+    const user = Meteor.user({ fields: { 'profile.name': 1 } })
 
     if (!template.room) {
         template.room = template.connection.get().initJitsiConference(template.roomName, {})
@@ -137,10 +147,13 @@ const onConnectionSuccess = (template) => {
         template.room.on(meetJs.events.conference.TRACK_REMOVED, (track) => onTrackRemoved(template, track))
         template.room.on(meetJs.events.conference.CONFERENCE_JOINED, onConferenceJoined)
         template.room.on(meetJs.events.conference.CONFERENCE_LEFT, onConferenceLeft)
-        template.room.on(meetJs.events.conference.USER_JOINED, (id) => console.log('user joined!', id))
+        template.room.on(meetJs.events.conference.USER_JOINED, (userId, participant) =>
+            onUserJoined(template, userId, participant)
+        )
         template.room.on(meetJs.events.conference.USER_LEFT, (id) => console.log('user left!', id))
 
         // Join
+        template.room.setDisplayName(user?.profile?.name)
         template.room.join()
         template.room.setSenderVideoConstraint(720) // Send at most 720p
         template.room.setReceiverVideoConstraint(360) // Receive at most 360p for each participant
