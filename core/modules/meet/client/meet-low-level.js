@@ -272,7 +272,25 @@ const updateTrack = (type, tracks) => {
     else if (type === 'video') user?.profile?.shareVideo ? track.unmute() : track.mute()
 }
 
-const onLocalTracks = (template, tracks) => {
+const replaceLocalTrack = (template, newTrack) => {
+    const localTracks = template.localTracks.get()
+
+    if (localTracks) {
+        template.localTracks.set(
+            localTracks.map((track) => {
+                if (track.getType() === newTrack.getType()) {
+                    // Replace old tracks by the new one
+                    template.room.replaceTrack(track, newTrack)
+                    return newTrack
+                }
+                return track
+            })
+        )
+        attachLocalTracks([newTrack])
+    }
+}
+
+const attachLocalTracks = (tracks) => {
     tracks.forEach((track) => {
         if (track.getType() === 'video') {
             let videoNode = document.querySelector('#video-stream-me')
@@ -282,8 +300,6 @@ const onLocalTracks = (template, tracks) => {
             // tracks[i].attach(audioNode)
         }
     })
-
-    template.localTracks.set(tracks)
 }
 
 const connect = async (template) => {
@@ -291,16 +307,23 @@ const connect = async (template) => {
 
     if (!template.connection.get()) {
         const options = getOptions(template.roomName)
+        const user = Meteor.user({ fields: { 'profile.audioRecorder': 1, 'profile.videoRecorder': 1 } })
 
         meetJs.init(options)
         meetJs.setLogLevel(meetJs.logLevels.ERROR)
 
-        await meetJs.createLocalTracks({ devices: ['audio', 'video'] }).then((tracks) => {
-            updateTrack('video', tracks)
-            updateTrack('audio', tracks)
-
-            onLocalTracks(template, tracks)
-        })
+        await meetJs
+            .createLocalTracks({
+                devices: ['audio', 'video'],
+                cameraDeviceId: user?.profile?.videoRecorder,
+                micDeviceId: user?.profile?.audioRecorder,
+            })
+            .then((tracks) => {
+                updateTrack('video', tracks)
+                updateTrack('audio', tracks)
+                attachLocalTracks(tracks)
+                template.localTracks.set(tracks)
+            })
 
         template.connection.set(new meetJs.JitsiConnection(null, null, options))
 
@@ -359,6 +382,30 @@ Template.meetLowLevel.onCreated(function () {
         const user = Meteor.user({ fields: { 'profile.avatar': 1 } })
 
         if (user) this.avatarURL.set(generateRandomAvatarURLForUser(user))
+    })
+
+    this.autorun(() => {
+        const user = Meteor.user({ fields: { 'profile.videoRecorder': 1 } })
+
+        if (!user) return
+        meetJs
+            .createLocalTracks({
+                devices: ['video'],
+                cameraDeviceId: user?.profile?.videoRecorder,
+            })
+            .then((tracks) => replaceLocalTrack(this, tracks[0]))
+    })
+
+    this.autorun(() => {
+        const user = Meteor.user({ fields: { 'profile.audioRecorder': 1 } })
+
+        if (!user) return
+        meetJs
+            .createLocalTracks({
+                devices: ['audio'],
+                micDeviceId: user?.profile?.audioRecorder,
+            })
+            .then((tracks) => replaceLocalTrack(this, tracks[0]))
     })
 
     window.addEventListener(eventTypes.onUsersComeCloser, (e) => {
