@@ -71,7 +71,7 @@ Template.userListEntry.helpers({
         return this.user
     },
     name() {
-        return getUserExtendedProfile(this.user).name
+        return this.user.profile.name
     },
 })
 
