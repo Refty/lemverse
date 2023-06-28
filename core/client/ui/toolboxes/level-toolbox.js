@@ -74,6 +74,9 @@ Template.levelToolbox.events({
     'change .js-send-text-select': function (event) {
         updateFeaturePermissionLevel('sendText', event)
     },
+    'change .js-extended-profile-select': function (event) {
+        updateFeaturePermissionLevel('extendedProfile', event)
+    },
 })
 
 Template.levelToolbox.helpers({
@@ -114,5 +117,8 @@ Template.levelToolbox.helpers({
     },
     sendText() {
         return getFeaturesPermissions().sendText || 'enabled'
+    },
+    extendedProfile() {
+        return getFeaturesPermissions().extendedProfile || 'enabled'
     },
 })

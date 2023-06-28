@@ -1,4 +1,4 @@
-import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, isLevelOwner } from '../../lib/misc'
+import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, getUserExtendedProfile, isLevelOwner } from '../../lib/misc'
 
 const userFields = {
     'status.online': 1,
@@ -28,15 +28,15 @@ const users = () => {
     }
 
     return Meteor.users.find(filters, {
-        sort: { 'profile.fullName': 1 },
+        sort: { 'profile.name': 1 },
         fields: userFields,
     })
 }
 
 const sortUserList = (a, b) => {
     if (a.status.online === b.status.online) {
-        const nameA = (a.profile.fullName || a.username).toLowerCase()
-        const nameB = (b.profile.fullName || b.username).toLowerCase()
+        const nameA = (a.profile.fullName || a.profile.name || a.username).toLowerCase()
+        const nameB = (b.profile.fullName || b.profile.name || b.username).toLowerCase()
 
         return nameA.localeCompare(nameB)
     }
@@ -56,6 +56,10 @@ Template.userListEntry.helpers({
 
         return canModerateUser(Meteor.user({ fields: { roles: 1 } }), this.user)
     },
+    showAllBaselines() {
+        const extendedProfile = this.level.featuresPermissions?.extendedProfile
+        return !extendedProfile || extendedProfile === "enabled"
+    },
     levelOwner() {
         if (!this.level) return false
         return isLevelOwner(this.user, this.level)
@@ -65,6 +69,9 @@ Template.userListEntry.helpers({
     },
     user() {
         return this.user
+    },
+    name() {
+        return this.user.profile.name
     },
 })
 
@@ -109,6 +116,11 @@ Template.userList.helpers({
         return "Users online"
     },
     users() {
-        return users().fetch().sort(sortUserList)
+        return users().fetch().sort(sortUserList).map(
+            user => {
+                user.profile = getUserExtendedProfile(user)
+                return user
+            }
+        )
     },
 })

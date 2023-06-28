@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 
 import { setReaction } from '../helpers'
-import { canUseLevelFeature } from '../../lib/misc'
+import { canUseLevelFeature, getUserExtendedProfile } from '../../lib/misc'
 
 let menuOpenUsingKey = false
 let menuHandler
@@ -337,10 +337,10 @@ Template.radialMenu.helpers({
     showShortcuts() {
         return Template.instance().showShortcuts.get()
     },
-    fullName() {
-        return menuCurrentUser({ fields: { 'profile.fullName': 1 } })?.profile.fullName
+    name() {
+        return getUserExtendedProfile(menuCurrentUser()).name
     },
     headline() {
-        return menuCurrentUser({ fields: { 'profile.baseline': 1 } })?.profile.baseline
+        return getUserExtendedProfile(menuCurrentUser()).baseline
     },
 })

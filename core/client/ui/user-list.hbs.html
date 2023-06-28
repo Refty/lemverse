@@ -1,7 +1,9 @@
 <template name="userListEntry">
     {{> avatarViewer user=user showStatus=true}}
-    <span class="js-profile">{{or user.profile.fullName user.profile.name}}</span>
+    <span class="js-profile">{{name}}</span>
+    {{#if showAllBaselines }}
     <span class="baseline" title="{{user.profile.baseline}}">{{user.profile.baseline}}</span>
+    {{/if}}
     <div class="actions">{{#each module in modules}} {{> Template.dynamic template=module}} {{/each}}</div>
     <div class="infos">
         {{#if admin}}

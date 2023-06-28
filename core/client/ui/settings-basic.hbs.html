@@ -28,6 +28,19 @@
                 />
             </div>
 
+            {{#if canSetExtendedProfile}}
+            <div class="form-element-m">
+                <label for="full-name" class="label">Full name</label>
+                <input
+                    type="text"
+                    name="fullName"
+                    id="fullName"
+                    class="js-name input"
+                    data-oldvalue="{{currentUser.profile.fullName}}"
+                    value="{{currentUser.profile.fullName}}"
+                />
+            </div>
+
             <div class="form-element-m">
                 <label for="baseline" class="label">Baseline</label>
                 <input
@@ -39,6 +52,7 @@
                     value="{{currentUser.profile.baseline}}"
                 />
             </div>
+            {{/if}}
 
             <div class="form-element-m">
                 <label for="name-color" class="label">Name color</label>

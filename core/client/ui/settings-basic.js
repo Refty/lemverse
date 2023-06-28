@@ -1,3 +1,4 @@
+import { canUseLevelFeature } from '../../lib/misc'
 import { formatURL } from '../helpers'
 
 const user = () => Meteor.user()
@@ -40,6 +41,9 @@ Template.settingsBasic.onCreated(function () {
 })
 
 Template.settingsBasic.helpers({
+    canSetExtendedProfile() {
+        return canUseLevelFeature(Meteor.user(), "extendedProfile")
+    },
     fieldUpdated() {
         return Template.instance().hasUpdates.get()
     },
