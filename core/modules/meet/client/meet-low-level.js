@@ -50,7 +50,7 @@ const getOptions = (roomName) => ({
     __end: true,
 })
 
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
     if (!Meteor.settings.public.meet) return
 
     const head = document.querySelector('head')
@@ -324,6 +324,7 @@ const connect = async (template) => {
                 attachLocalTracks(tracks)
                 template.localTracks.set(tracks)
             })
+            .catch((err) => console.error('An error occured while creating local tracks', err))
 
         template.connection.set(new meetJs.JitsiConnection(null, null, options))
 
@@ -337,7 +338,10 @@ const connect = async (template) => {
             .get()
             .addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected)
 
-        template.connection.get().connect()
+        await template.connection
+            .get()
+            .connect()
+            .catch((err) => console.error('An error occured while attempt to connect.', err))
     }
 }
 
@@ -345,14 +349,9 @@ const disconnect = async (template) => {
     console.log('DISCONNECT')
 
     if (template.room?.room) {
-        await template.room
-            .leave()
-            .then(() => {
-                console.log('Leave the room')
-            })
-            .catch((err) => {
-                console.log('Error during leaving', err)
-            })
+        await template.room.leave().catch((err) => {
+            console.log('Error during leaving', err)
+        })
     }
 
     template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
@@ -387,25 +386,27 @@ Template.meetLowLevel.onCreated(function () {
     this.autorun(() => {
         const user = Meteor.user({ fields: { 'profile.videoRecorder': 1 } })
 
-        if (!user) return
+        if (!user || !meetJs) return
         meetJs
             .createLocalTracks({
                 devices: ['video'],
                 cameraDeviceId: user?.profile?.videoRecorder,
             })
             .then((tracks) => replaceLocalTrack(this, tracks[0]))
+            .catch((err) => console.error('An error occured while creating local tracks', err))
     })
 
     this.autorun(() => {
         const user = Meteor.user({ fields: { 'profile.audioRecorder': 1 } })
 
-        if (!user) return
+        if (!user || !meetJs) return
         meetJs
             .createLocalTracks({
                 devices: ['audio'],
                 micDeviceId: user?.profile?.audioRecorder,
             })
             .then((tracks) => replaceLocalTrack(this, tracks[0]))
+            .catch((err) => console.error('An error occured while creating local tracks', err))
     })
 
     window.addEventListener(eventTypes.onUsersComeCloser, (e) => {
