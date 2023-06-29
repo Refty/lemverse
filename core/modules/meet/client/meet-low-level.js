@@ -190,11 +190,11 @@ const onConnectionDisconnected = (template) => {
 /*
  ** Video/Audio Track templates
  */
-const trackAttach = (template) => {
+const trackAttach = (template, trackId) => {
     const { track } = Template.currentData() // Do not replace it to use 'template' props, need use global 'Template' to get the track
 
     if (!track) return
-    const el = document.getElementById(getTrackId(track))
+    const el = document.getElementById(trackId || getTrackId(track))
 
     if (template.isMuted) {
         template.isMuted.set(track.isMuted())
@@ -210,11 +210,11 @@ const trackAttach = (template) => {
     track.attach(el)
 }
 
-const trackDetach = () => {
+const trackDetach = (trackId) => {
     const { track } = Template.currentData()
 
     if (!track) return
-    const el = document.getElementById(getTrackId(track))
+    const el = document.getElementById(trackId || getTrackId(track))
 
     if (!el) return
     track.detach(el)
@@ -229,6 +229,9 @@ Template.remoteAudioTrack.onCreated(function () {
 Template.remoteDesktopTrack.onCreated(function () {
     this.isMuted = new ReactiveVar(false)
 })
+Template.remoteFullscreen.onCreated(function () {
+    this.isMuted = new ReactiveVar(false)
+})
 
 Template.remoteVideoTrack.onRendered(function () {
     this.autorun(() => trackAttach(this))
@@ -239,6 +242,13 @@ Template.remoteAudioTrack.onRendered(function () {
 Template.remoteDesktopTrack.onRendered(function () {
     this.autorun(() => trackAttach(this))
 })
+Template.remoteFullscreen.onRendered(function () {
+    this.autorun(() => {
+        const { track } = Template.currentData()
+        trackAttach(this, `${track.getParticipantId()}-fullscreen`)
+        trackAttach(this, `${track.getParticipantId()}-fullscreenBackground`)
+    })
+})
 
 Template.remoteVideoTrack.onDestroyed(function () {
     this.autorun(() => trackDetach())
@@ -248,6 +258,35 @@ Template.remoteAudioTrack.onDestroyed(function () {
 })
 Template.remoteDesktopTrack.onDestroyed(function () {
     this.autorun(() => trackDetach())
+})
+Template.remoteFullscreen.onDestroyed(function () {
+    this.autorun(() => {
+        const { track } = Template.currentData()
+        trackDetach(`${track.getParticipantId()}-fullscreen`)
+        trackDetach(`${track.getParticipantId()}-fullscreenBackground`)
+    })
+})
+
+Template.remoteVideoTrack.events({
+    'click .webcam': function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        const { track } = Template.currentData()
+
+        if (!track) return
+        Session.set('fullscreenTrackId', Session.get('fullscreenTrackId') === track.getId() ? null : track.getId())
+    },
+})
+
+Template.remoteDesktopTrack.events({
+    'click .js-screenshare': function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        const { track } = Template.currentData()
+
+        if (!track) return
+        Session.set('fullscreenTrackId', Session.get('fullscreenTrackId') === track.getId() ? null : track.getId())
+    },
 })
 
 Template.remoteVideoTrack.helpers({
@@ -531,5 +570,23 @@ Template.meetLowLevel.helpers({
         const localTracks = Template.instance().localTracks.get()
 
         return localTracks?.find((t) => t.getType() === 'video' && t.getVideoType() === 'desktop')
+    },
+    fullscreenTrack() {
+        const fullscreenTrackId = Session.get('fullscreenTrackId')
+
+        if (!Session.get('fullscreenTrackId')) return
+        let fullscreenTrack
+        const remoteTracks = Object.values(Template.instance().remoteTracks.get())
+
+        remoteTracks?.forEach((tracks) => {
+            const tracksMap = Object.values(tracks)
+            tracksMap.forEach((track) => {
+                if (track && typeof track !== 'string' && track.getId() === fullscreenTrackId) {
+                    fullscreenTrack = track
+                }
+            })
+        })
+
+        return fullscreenTrack
     },
 })

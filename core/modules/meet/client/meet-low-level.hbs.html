@@ -1,7 +1,7 @@
 <template name="remoteVideoTrack">
     <div class="remote-stream">
         <div class="stream-name">{{displayName}}</div>
-        <div class="js-webcam webcam">
+        <div class="webcam">
             {{#if isMuted}}
             <img src="{{avatar}}" alt="avatar" class="avatar" />
             {{/if}}
@@ -26,6 +26,19 @@
         </div>
         {{/if}}
         <audio autoplay="1" id="{{track.getParticipantId}}-audio"></audio>
+    </div>
+</template>
+
+<template name="remoteFullscreen">
+    <div class="fullscreen-container">
+        <div class="fullscreen">
+            <div class="fullscreen-background">
+                <video id="{{track.getParticipantId}}-fullscreenBackground" type="video/mp4" autoplay></video>
+            </div>
+            <div class="main">
+                <video id="{{track.getParticipantId}}-fullscreen" type="video/mp4" autoplay></video>
+            </div>
+        </div>
     </div>
 </template>
 
