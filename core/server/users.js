@@ -9,7 +9,8 @@ const mainFields = {
 }
 
 const getUsers = (levelId) => {
-    let filters = { 'status.online': true, 'profile.levelId': levelId }
+    const registeredOrGuest = {"$or": [{"profile.guest": {"$ne": true}, "username": null}, {"profile.guest": true, "username": {$exists: true}} ]}
+    const filters = { 'status.online': true, 'profile.levelId': levelId, ...registeredOrGuest}
     const users = Meteor.users.find(filters, { fields: mainFields })
     return { users: users.fetch() }
 }
