@@ -30,6 +30,7 @@
 </template>
 
 <template name="meetLowLevel">
+    {{#if isActive}}
     <div class="remote-users">
         {{#each tracks in remoteTracks}}
         <div class="remote-user">
@@ -38,6 +39,7 @@
         </div>
         {{/each}}
     </div>
+    {{#if fullscreenTrack }} {{> remoteFullscreen track=fullscreenTrack}} {{/if}} {{/if}}
 
     <div class="container-stream-me {{#if isActive}}active{{/if}}" tabindex="-1">
         <div class="stream-screen-me {{#if isSharingScreen}}active{{/if}}">

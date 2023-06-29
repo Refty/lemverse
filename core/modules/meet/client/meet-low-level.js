@@ -111,8 +111,13 @@ const onTrackRemoved = (template, track) => {
     }
 }
 
-const onConferenceJoined = () => {
+const onConferenceJoined = (template) => {
     console.log('conference joined!')
+
+    // If the user is the only user in the conference, disconnect from the conference.
+    if (template.usersIdsInCall.length === 0) {
+        disconnect(template)
+    }
 }
 
 const onConferenceLeft = () => {
@@ -145,7 +150,7 @@ const onConnectionSuccess = (template) => {
         // Setup event listeners
         template.room.on(meetJs.events.conference.TRACK_ADDED, (track) => onTrackAdded(template, track))
         template.room.on(meetJs.events.conference.TRACK_REMOVED, (track) => onTrackRemoved(template, track))
-        template.room.on(meetJs.events.conference.CONFERENCE_JOINED, onConferenceJoined)
+        template.room.on(meetJs.events.conference.CONFERENCE_JOINED, () => onConferenceJoined(template))
         template.room.on(meetJs.events.conference.CONFERENCE_LEFT, onConferenceLeft)
         template.room.on(meetJs.events.conference.USER_JOINED, (userId, participant) =>
             onUserJoined(template, userId, participant)
@@ -164,7 +169,7 @@ const onConnectionFailed = () => {
     console.error('connection failed!')
 }
 
-const onConnectionDisconnected = () => {
+const onConnectionDisconnected = (template) => {
     console.log('CONNECTION_DISCONNECTED')
 
     const _localTracks = template.localTracks.get()
@@ -176,7 +181,10 @@ const onConnectionDisconnected = () => {
     template.localTracks.set([])
     template.remoteTracks.set({})
     template.usersInCall = []
-    console.log('ON A DISCO')
+
+    connection.removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () =>
+        onConnectionDisconnected(template)
+    )
 }
 
 /*
@@ -326,41 +334,44 @@ const connect = async (template) => {
             })
             .catch((err) => console.error('An error occured while creating local tracks', err))
 
-        template.connection.set(new meetJs.JitsiConnection(null, null, options))
+        const connection = new meetJs.JitsiConnection(null, null, options)
 
-        template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () => {
+        connection.addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () => {
             console.log('CONNECTION_ESTABLISHED ')
-
             onConnectionSuccess(template)
         })
-        template.connection.get().addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
-        template.connection
-            .get()
-            .addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected)
+        connection.addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+        connection.addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () =>
+            onConnectionDisconnected(template)
+        )
 
-        await template.connection
-            .get()
-            .connect()
-            .catch((err) => console.error('An error occured while attempt to connect.', err))
+        connection.connect()
+        template.connection.set(connection)
     }
 }
 
 const disconnect = async (template) => {
     console.log('DISCONNECT')
 
+    template.connectionStarted = false
+    Meteor.users.update(Meteor.userId(), {
+        $unset: { 'profile.meetRoomName': 1 },
+    })
+
     if (template.room?.room) {
-        await template.room.leave().catch((err) => {
-            console.log('Error during leaving', err)
-        })
+        await template.room
+            .leave()
+            .then(() => console.log('Room leaved'))
+            .catch((err) => console.log('Error during leaving', err))
     }
 
-    template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
-    template.connection.get().removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
-    template.connection
-        .get()
-        .removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected)
+    const connection = template.connection.get()
+    connection.removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
+    connection.removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+    connection.disconnect()
 
-    await template.connection.get().disconnect()
+    template.room = undefined
+    template.connection.set(undefined)
 }
 
 Template.meetLowLevel.onCreated(function () {
@@ -443,20 +454,13 @@ Template.meetLowLevel.onCreated(function () {
         })
     })
 
-    window.addEventListener(eventTypes.onUsersMovedAway, async (e) => {
+    window.addEventListener(eventTypes.onUsersMovedAway, (e) => {
         const { users } = e.detail
 
         users.forEach((user) => (this.usersIdsInCall = _.without(this.usersIdsInCall, user._id)))
 
         if (this.connection.get() && this.usersIdsInCall.length === 0) {
-            this.connectionStarted = false
-            Meteor.users.update(Meteor.userId(), {
-                $unset: { 'profile.meetRoomName': 1 },
-            })
-
-            await disconnect(this)
-            this.room = undefined
-            this.connection.set(undefined)
+            disconnect(this)
         }
     })
 
@@ -511,11 +515,11 @@ Template.meetLowLevel.helpers({
         return Template.instance().avatarURL.get()
     },
     isActive() {
-        return Template.instance().connection.get() !== undefined
+        return Template.instance().connection.get() !== undefined && Template.instance().usersIdsInCall.length > 0
     },
     remoteTracks() {
         // Check a better way to remove undefined tracks
-        return Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio || track.camera)
+        return Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio && track.camera)
     },
     isLocalVideoActive() {
         const user = Meteor.user({ fields: { 'profile.shareVideo': 1 } })
