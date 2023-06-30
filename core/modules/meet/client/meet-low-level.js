@@ -181,15 +181,19 @@ const onConnectionDisconnected = (template) => {
     template.localTracks.set([])
     template.remoteTracks.set({})
     template.usersInCall = []
-
-    connection.removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () =>
-        onConnectionDisconnected(template)
-    )
+    toggleUserProperty('shareScreen')
 }
 
 /*
  ** Video/Audio Track templates
  */
+
+const updateTrackMuteState = (track) => {
+    if (template.isMuted) {
+        template.isMuted.set(track.isMuted())
+    }
+}
+
 const trackAttach = (template, trackId) => {
     const { track } = Template.currentData() // Do not replace it to use 'template' props, need use global 'Template' to get the track
 
@@ -200,11 +204,7 @@ const trackAttach = (template, trackId) => {
         template.isMuted.set(track.isMuted())
     }
 
-    track.addEventListener(meetJs.events.track.TRACK_MUTE_CHANGED, (track) => {
-        if (template.isMuted) {
-            template.isMuted.set(track.isMuted())
-        }
-    })
+    track.addEventListener(meetJs.events.track.TRACK_MUTE_CHANGED, () => updateTrackMuteState(track))
 
     if (!el) return
     track.attach(el)
@@ -215,6 +215,8 @@ const trackDetach = (trackId) => {
 
     if (!track) return
     const el = document.getElementById(trackId || getTrackId(track))
+
+    track.removeEventListener(meetJs.events.track.TRACK_MUTE_CHANGED, () => updateTrackMuteState(track))
 
     if (!el) return
     track.detach(el)
@@ -277,7 +279,6 @@ Template.remoteVideoTrack.events({
         Session.set('fullscreenTrackId', Session.get('fullscreenTrackId') === track.getId() ? null : track.getId())
     },
 })
-
 Template.remoteDesktopTrack.events({
     'click .js-screenshare': function (event) {
         event.preventDefault()
@@ -375,10 +376,9 @@ const connect = async (template) => {
 
         const connection = new meetJs.JitsiConnection(null, null, options)
 
-        connection.addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () => {
-            console.log('CONNECTION_ESTABLISHED ')
+        connection.addEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, () =>
             onConnectionSuccess(template)
-        })
+        )
         connection.addEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
         connection.addEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () =>
             onConnectionDisconnected(template)
@@ -405,12 +405,107 @@ const disconnect = async (template) => {
     }
 
     const connection = template.connection.get()
-    connection.removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess)
-    connection.removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+
     connection.disconnect()
+    connection.removeEventListener(meetJs.events.connection.CONNECTION_ESTABLISHED, (template) =>
+        onConnectionSuccess(template)
+    )
+    connection.removeEventListener(meetJs.events.connection.CONNECTION_FAILED, onConnectionFailed)
+    connection.removeEventListener(meetJs.events.connection.CONNECTION_DISCONNECTED, () =>
+        onConnectionDisconnected(template)
+    )
 
     template.room = undefined
     template.connection.set(undefined)
+}
+
+const onUserPropertyUpdated = async (e, template) => {
+    const { propertyName, propertyValue } = e.detail
+    const localTracks = template.localTracks.get()
+
+    if (!localTracks || localTracks.length === 0 || !propertyName) return
+
+    if (propertyName === 'shareAudio') {
+        updateTrack('audio', localTracks)
+    } else if (propertyName === 'shareVideo') {
+        updateTrack('video', localTracks)
+    } else if (propertyName === 'shareScreen') {
+        if (propertyValue) {
+            await meetJs.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
+                const currentDesktopTrack = localTracks.find((t) => t.getVideoType() === 'desktop')
+                const screenNode = document.querySelector('#video-screen-me')
+                const track = tracks[0] // Since we just ask for desktop, we will only have one item
+
+                track.attach(screenNode)
+
+                // If it's the first time we share screen, we should add it to the conference
+                if (!currentDesktopTrack) {
+                    template.room.addTrack(track)
+                } else {
+                    // Otherwise, we should replace since because Meet will not trigger 'TRACK_REMOVED' when we dispose the desktop track
+                    template.room.replaceTrack(currentDesktopTrack, track)
+                }
+
+                localTracks.push(track)
+                template.localTracks.set(localTracks)
+            })
+        } else {
+            let filteredLocalTracks = localTracks.filter((track) => {
+                // While we remove the desktop track, we dispose it at the same time
+                if (track.getVideoType() === 'desktop') {
+                    track.dispose()
+                    return false
+                }
+                return true
+            })
+
+            template.localTracks.set(filteredLocalTracks)
+        }
+    }
+}
+
+const onUsersMovedAway = (e, template) => {
+    const { users } = e.detail
+
+    users.forEach((user) => (template.usersIdsInCall = _.without(template.usersIdsInCall, user._id)))
+
+    if (template.connection.get() && template.usersIdsInCall.length === 0) {
+        disconnect(template)
+    }
+}
+
+const onUsersComeCloser = (e, template) => {
+    const { users } = e.detail
+
+    if (meetJs && !template.connection.get() && !template.connectionStarted) {
+        template.connectionStarted = true
+        let roomName = users[0]?.profile?.meetRoomName
+
+        if (!roomName) {
+            usersIds = users.map((user) => user._id).concat(Meteor.userId())
+
+            Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, roomName) => {
+                if (!roomName) {
+                    lp.notif.error('Unable to load a room, please try later')
+                    return
+                }
+
+                template.roomName = roomName
+                connect(template)
+            })
+        } else {
+            template.roomName = roomName
+
+            Meteor.users.update(Meteor.userId(), {
+                $set: { 'profile.meetRoomName': roomName },
+            })
+            connect(template)
+        }
+    }
+
+    users.forEach((user) => {
+        if (!template.usersIdsInCall.includes(user._id)) template.usersIdsInCall.push(user._id)
+    })
 }
 
 Template.meetLowLevel.onCreated(function () {
@@ -459,94 +554,15 @@ Template.meetLowLevel.onCreated(function () {
             .catch((err) => console.error('An error occured while creating local tracks', err))
     })
 
-    window.addEventListener(eventTypes.onUsersComeCloser, (e) => {
-        const { users } = e.detail
+    window.addEventListener(eventTypes.onUsersComeCloser, (e) => onUsersComeCloser(e, this))
+    window.addEventListener(eventTypes.onUsersMovedAway, (e) => onUsersMovedAway(e, this))
+    window.addEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
+})
 
-        if (meetJs && !this.connection.get() && !this.connectionStarted) {
-            this.connectionStarted = true
-            let roomName = users[0]?.profile?.meetRoomName
-
-            if (!roomName) {
-                usersIds = users.map((user) => user._id).concat(Meteor.userId())
-
-                Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, roomName) => {
-                    if (!roomName) {
-                        lp.notif.error('Unable to load a room, please try later')
-                        return
-                    }
-
-                    this.roomName = roomName
-                    connect(this)
-                })
-            } else {
-                this.roomName = roomName
-
-                Meteor.users.update(Meteor.userId(), {
-                    $set: { 'profile.meetRoomName': roomName },
-                })
-                connect(this)
-            }
-        }
-
-        users.forEach((user) => {
-            if (!this.usersIdsInCall.includes(user._id)) this.usersIdsInCall.push(user._id)
-        })
-    })
-
-    window.addEventListener(eventTypes.onUsersMovedAway, (e) => {
-        const { users } = e.detail
-
-        users.forEach((user) => (this.usersIdsInCall = _.without(this.usersIdsInCall, user._id)))
-
-        if (this.connection.get() && this.usersIdsInCall.length === 0) {
-            disconnect(this)
-        }
-    })
-
-    window.addEventListener(eventTypes.onUserPropertyUpdated, async (e) => {
-        const { propertyName, propertyValue } = e.detail
-        const localTracks = this.localTracks.get()
-
-        if (!localTracks || localTracks.length === 0 || !propertyName) return
-
-        if (propertyName === 'shareAudio') {
-            updateTrack('audio', localTracks)
-        } else if (propertyName === 'shareVideo') {
-            updateTrack('video', localTracks)
-        } else if (propertyName === 'shareScreen') {
-            if (propertyValue) {
-                await meetJs.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
-                    const currentDesktopTrack = localTracks.find((t) => t.getVideoType() === 'desktop')
-                    const screenNode = document.querySelector('#video-screen-me')
-                    const track = tracks[0] // Since we just ask for desktop, we will only have one item
-
-                    track.attach(screenNode)
-
-                    // If it's the first time we share screen, we should add it to the conference
-                    if (!currentDesktopTrack) {
-                        this.room.addTrack(track)
-                    } else {
-                        // Otherwise, we should replace since because Meet will not trigger 'TRACK_REMOVED' when we dispose the desktop track
-                        this.room.replaceTrack(currentDesktopTrack, track)
-                    }
-
-                    localTracks.push(track)
-                    this.localTracks.set(localTracks)
-                })
-            } else {
-                let filteredLocalTracks = localTracks.filter((track) => {
-                    // While we remove the desktop track, we dispose it at the same time
-                    if (track.getVideoType() === 'desktop') {
-                        track.dispose()
-                        return false
-                    }
-                    return true
-                })
-
-                this.localTracks.set(filteredLocalTracks)
-            }
-        }
-    })
+Template.meetLowLevel.onDestroyed(() => {
+    window.removeEventListener(eventTypes.onUsersComeCloser, (e) => onUsersComeCloser(e, this))
+    window.removeEventListener(eventTypes.onUsersMovedAway, (e) => onUsersMovedAway(e, this))
+    window.removeEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
 })
 
 Template.meetLowLevel.helpers({
