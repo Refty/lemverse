@@ -1,0 +1,12 @@
+<template name="remoteVideoTrack">
+    <div class="remote-video">
+        <div class="stream-name">{{displayName}}</div>
+        <div class="webcam">
+            {{#if isMuted}}
+            <img src="{{avatar}}" alt="avatar" class="avatar" />
+            {{/if}}
+            <video id="{{track.getParticipantId}}-camera" type="video/mp4" autoplay></video>
+            {{#if desktopTrack}} {{> remoteDesktopTrack track=desktopTrack}} {{/if}}
+        </div>
+    </div>
+</template>
