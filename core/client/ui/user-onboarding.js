@@ -43,8 +43,6 @@ const updateSettingsStream = async (template) => {
     video.srcObject = stream
     video.onloadedmetadata = () => video.play()
 
-    peer.updatePeersStream(stream, streamTypes.main)
-
     if (interval) clearInterval(interval)
     interval = userStreams.trackSound(stream, (audioMeter) => template.audioMeter.set(audioMeter))
 }

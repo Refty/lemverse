@@ -21,16 +21,6 @@ const punch = (users) => {
 }
 
 window.addEventListener('load', () => {
-    window.addEventListener(eventTypes.onPeerDataReceived, (e) => {
-        const { data, userEmitter } = e.detail
-        if (data.type !== 'punch') return
-
-        if (!userProximitySensor.isUserNear(userEmitter)) return
-        playPunchAnimation()
-
-        userManager.getCharacter(Meteor.userId())?.onDamage()
-    })
-
     hotkeys('x', { scope: scopes.player }, (e) => {
         const user = Meteor.user({
             fields: { _id: 1, 'profile.levelId': 1, roles: 1 },

@@ -85,7 +85,6 @@ module.exports = {
         findFirstCharacters: 'writable',
         tilesets: 'writable',
         layers: 'writable',
-        peer: 'writable',
         settings: 'writable',
         meet: 'writable',
         meetLowLevel: 'writable',
@@ -99,7 +98,6 @@ module.exports = {
         charactersParts: 'writable',
         characterPopIns: 'writable',
         capitalize: 'writable',
-        generateTURNCredentials: 'writable',
         isModalOpen: 'writable',
         closeModal: 'writable',
         toggleModal: 'writable',
@@ -130,8 +128,6 @@ module.exports = {
 
         relativePositionToCamera: 'writable',
         updateViewport: 'writable',
-        sendDataToUsers: 'writable',
-        sendDataToUsersInZone: 'writable',
 
         BootScene: 'writable',
         EditorScene: 'writable',

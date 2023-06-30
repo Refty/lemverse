@@ -255,7 +255,6 @@ WorldScene = new Phaser.Class({
         userManager.destroy()
         zoneManager.destroy()
         userProximitySensor.callProximityEndedForAllNearUsers()
-        peer.closeAll()
 
         Session.set('sceneWorldReady', false)
     },

@@ -1,33 +1,9 @@
-import { PeerServer } from 'peer'
 import crypto from 'crypto'
-
-if (Meteor.settings.peer.server.start) {
-    // eslint-disable-next-line new-cap
-    PeerServer({
-        ...Meteor.settings.peer.server,
-        path: Meteor.settings.peer.path,
-    })
-}
 
 Accounts.emailTemplates.from = Meteor.settings.email.from
 AccountsGuest.enabled = true
 AccountsGuest.forced = true
 AccountsGuest.name = true
-
-const getTURNCredentialsExpiration = () => {
-    const duration = Meteor.settings.peer?.client.credentialDuration || 86400
-    return parseInt(Date.now() / 1000, 10) + duration
-}
-
-const generateTURNCredentials = (name, secret) => {
-    const username = [getTURNCredentialsExpiration(), name].join(':')
-    const hmac = crypto.createHmac('sha1', secret)
-    hmac.setEncoding('base64')
-    hmac.write(username)
-    hmac.end()
-
-    return { username, password: hmac.read() }
-}
 
 Meteor.publish('tiles', function (levelId) {
     check(levelId, Match.Maybe(String))
@@ -44,30 +20,6 @@ Meteor.publish('characters', function () {
     if (!this.userId) return undefined
 
     return Characters.find()
-})
-
-Meteor.methods({
-    getPeerConfig() {
-        if (!this.userId) throw new Meteor.Error('missing-user', 'A valid user is required')
-        const { url, config, port, secret } = Meteor.settings.peer.client
-        const { username, password: credential } = generateTURNCredentials(this.userId, secret)
-
-        const iceServers = config.iceServers.map(({ urls, auth }) => {
-            if (!auth) return { urls }
-            return { urls, username, credential }
-        })
-
-        return {
-            url,
-            port,
-            path: Meteor.settings.peer.path,
-            expiration: getTURNCredentialsExpiration(),
-            config: {
-                ...config,
-                iceServers,
-            },
-        }
-    },
 })
 
 lp.defer(() => {

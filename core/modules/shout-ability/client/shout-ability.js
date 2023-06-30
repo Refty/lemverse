@@ -26,18 +26,6 @@ window.addEventListener('load', () => {
         track.stop()
     })
 
-    hotkeys('r', { keyup: true, scope: scopes.player }, (event) => {
-        if (event.repeat) return
-
-        const user = Meteor.user({
-            fields: { _id: 1, 'profile.levelId': 1, roles: 1 },
-        })
-
-        if (!user || !canUseLevelFeature(user, 'shout', true)) return
-
-        userVoiceRecorderAbility.recordVoice(event.type === 'keydown', sendAudioChunksToUsersInZone)
-    })
-
     const onMenuOptionSelected = (e) => {
         const { option } = e.detail
         const user = Meteor.user({

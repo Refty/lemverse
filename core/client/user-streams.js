@@ -49,12 +49,6 @@ userStreams = {
 
         this.stopTracks(screenStream)
         this.streams.screen.instance = undefined
-        Object.entries(peer.calls).forEach(([key, call]) => {
-            if (key.indexOf('-screen') === -1) return
-            debug('me -> you screen ****** I stop sharing screen, call closing', key)
-            call.close()
-            delete peer.calls[key]
-        })
     },
 
     destroyStream(type) {

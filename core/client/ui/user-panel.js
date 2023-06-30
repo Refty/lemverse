@@ -1,6 +1,7 @@
 import { guestAllowed, permissionTypes } from '../../lib/misc'
 
-const talking = () => !!peer.remoteStreamsByUsers.get().length
+// TODO: Replace it with meetLowLevel
+const talking = () => true
 
 Template.userPanel.onCreated(function () {
     if (Meteor.settings.public.features?.userPanel?.enabled === false) return

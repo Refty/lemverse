@@ -33,27 +33,10 @@
             "pinchDelta": 4
         },
 
-        "peer": {
-            "answerMaxAttempt": 5,
-            "answerDelayBetweenAttempt": 750,
-            "avatarAPI": "https://source.unsplash.com/320x240/?[user_avatar]&sig=[user_id]",
-            "callDelay": 250,
-            "delayBeforeClosingCall": 1000,
-            "sounds": {
-                "hangUp": {
-                    "file": "webrtc-out.mp3",
-                    "volume": 1
-                },
-                "incomingCall": {
-                    "file": "webrtc-in.mp3",
-                    "volume": 1
-                }
-            }
-        },
-
         "meet": {
             "serverURL": "meet.jit.si",
             "roomDefaultName": "lemverse-test",
+            "avatarAPI": "https://source.unsplash.com/320x240/?[user_avatar]&sig=[user_id]",
             "configOverwrite": {}
         },
 
@@ -242,33 +225,6 @@
         "iss": "",
         "keyid": "",
         "sub": ""
-    },
-
-    "peer": {
-        "path": "/peer",
-        "client": {
-            "url": "localhost",
-            "port": 7010,
-            "credentialDuration": 86400,
-            "secret": "",
-            "config": {
-                "iceServers": [
-                    {
-                        "urls": "stun:stun.l.google.com:19302"
-                    }
-                ],
-                "iceTransportPolicy": "all",
-                "sdpSemantics": "unified-plan"
-            }
-        },
-        "server": {
-            "start": true,
-            "port": 7010,
-            "key": "peerjs",
-            "alive_timeout": 5000,
-            "expire_timeout": 5000,
-            "allow_discovery": true
-        }
     },
 
     "s3": {},
