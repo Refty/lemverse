@@ -76,7 +76,10 @@ Template.meetLowLevel.helpers({
         return Template.instance().avatarURL.get()
     },
     isActive() {
-        return Template.instance().connection.get() !== undefined && getCallCount(Template.instance()) > 0
+        const isActive = Template.instance().connection.get() !== undefined && getCallCount(Template.instance()) > 0
+
+        Session.set('isLowLevelActive', isActive)
+        return isActive
     },
     remoteTracks() {
         console.log(

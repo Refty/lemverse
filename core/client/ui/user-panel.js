@@ -1,7 +1,6 @@
 import { guestAllowed, permissionTypes } from '../../lib/misc'
 
-// TODO: Replace it with meetLowLevel
-const talking = () => true
+const talking = () => Session.get('isLowLevelActive')
 
 Template.userPanel.onCreated(function () {
     if (Meteor.settings.public.features?.userPanel?.enabled === false) return
