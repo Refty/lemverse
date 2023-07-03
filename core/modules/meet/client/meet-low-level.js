@@ -24,7 +24,7 @@ Template.meetLowLevel.onCreated(function () {
     this.connectionStarted = false
     this.room = undefined
     this.roomName = undefined
-    this.usersIdsInCall = []
+    this.usersInCall = {}
 
     this.autorun(() => {
         if (!Meteor.userId()) return
@@ -76,7 +76,7 @@ Template.meetLowLevel.helpers({
         return Template.instance().avatarURL.get()
     },
     isActive() {
-        return Template.instance().connection.get() !== undefined && Template.instance().usersIdsInCall.length > 0
+        return Template.instance().connection.get() !== undefined && getCallCount(Template.instance()) > 0
     },
     remoteTracks() {
         console.log(
@@ -289,7 +289,7 @@ const onConferenceJoined = (template) => {
     console.log('conference joined!')
 
     // If the user is the only user in the conference, disconnect from the conference.
-    if (template.usersIdsInCall.length === 0) {
+    if (getCallCount(template) === 0) {
         disconnect(template)
     }
 }
@@ -410,9 +410,19 @@ const onUserPropertyUpdated = async (e, template) => {
 const onUsersMovedAway = (e, template) => {
     const { users } = e.detail
 
-    users.forEach((user) => (template.usersIdsInCall = _.without(template.usersIdsInCall, user._id)))
+    users.forEach((user) => {
+        if (template.usersInCall[user._id]) {
+            const duration = (Date.now() - template.usersInCall[user._id].callStartDate) / 1000
+            Meteor.call('analyticsDiscussionEnd', {
+                peerUserId: user._id,
+                duration,
+                usersAttendingCount: getCallCount(template),
+            })
+            delete template.usersInCall[user._id]
+        }
+    })
 
-    if (template.connection.get() && template.usersIdsInCall.length === 0) {
+    if (template.connection.get() && getCallCount(template) === 0) {
         disconnect(template)
     }
 }
@@ -447,6 +457,16 @@ const onUsersComeCloser = (e, template) => {
     }
 
     users.forEach((user) => {
-        if (!template.usersIdsInCall.includes(user._id)) template.usersIdsInCall.push(user._id)
+        if (!template.usersInCall[user._id]) {
+            template.usersInCall[user._id] = {
+                callStartDate: Date.now(),
+            }
+            Meteor.call('analyticsDiscussionAttend', {
+                peerUserId: user._id,
+                usersAttendingCount: getCallCount(template),
+            })
+        }
     })
 }
+
+const getCallCount = (template) => Object.keys(template.usersInCall).length
