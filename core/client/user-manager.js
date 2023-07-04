@@ -272,7 +272,7 @@ userManager = {
             const nearUsersCount = guestAllowed(permissionTypes.talkToUsers)
                 ? userProximitySensor.nearUsersCount()
                 : userProximitySensor.nearNonGuestUsers().length
-            this.controlledCharacter.enableChatCircle(nearUsersCount > 0)
+            this.controlledCharacter.enableChatCircle(!Session.get('isJitsiMeetOpen') && nearUsersCount > 0)
         } else this.controlledCharacter.enableChatCircle(false)
 
         const newVelocity = this.controlledCharacter.physicsStep()

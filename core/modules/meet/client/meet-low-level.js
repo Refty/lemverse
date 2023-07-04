@@ -54,6 +54,12 @@ Template.meetLowLevel.onCreated(function () {
             .catch((err) => console.error('An error occured while creating local tracks', err))
     })
 
+    this.autorun(() => {
+        if (this.connection.get() && Session.get('isJitsiMeetOpen')) {
+            meetLowLevel.disconnect()
+        }
+    })
+
     window.addEventListener(eventTypes.onUsersComeCloser, (e) => onUsersComeCloser(e, this))
     window.addEventListener(eventTypes.onUsersMovedAway, (e) => onUsersMovedAway(e, this))
     window.addEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
