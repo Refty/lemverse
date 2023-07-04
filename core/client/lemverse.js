@@ -229,10 +229,6 @@ Template.lemverse.onCreated(function () {
                 const meetingRoomService = meetingRoom.getMeetingRoomService()
                 if (user.profile.shareScreen) meetingRoomService.shareScreen()
                 else meetingRoomService.unshareScreen()
-            } else if (user.profile.shareScreen) {
-                await userStreams.createScreenStream()
-                userStreams.screen(true)
-                userProximitySensor.callProximityStartedForAllNearUsers()
             } else {
                 userStreams.screen(false)
             }

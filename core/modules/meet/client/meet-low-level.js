@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     head.appendChild(scriptLowLevel)
 
     scriptLowLevel.onload = () => {
-        meetLowLevel = window.JitsiMeetJS
+        jitsiMeetJS = window.JitsiMeetJS
     }
 })
 
@@ -20,25 +20,19 @@ Template.meetLowLevel.onCreated(function () {
     this.connection = new ReactiveVar(undefined)
     this.localTracks = new ReactiveVar([])
     this.remoteTracks = new ReactiveVar({})
-
-    this.connectionStarted = false
-    this.room = undefined
-    this.roomName = undefined
-    this.usersInCall = {}
+    meetLowLevel.template = this
 
     this.autorun(() => {
         if (!Meteor.userId()) return
-
         const user = Meteor.user({ fields: { 'profile.avatar': 1 } })
-
         if (user) this.avatarURL.set(generateRandomAvatarURLForUser(user))
     })
 
     this.autorun(() => {
         const user = Meteor.user({ fields: { 'profile.videoRecorder': 1 } })
 
-        if (!user || !meetLowLevel) return
-        meetLowLevel
+        if (!user || !jitsiMeetJS) return
+        jitsiMeetJS
             .createLocalTracks({
                 devices: ['video'],
                 cameraDeviceId: user?.profile?.videoRecorder,
@@ -50,8 +44,8 @@ Template.meetLowLevel.onCreated(function () {
     this.autorun(() => {
         const user = Meteor.user({ fields: { 'profile.audioRecorder': 1 } })
 
-        if (!user || !meetLowLevel) return
-        meetLowLevel
+        if (!user || !jitsiMeetJS) return
+        jitsiMeetJS
             .createLocalTracks({
                 devices: ['audio'],
                 micDeviceId: user?.profile?.audioRecorder,
@@ -76,22 +70,12 @@ Template.meetLowLevel.helpers({
         return Template.instance().avatarURL.get()
     },
     isActive() {
-        const isActive = Template.instance().connection.get() !== undefined && getCallCount(Template.instance()) > 0
+        const isActive = Template.instance().connection.get() !== undefined && meetLowLevel.getCallCount() > 0
 
         Session.set('isLowLevelActive', isActive)
         return isActive
     },
     remoteTracks() {
-        console.log(
-            '🚀 ---------------------------------------------------------------------------------------------------------------------------------🚀'
-        )
-        console.log(
-            '🚀 - file: meet-low-level.js:551 - remoteTracks - Template.instance().remoteTracks.get():',
-            Template.instance().remoteTracks.get()
-        )
-        console.log(
-            '🚀 ---------------------------------------------------------------------------------------------------------------------------------🚀'
-        )
         // Check a better way to remove undefined tracks
         return Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio && track.camera)
     },
@@ -127,19 +111,128 @@ Template.meetLowLevel.helpers({
 })
 
 /*
+ ** Events listeners
+ */
+
+const onUsersComeCloser = (e, template) => {
+    const { users } = e.detail
+
+    if (jitsiMeetJS && !template.connection.get() && !meetLowLevel.connectionStarted) {
+        meetLowLevel.connectionStarted = true
+        const roomName = users[0]?.profile?.meetRoomName
+
+        if (!roomName) {
+            const usersIds = users.map((user) => user._id).concat(Meteor.userId())
+            Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, computedRoomName) => {
+                if (!computedRoomName) {
+                    lp.notif.error('Unable to load a room, please try later')
+                    return
+                }
+
+                meetLowLevel.roomName = computedRoomName
+                meetLowLevel.connect()
+            })
+        } else {
+            meetLowLevel.roomName = roomName
+            Meteor.users.update(Meteor.userId(), {
+                $set: { 'profile.meetRoomName': roomName },
+            })
+            meetLowLevel.connect()
+        }
+    }
+
+    users.forEach((user) => {
+        if (!meetLowLevel.usersInCall[user._id]) {
+            meetLowLevel.usersInCall[user._id] = {
+                callStartDate: Date.now(),
+            }
+            Meteor.call('analyticsDiscussionAttend', {
+                peerUserId: user._id,
+                usersAttendingCount: meetLowLevel.getCallCount(),
+            })
+        }
+    })
+}
+
+const onUsersMovedAway = (e, template) => {
+    const { users } = e.detail
+
+    users.forEach((user) => {
+        if (meetLowLevel.usersInCall[user._id]) {
+            const duration = (Date.now() - meetLowLevel.usersInCall[user._id].callStartDate) / 1000
+            Meteor.call('analyticsDiscussionEnd', {
+                peerUserId: user._id,
+                duration,
+                usersAttendingCount: meetLowLevel.getCallCount(template),
+            })
+            delete meetLowLevel.usersInCall[user._id]
+        }
+    })
+
+    if (template.connection.get() && meetLowLevel.getCallCount() === 0) {
+        meetLowLevel.disconnect()
+    }
+}
+
+const onUserPropertyUpdated = async (e, template) => {
+    const { propertyName, propertyValue } = e.detail
+    const localTracks = template.localTracks.get()
+
+    if (!localTracks || localTracks.length === 0 || !propertyName) return
+
+    if (propertyName === 'shareAudio') {
+        updateTrack('audio', localTracks)
+    } else if (propertyName === 'shareVideo') {
+        updateTrack('video', localTracks)
+    } else if (propertyName === 'shareScreen') {
+        if (propertyValue) {
+            await jitsiMeetJS.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
+                const currentDesktopTrack = localTracks.find((t) => t.getVideoType() === 'desktop')
+                const screenNode = document.querySelector('#video-screen-me')
+                const track = tracks[0] // Since we just ask for desktop, we will only have one item
+
+                track.attach(screenNode)
+
+                // If it's the first time we share screen, we should add it to the conference
+                if (!currentDesktopTrack) {
+                    meetLowLevel.room.addTrack(track)
+                } else {
+                    // Otherwise, we should replace since because Meet will not trigger 'TRACK_REMOVED' when we dispose the desktop track
+                    meetLowLevel.room.replaceTrack(currentDesktopTrack, track)
+                }
+
+                localTracks.push(track)
+                template.localTracks.set(localTracks)
+            })
+        } else {
+            const filteredLocalTracks = localTracks.filter((track) => {
+                // While we remove the desktop track, we dispose it at the same time
+                if (track.getVideoType() === 'desktop') {
+                    track.dispose()
+                    return false
+                }
+                return true
+            })
+
+            template.localTracks.set(filteredLocalTracks)
+        }
+    }
+}
+
+/*
  ** LowMeetJs
  */
 
 const DOMAIN = '8x8.vc'
-const getOptions = (roomName) => ({
+const getOptions = () => ({
     // Connection
     hosts: {
         domain: DOMAIN,
         muc: `conference.${DOMAIN}`,
         focus: `focus.${DOMAIN}`,
     },
-    serviceUrl: `wss://${DOMAIN}/xmpp-websocket?room=${roomName}`,
-    websocketKeepAliveUrl: `https://${DOMAIN}/_unlock?room=${roomName}`,
+    serviceUrl: `wss://${DOMAIN}/xmpp-websocket?room=${meetLowLevel.roomName}`,
+    websocketKeepAliveUrl: `https://${DOMAIN}/_unlock?room=${meetLowLevel.roomName}`,
 
     // Enable Peer-to-Peer for 1-1 calls
     p2p: {
@@ -178,298 +271,200 @@ const getOptions = (roomName) => ({
     __end: true,
 })
 
-const connect = async (template) => {
-    console.log('Connection started')
+meetLowLevel = {
+    connectionStarted: false,
+    room: undefined,
+    roomName: undefined,
+    usersInCall: {},
+    template: undefined,
 
-    if (!template.connection.get()) {
-        const options = getOptions(template.roomName)
-        const user = Meteor.user({ fields: { 'profile.audioRecorder': 1, 'profile.videoRecorder': 1 } })
+    async connect() {
+        if (!this.template.connection.get()) {
+            const options = getOptions()
+            const user = Meteor.user({ fields: { 'profile.audioRecorder': 1, 'profile.videoRecorder': 1 } })
 
-        meetLowLevel.init(options)
-        meetLowLevel.setLogLevel(meetLowLevel.logLevels.ERROR)
+            jitsiMeetJS.init(options)
+            jitsiMeetJS.setLogLevel(jitsiMeetJS.logLevels.ERROR)
 
-        await meetLowLevel
-            .createLocalTracks({
-                devices: ['audio', 'video'],
-                cameraDeviceId: user?.profile?.videoRecorder,
-                micDeviceId: user?.profile?.audioRecorder,
+            await jitsiMeetJS
+                .createLocalTracks({
+                    devices: ['audio', 'video'],
+                    cameraDeviceId: user?.profile?.videoRecorder,
+                    micDeviceId: user?.profile?.audioRecorder,
+                })
+                .then((tracks) => {
+                    updateTrack('video', tracks)
+                    updateTrack('audio', tracks)
+                    attachLocalTracks(tracks)
+                    this.template.localTracks.set(tracks)
+                })
+                .catch((err) => console.error('An error occured while creating local tracks', err))
+
+            const connection = new jitsiMeetJS.JitsiConnection(null, null, options)
+
+            connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, () => {
+                this.onConnectionSuccess()
             })
-            .then((tracks) => {
-                updateTrack('video', tracks)
-                updateTrack('audio', tracks)
-                attachLocalTracks(tracks)
-                template.localTracks.set(tracks)
+            connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_FAILED, () => {
+                this.onConnectionFailed()
             })
-            .catch((err) => console.error('An error occured while creating local tracks', err))
+            connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, () => {
+                this.onConnectionDisconnected()
+            })
 
-        const connection = new meetLowLevel.JitsiConnection(null, null, options)
-
-        connection.addEventListener(meetLowLevel.events.connection.CONNECTION_ESTABLISHED, () =>
-            onConnectionSuccess(template)
-        )
-        connection.addEventListener(meetLowLevel.events.connection.CONNECTION_FAILED, onConnectionFailed)
-        connection.addEventListener(meetLowLevel.events.connection.CONNECTION_DISCONNECTED, () =>
-            onConnectionDisconnected(template)
-        )
-
-        connection.connect()
-        template.connection.set(connection)
-    }
-}
-
-const disconnect = async (template) => {
-    console.log('DISCONNECT')
-
-    template.connectionStarted = false
-    Meteor.users.update(Meteor.userId(), {
-        $unset: { 'profile.meetRoomName': 1 },
-    })
-
-    if (template.room?.room) {
-        try {
-            template.room.leave()
-        } catch (err) {
-            console.log('Error during leaving', err)
+            connection.connect()
+            this.template.connection.set(connection)
         }
-    }
+    },
 
-    const connection = template.connection.get()
+    async disconnect() {
+        this.connectionStarted = false
+        Meteor.users.update(Meteor.userId(), {
+            $unset: { 'profile.meetRoomName': 1 },
+        })
 
-    connection.disconnect()
-    connection.removeEventListener(meetLowLevel.events.connection.CONNECTION_ESTABLISHED, (template) =>
-        onConnectionSuccess(template)
-    )
-    connection.removeEventListener(meetLowLevel.events.connection.CONNECTION_FAILED, onConnectionFailed)
-    connection.removeEventListener(meetLowLevel.events.connection.CONNECTION_DISCONNECTED, () =>
-        onConnectionDisconnected(template)
-    )
-
-    template.room = undefined
-    template.connection.set(undefined)
-}
-
-/*
- **  LowMeetJs events listeners
- */
-const onTrackAdded = (template, track) => {
-    // Since we attach local tracks separately, we do not need attach it again
-    if (track.isLocal()) return
-
-    const participantId = track.getParticipantId()
-    const _remoteTracks = template.remoteTracks.get()
-
-    if (!_remoteTracks[participantId]) _remoteTracks[participantId] = {}
-
-    if (track.getType() === 'video') {
-        // When receiving a 'desktop' track, Jitsi doesn't immediately set the correct type, leading to confusion with our own tracks.
-        // Initially, a 'desktop' track is classified as a 'camera' type, but after a few seconds, it is eventually updated to a 'desktop' track type.
-        // This inconsistency is quite frustrating, and since we haven't found a suitable solution, it's better to introduce a timeout before setting the track type to 'video'.
-        // Cf: https://community.jitsi.org/t/identifying-new-track-as-desktop/118232/2
-
-        setTimeout(() => {
-            _remoteTracks[participantId][getTrackType(track)] = track
-            template.remoteTracks.set(_remoteTracks)
-        }, 1000)
-    } else {
-        _remoteTracks[participantId][getTrackType(track)] = track
-        template.remoteTracks.set(_remoteTracks)
-    }
-}
-
-const onTrackRemoved = (template, track) => {
-    const _remoteTracks = template.remoteTracks.get()
-    const participantId = track.getParticipantId()
-
-    if (_remoteTracks[participantId]) {
-        _remoteTracks[participantId][getTrackType(track)] = null
-
-        if (_remoteTracks[participantId].length === 0) delete _remoteTracks[participantId]
-        template.remoteTracks.set(_remoteTracks)
-    }
-}
-
-const onConferenceJoined = (template) => {
-    console.log('conference joined!')
-
-    // If the user is the only user in the conference, disconnect from the conference.
-    if (getCallCount(template) === 0) {
-        disconnect(template)
-    }
-}
-
-const onConferenceLeft = () => {
-    console.log('conference left!')
-}
-
-const onUserJoined = (template, userId, participant) => {
-    console.log('user joined!', userId)
-    const _remoteTracks = template.remoteTracks.get()
-
-    if (!_remoteTracks[userId]) _remoteTracks[userId] = {}
-    _remoteTracks[userId].displayName = participant.getDisplayName()
-    template.remoteTracks.set(_remoteTracks)
-}
-
-const onConnectionSuccess = (template) => {
-    console.log('Successfully connected')
-    const user = Meteor.user({ fields: { 'profile.name': 1 } })
-
-    if (!template.room) {
-        template.room = template.connection.get().initJitsiConference(template.roomName, {})
-
-        const _localTracks = template.localTracks.get()
-
-        // Add local tracks before joining
-        for (let i = 0; i < _localTracks.length; i++) {
-            template.room.addTrack(_localTracks[i])
-        }
-
-        // Setup event listeners
-        template.room.on(meetLowLevel.events.conference.TRACK_ADDED, (track) => onTrackAdded(template, track))
-        template.room.on(meetLowLevel.events.conference.TRACK_REMOVED, (track) => onTrackRemoved(template, track))
-        template.room.on(meetLowLevel.events.conference.CONFERENCE_JOINED, () => onConferenceJoined(template))
-        template.room.on(meetLowLevel.events.conference.CONFERENCE_LEFT, onConferenceLeft)
-        template.room.on(meetLowLevel.events.conference.USER_JOINED, (userId, participant) =>
-            onUserJoined(template, userId, participant)
-        )
-        template.room.on(meetLowLevel.events.conference.USER_LEFT, (id) => console.log('user left!', id))
-
-        // Join
-        template.room.setDisplayName(user?.profile?.name)
-        template.room.join()
-        template.room.setSenderVideoConstraint(720) // Send at most 720p
-        template.room.setReceiverVideoConstraint(360) // Receive at most 360p for each participant
-    }
-}
-
-const onConnectionFailed = () => {
-    console.error('connection failed!')
-}
-
-const onConnectionDisconnected = (template) => {
-    console.log('CONNECTION_DISCONNECTED')
-
-    const _localTracks = template.localTracks.get()
-
-    for (let i = 0; i < _localTracks.length; i++) {
-        _localTracks[i].dispose()
-    }
-
-    template.localTracks.set([])
-    template.remoteTracks.set({})
-    template.usersInCall = []
-    toggleUserProperty('shareScreen', false)
-}
-
-/*
- ** Events listeners
- */
-
-const onUserPropertyUpdated = async (e, template) => {
-    const { propertyName, propertyValue } = e.detail
-    const localTracks = template.localTracks.get()
-
-    if (!localTracks || localTracks.length === 0 || !propertyName) return
-
-    if (propertyName === 'shareAudio') {
-        updateTrack('audio', localTracks)
-    } else if (propertyName === 'shareVideo') {
-        updateTrack('video', localTracks)
-    } else if (propertyName === 'shareScreen') {
-        if (propertyValue) {
-            await meetLowLevel.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
-                const currentDesktopTrack = localTracks.find((t) => t.getVideoType() === 'desktop')
-                const screenNode = document.querySelector('#video-screen-me')
-                const track = tracks[0] // Since we just ask for desktop, we will only have one item
-
-                track.attach(screenNode)
-
-                // If it's the first time we share screen, we should add it to the conference
-                if (!currentDesktopTrack) {
-                    template.room.addTrack(track)
-                } else {
-                    // Otherwise, we should replace since because Meet will not trigger 'TRACK_REMOVED' when we dispose the desktop track
-                    template.room.replaceTrack(currentDesktopTrack, track)
-                }
-
-                localTracks.push(track)
-                template.localTracks.set(localTracks)
-            })
-        } else {
-            let filteredLocalTracks = localTracks.filter((track) => {
-                // While we remove the desktop track, we dispose it at the same time
-                if (track.getVideoType() === 'desktop') {
-                    track.dispose()
-                    return false
-                }
-                return true
-            })
-
-            template.localTracks.set(filteredLocalTracks)
-        }
-    }
-}
-
-const onUsersMovedAway = (e, template) => {
-    const { users } = e.detail
-
-    users.forEach((user) => {
-        if (template.usersInCall[user._id]) {
-            const duration = (Date.now() - template.usersInCall[user._id].callStartDate) / 1000
-            Meteor.call('analyticsDiscussionEnd', {
-                peerUserId: user._id,
-                duration,
-                usersAttendingCount: getCallCount(template),
-            })
-            delete template.usersInCall[user._id]
-        }
-    })
-
-    if (template.connection.get() && getCallCount(template) === 0) {
-        disconnect(template)
-    }
-}
-
-const onUsersComeCloser = (e, template) => {
-    const { users } = e.detail
-
-    if (meetLowLevel && !template.connection.get() && !template.connectionStarted) {
-        template.connectionStarted = true
-        let roomName = users[0]?.profile?.meetRoomName
-
-        if (!roomName) {
-            usersIds = users.map((user) => user._id).concat(Meteor.userId())
-
-            Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, roomName) => {
-                if (!roomName) {
-                    lp.notif.error('Unable to load a room, please try later')
-                    return
-                }
-
-                template.roomName = roomName
-                connect(template)
-            })
-        } else {
-            template.roomName = roomName
-
-            Meteor.users.update(Meteor.userId(), {
-                $set: { 'profile.meetRoomName': roomName },
-            })
-            connect(template)
-        }
-    }
-
-    users.forEach((user) => {
-        if (!template.usersInCall[user._id]) {
-            template.usersInCall[user._id] = {
-                callStartDate: Date.now(),
+        if (this.room?.room) {
+            try {
+                this.room.leave()
+            } catch (err) {
+                console.log('Error while leaving', err)
             }
-            Meteor.call('analyticsDiscussionAttend', {
-                peerUserId: user._id,
-                usersAttendingCount: getCallCount(template),
-            })
         }
-    })
-}
 
-const getCallCount = (template) => Object.keys(template.usersInCall).length
+        const connection = this.template.connection.get()
+
+        connection.disconnect()
+        connection.removeEventListener(jitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, () => {
+            this.onConnectionSuccess()
+        })
+        connection.removeEventListener(jitsiMeetJS.events.connection.CONNECTION_FAILED, () => {
+            this.onConnectionFailed()
+        })
+        connection.removeEventListener(jitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, () => {
+            this.onConnectionDisconnected()
+        })
+
+        this.room = undefined
+        this.template.connection.set(undefined)
+    },
+
+    getCallCount() {
+        return Object.keys(this.usersInCall).length
+    },
+
+    /*
+     **  LowMeetJs events listeners
+     */
+    onTrackAdded(track) {
+        // Since we attach local tracks separately, we do not need attach it again
+        if (track.isLocal()) return
+
+        const participantId = track.getParticipantId()
+        const _remoteTracks = this.template.remoteTracks.get()
+
+        if (!_remoteTracks[participantId]) _remoteTracks[participantId] = {}
+
+        if (track.getType() === 'video') {
+            // When receiving a 'desktop' track, Jitsi doesn't immediately set the correct type, leading to confusion with our own tracks.
+            // Initially, a 'desktop' track is classified as a 'camera' type, but after a few seconds, it is eventually updated to a 'desktop' track type.
+            // This inconsistency is quite frustrating, and since we haven't found a suitable solution, it's better to introduce a timeout before setting the track type to 'video'.
+            // Cf: https://community.jitsi.org/t/identifying-new-track-as-desktop/118232/2
+
+            setTimeout(() => {
+                _remoteTracks[participantId][getTrackType(track)] = track
+                this.template.remoteTracks.set(_remoteTracks)
+            }, 1000)
+        } else {
+            _remoteTracks[participantId][getTrackType(track)] = track
+            this.template.remoteTracks.set(_remoteTracks)
+        }
+    },
+
+    onTrackRemoved(track) {
+        const _remoteTracks = this.template.remoteTracks.get()
+        const participantId = track.getParticipantId()
+
+        if (_remoteTracks[participantId]) {
+            _remoteTracks[participantId][getTrackType(track)] = null
+
+            if (_remoteTracks[participantId].length === 0) delete _remoteTracks[participantId]
+            this.template.remoteTracks.set(_remoteTracks)
+        }
+    },
+
+    onConferenceJoined() {
+        console.log('conference joined!')
+
+        // If the user is the only user in the conference, disconnect from the conference.
+        if (this.getCallCount() === 0) {
+            this.disconnect()
+        }
+    },
+
+    onConferenceLeft() {
+        console.log('conference left!')
+    },
+
+    onUserJoined(userId, participant) {
+        console.log('user joined!', userId)
+        const _remoteTracks = this.template.remoteTracks.get()
+
+        if (!_remoteTracks[userId]) _remoteTracks[userId] = {}
+        _remoteTracks[userId].displayName = participant.getDisplayName()
+        this.template.remoteTracks.set(_remoteTracks)
+    },
+
+    onConnectionSuccess() {
+        console.log('Successfully connected')
+        const user = Meteor.user({ fields: { 'profile.name': 1 } })
+
+        if (!this.room) {
+            this.room = this.template.connection.get().initJitsiConference(this.roomName, {})
+            const _localTracks = this.template.localTracks.get()
+
+            // Add local tracks before joining
+            for (let i = 0; i < _localTracks.length; i++) {
+                this.room.addTrack(_localTracks[i])
+            }
+
+            // Setup event listeners
+            this.room.on(jitsiMeetJS.events.conference.TRACK_ADDED, (track) => this.onTrackAdded(track))
+            this.room.on(jitsiMeetJS.events.conference.TRACK_REMOVED, (track) => this.onTrackRemoved(track))
+            this.room.on(jitsiMeetJS.events.conference.CONFERENCE_JOINED, () => {
+                this.onConferenceJoined()
+            })
+            this.room.on(jitsiMeetJS.events.conference.CONFERENCE_LEFT, () => {
+                this.onConferenceLeft()
+            })
+            this.room.on(jitsiMeetJS.events.conference.USER_JOINED, (userId, participant) =>
+                this.onUserJoined(userId, participant)
+            )
+            this.room.on(jitsiMeetJS.events.conference.USER_LEFT, (id) => console.log('user left!', id))
+
+            // Join
+            this.room.setDisplayName(user?.profile?.name)
+            this.room.join()
+            this.room.setSenderVideoConstraint(720) // Send at most 720p
+            this.room.setReceiverVideoConstraint(360) // Receive at most 360p for each participant
+        }
+    },
+
+    onConnectionFailed() {
+        console.error('connection failed!')
+    },
+
+    onConnectionDisconnected() {
+        console.log('connection disconnected')
+
+        const _localTracks = this.template.localTracks.get()
+
+        for (let i = 0; i < _localTracks.length; i++) {
+            _localTracks[i].dispose()
+        }
+
+        this.template.localTracks.set([])
+        this.template.remoteTracks.set({})
+        this.usersInCall = []
+        toggleUserProperty('shareScreen', false)
+    },
+}

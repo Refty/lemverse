@@ -39,7 +39,7 @@ const replaceLocalTrack = (template, newTrack) => {
             localTracks.map((track) => {
                 if (track.getType() === newTrack.getType()) {
                     // Replace old tracks by the new one
-                    template.room.replaceTrack(track, newTrack)
+                    meetLowLevel.room.replaceTrack(track, newTrack)
                     return newTrack
                 }
                 return track
@@ -59,19 +59,19 @@ const trackAttach = (template, trackId) => {
         template.isMuted.set(track.isMuted())
     }
 
-    track.addEventListener(meetLowLevel.events.track.TRACK_MUTE_CHANGED, () => updateTrackMuteState(track, template))
+    track.addEventListener(jitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => updateTrackMuteState(track, template))
 
     if (!el) return
     track.attach(el)
 }
 
-const trackDetach = (trackId) => {
+const trackDetach = (template, trackId) => {
     const { track } = Template.currentData()
 
     if (!track) return
     const el = document.getElementById(trackId || getTrackId(track))
 
-    track.removeEventListener(meetLowLevel.events.track.TRACK_MUTE_CHANGED, () => updateTrackMuteState(track, template))
+    track.removeEventListener(jitsiMeetJS.events.track.TRACK_MUTE_CHANGED, () => updateTrackMuteState(track, template))
 
     if (!el) return
     track.detach(el)

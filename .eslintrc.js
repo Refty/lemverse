@@ -89,6 +89,7 @@ module.exports = {
         meet: 'writable',
         meetLowLevel: 'writable',
         meetHighLevel: 'writable',
+        jitsiMeetJS: 'writable',
         zoneManager: 'writable',
         notificationMessage: 'writable',
         nippleManager: 'writable',

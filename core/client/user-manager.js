@@ -268,7 +268,7 @@ userManager = {
         this.controlledCharacter.running = hotkeys.isPressed('shift')
         this.controlledCharacter.moveDirection = this.inputVector
 
-        if (meetLowLevel && !Session.get('menu')) {
+        if (jitsiMeetJS && !Session.get('menu')) {
             const nearUsersCount = guestAllowed(permissionTypes.talkToUsers)
                 ? userProximitySensor.nearUsersCount()
                 : userProximitySensor.nearNonGuestUsers().length
