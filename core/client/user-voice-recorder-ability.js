@@ -149,23 +149,6 @@ const sendAudioChunksToTargets = (chunks, userIds) => {
     uploadInstance.start()
 }
 
-sendAudioChunksToUsersInZone = async (chunks) => {
-    const user = Meteor.user()
-    const usersInZone = zoneManager.usersInZone(zoneManager.currentZone(user))
-    const userInZoneIds = usersInZone.map((u) => u._id)
-
-    try {
-        await networkManager.sendData(userInZoneIds, {
-            type: 'audio',
-            emitter: user._id,
-            data: chunks,
-        })
-        lp.notif.success(`📣 Everyone has heard your powerful voice`)
-    } catch {
-        lp.notif.warning('❌ No one is there to hear you')
-    }
-}
-
 sendAudioChunksToNearUsers = (chunks) => {
     const { nearUsers } = userProximitySensor
     const userIds = [...new Set(_.keys(nearUsers))].filter((target) => target !== Meteor.userId())

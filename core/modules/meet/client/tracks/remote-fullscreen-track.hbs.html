@@ -1,0 +1,12 @@
+<template name="remoteFullscreen">
+    <div class="fullscreen-container">
+        <div class="fullscreen">
+            <div class="fullscreen-background">
+                <video id="{{track.getParticipantId}}-fullscreenBackground" type="video/mp4" autoplay></video>
+            </div>
+            <div class="main">
+                <video id="{{track.getParticipantId}}-fullscreen" type="video/mp4" autoplay></video>
+            </div>
+        </div>
+    </div>
+</template>

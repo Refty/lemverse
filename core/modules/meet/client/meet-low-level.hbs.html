@@ -1,26 +1,25 @@
-<template name="meetLowLevelTracks">
-    {{#if sessionMeetLowLevelTracks.length}}
-    <div class="meet-low-level-tracks js-streams {{#if Session 'meetLowLevelFullscreenTrackId'}}fullscreen{{/if}}">
-        {{#each sessionMeetLowLevelTracks}} {{#with track}} {{> meetLowLevelTrack}} {{/with}} {{/each}}
+<template name="meetLowLevel">
+    {{#if isActive}}
+    <div class="remote-users">
+        {{#each tracks in remoteTracks}}
+        <div class="remote-user">
+            {{> remoteAudioTrack track=tracks.audio}} {{> remoteVideoTrack track=tracks.camera
+            desktopTrack=tracks.desktop displayName=tracks.displayName }}
+        </div>
+        {{/each}}
     </div>
-    {{/if}}
-</template>
+    {{#if fullscreenTrack }} {{> remoteFullscreen track=fullscreenTrack}} {{/if}} {{/if}}
 
-<template name="meetLowLevelTrack">
-    {{#if eq getType "audio"}} {{> meetLowLevelAudioTrack}} {{else}} {{> meetLowLevelVideoTrack}} {{/if}}
-</template>
-
-<template name="meetLowLevelAudioTrack">
-    <div id="{{getId}}" class="hide">
-        <audio class="st" autoplay="1" id="{{getId}}" muted="{{isLocal}}"></audio>
-    </div>
-</template>
-
-<template name="meetLowLevelVideoTrack">
-    <div id="{{getId}}" class="stream {{#if eq (Session 'meetLowLevelFullscreenTrackId') getId}}active{{/if}}">
-        <div class="stream-name">{{name}}</div>
-        <div class="webcam js-fullscreen">
-            <video class="st" autoplay="1"></video>
+    <div class="container-stream-me {{#if isActive}}active{{/if}}" tabindex="-1">
+        <div class="stream-screen-me {{#if isSharingScreen}}active{{/if}}">
+            <video id="video-screen-me" type="video/mp4" width="340" height="240" autoplay muted></video>
+        </div>
+        <div
+            class="stream-me {{#if isLocalVideoActive}}active-video{{/if}}"
+            style="background-image: url('{{avatarURL}}')"
+        >
+            <video id="video-stream-me" type="video/mp4" width="240" height="180" autoplay muted></video>
+            <audio id="audio-stream-me" autoplay="1"></audio>
         </div>
     </div>
 </template>

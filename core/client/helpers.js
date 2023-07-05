@@ -29,7 +29,6 @@ eventTypes = Object.freeze({
     onMeetEnded: 'onMeetEnded',
     onMenuOptionSelected: 'onMenuOptionSelected',
     onMenuOptionUnselected: 'onMenuOptionUnselected',
-    onPeerDataReceived: 'onPeerDataReceived',
     onMediaStreamStateChanged: 'onMediaStreamStateChanged',
     onTileAdded: 'onTileAdded',
     onTileChanged: 'onTileChanged',
@@ -47,6 +46,7 @@ eventTypes = Object.freeze({
     beforeSendingMessage: 'beforeSendingMessage',
     afterSendingMessage: 'afterSendingMessage',
     consoleClosed: 'consoleClosed',
+    onUserPropertyUpdated: 'onUserPropertyUpdated',
 })
 
 toggleUserProperty = (propertyName, value) => {
@@ -79,14 +79,16 @@ toggleUserProperty = (propertyName, value) => {
         }
     }
 
-    if (typeof value === 'boolean')
-        Meteor.users.update(user._id, {
-            $set: { [`profile.${propertyName}`]: !!value },
+    const propertyValue = typeof value === 'boolean' ? !!value : !user.profile[propertyName]
+
+    Meteor.users.update(user._id, {
+        $set: { [`profile.${propertyName}`]: propertyValue },
+    })
+    window.dispatchEvent(
+        new CustomEvent(eventTypes.onUserPropertyUpdated, {
+            detail: { propertyName, propertyValue },
         })
-    else
-        Meteor.users.update(user._id, {
-            $set: { [`profile.${propertyName}`]: !user.profile[propertyName] },
-        })
+    )
 }
 
 relativePositionToCamera = (position, camera) => {
@@ -193,27 +195,6 @@ const formatURLs = (text, shortName = false) =>
         return `<a href="${formatedURL}" target="_blank" title="${formatedURL}">${linkName}</a>`
     })
 
-sendDataToUsers = (type, data, emitterId, userIds = []) => {
-    let targets = [...new Set(userIds)]
-    targets = targets.filter((target) => target !== Meteor.userId())
-    if (!targets.length) throw new Error('no-targets')
-
-    return networkManager.sendData(targets, { type, emitter: emitterId, data })
-}
-
-sendDataToUsersInZone = (type, data, emitterId) => {
-    const user = Meteor.user()
-    const usersInZone = zoneManager.usersInZone(zoneManager.currentZone(user))
-    const userInZoneIds = usersInZone.map((u) => u._id)
-    if (!userInZoneIds.length) throw new Error('no-targets')
-
-    return networkManager.sendData(userInZoneIds, {
-        type,
-        emitter: emitterId,
-        data,
-    })
-}
-
 kebabCase = (string) =>
     string
         .replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -265,7 +246,7 @@ const replaceTextVars = (text) =>
     })
 
 generateRandomAvatarURLForUser = (user) =>
-    Meteor.settings.public.peer.avatarAPI
+    Meteor.settings.public.meet.avatarAPI
         .replace('[user_id]', encodeURI(user._id || 'guest'))
         .replace('[user_name]', encodeURI(user.profile.name || 'guest'))
         .replace('[user_avatar]', encodeURI(user.profile.avatar || 'cat'))

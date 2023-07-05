@@ -1,0 +1,11 @@
+<template name="remoteAudioTrack">
+    <div class="remote-audio">
+        {{#if isMuted}}
+        <div class="mute">
+            <div>🎤</div>
+            <div>❌</div>
+        </div>
+        {{/if}}
+        <audio autoplay="1" id="{{track.getParticipantId}}-audio"></audio>
+    </div>
+</template>

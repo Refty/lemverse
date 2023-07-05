@@ -180,7 +180,6 @@ userManager = {
             }
         } else {
             if (shouldCheckDistance) userProximitySensor.checkDistance(loggedUser, user)
-            if (user.profile.shareScreen !== oldUser?.profile.shareScreen) peer.onStreamSettingsChanged(user)
         }
     },
 
@@ -269,11 +268,11 @@ userManager = {
         this.controlledCharacter.running = hotkeys.isPressed('shift')
         this.controlledCharacter.moveDirection = this.inputVector
 
-        if (peer.isEnabled() && !Session.get('menu')) {
+        if (jitsiMeetJS && !Session.get('menu')) {
             const nearUsersCount = guestAllowed(permissionTypes.talkToUsers)
                 ? userProximitySensor.nearUsersCount()
                 : userProximitySensor.nearNonGuestUsers().length
-            this.controlledCharacter.enableChatCircle(nearUsersCount > 0)
+            this.controlledCharacter.enableChatCircle(!Session.get('isJitsiMeetOpen') && nearUsersCount > 0)
         } else this.controlledCharacter.enableChatCircle(false)
 
         const newVelocity = this.controlledCharacter.physicsStep()
@@ -290,7 +289,6 @@ userManager = {
             this.stopInteracting()
         }
 
-        if (!peer.hasActiveStreams()) peer.enableSensor(!(this.controlledCharacter.running && moving))
         this.controlledCharacter.wasMoving = moving
         this.controlledCharacter?.postUpdateStep()
     },
@@ -321,18 +319,15 @@ userManager = {
         if (!user || (user && this.controlledCharacter.followedGameObject)) {
             if (this.controlledCharacter.followedGameObject) {
                 lp.notif.success(`You no longer follow anyone`)
-                peer.unlockCall(this.controlledCharacter.followedGameObject.getData('userId'), true)
             }
 
             this.controlledCharacter.stopFollow()
-
             return
         }
 
         this.controlledCharacter.follow(this.getCharacter(user._id))
 
         lp.notif.success(`You are following ${user.profile.name}`)
-        peer.lockCall(user._id, true)
     },
 
     setUserInDoNotDisturbMode(enable) {
@@ -379,54 +374,6 @@ userManager = {
         }
 
         this.userMediaStates = undefined
-    },
-
-    onPeerDataReceived(dataReceived) {
-        const { emitter: emitterUserId, type, data } = dataReceived
-
-        const userEmitter = Meteor.users.findOne(emitterUserId)
-        if (!userEmitter) return
-
-        const meta = {}
-
-        if (type === 'audio') audioManager.playFromChunks(data)
-        else if (type === 'followed') {
-            peer.lockCall(emitterUserId)
-            lp.notif.warning(`${userEmitter.profile.name} is following you 👀`)
-        } else if (type === 'unfollowed') {
-            peer.unlockCall(emitterUserId)
-
-            const followedUserId = this.controlledCharacter.followedGameObject?.getData('userId')
-            if (followedUserId === emitterUserId) this.controlledCharacter.stopFollow()
-            else lp.notif.warning(`${userEmitter.profile.name} has finally stopped following you 🎉`)
-        } else if (type === 'text') {
-            const emitterPlayer = this.getCharacter(emitterUserId)
-            if (!emitterPlayer) return
-            if (!data.content) return
-
-            const { zoneLastSeenDates = [], zoneMuted = [] } = Meteor.user({
-                fields: { zoneMuted: 1, zoneLastSeenDates: 1 },
-            })
-            const userEmitterZoneId = zoneManager.currentZone(userEmitter)?._id
-            if (zoneLastSeenDates[userEmitterZoneId] && !zoneMuted[userEmitterZoneId])
-                audioManager.play('text-sound.wav', 0.5)
-
-            const popInIdentifier = `${emitterUserId}-pop-in`
-            meta['pop-in'] = characterPopIns.createOrUpdate(popInIdentifier, data.content, {
-                target: emitterPlayer,
-                className: messageReceived.style,
-                autoClose: messageReceived.duration,
-                parseURL: true,
-                classList: 'copy',
-                offset: characterPopInOffset,
-            })
-        }
-
-        window.dispatchEvent(
-            new CustomEvent(eventTypes.onPeerDataReceived, {
-                detail: { data: dataReceived, userEmitter, meta },
-            })
-        )
     },
 
     getCharacter(userId) {

@@ -103,7 +103,6 @@ Template.lemverse.onCreated(function () {
 
     window.addEventListener('beforeunload', () => {
         toggleUserProperty('shareScreen', false)
-        peer.destroy()
     })
 
     initAppColor()
@@ -159,8 +158,6 @@ Template.lemverse.onCreated(function () {
             const user = Meteor.user()
             if (!user) return
             if (user.profile.guest && !guestAllowed(permissionTypes.talkToUsers)) return
-
-            peer.createMyPeer()
         })
     })
 
@@ -170,9 +167,6 @@ Template.lemverse.onCreated(function () {
             const user = Meteor.user()
             if (!user) return
             if (user.profile.guest && !guestAllowed(permissionTypes.talkToUsers)) return
-
-            if (status === 'connected') peer.createMyPeer()
-            else peer.peerInstance?.disconnect()
         })
     })
 
@@ -235,10 +229,6 @@ Template.lemverse.onCreated(function () {
                 const meetingRoomService = meetingRoom.getMeetingRoomService()
                 if (user.profile.shareScreen) meetingRoomService.shareScreen()
                 else meetingRoomService.unshareScreen()
-            } else if (user.profile.shareScreen) {
-                await userStreams.createScreenStream()
-                userStreams.screen(true)
-                userProximitySensor.callProximityStartedForAllNearUsers()
             } else {
                 userStreams.screen(false)
             }
@@ -418,7 +408,6 @@ Template.lemverse.onCreated(function () {
                         removed: (user) => {
                             userManager.onDocumentRemoved(user)
                             userProximitySensor.removeNearUser(user)
-                            lp.defer(() => peer.close(user._id, 0, 'user-disconnected'))
                         },
                     })
                     if (onLoaded) onLoaded()
@@ -429,7 +418,6 @@ Template.lemverse.onCreated(function () {
 
             loadUsers(() => {
                 log('loading level: all users loaded')
-                peer.init()
 
                 // Load entities
                 log(`loading level: loading entities`)

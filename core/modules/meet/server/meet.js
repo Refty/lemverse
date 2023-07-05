@@ -1,8 +1,7 @@
 import * as jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 import { canAccessZone } from '../../../lib/misc'
-
-const { randomUUID } = require('crypto')
 
 const computeRoomName = (zone) => {
     check(zone._id, Match.Id)
@@ -11,7 +10,7 @@ const computeRoomName = (zone) => {
 
     let { uuid } = zone
     if (!uuid) {
-        uuid = randomUUID()
+        uuid = crypto.randomUUID()
         Zones.update(zone._id, { $set: { uuid } })
     }
 
@@ -50,7 +49,25 @@ const computeRoomToken = (user, roomName, moderator = false) => {
     )
 }
 
+const updateUserRoomName = (roomName) => {
+    const updateObject = roomName ? { $set: { 'meet.roomName': roomName } } : { $unset: { 'meet.roomName': 1 } }
+    Meteor.users.update(Meteor.userId(), updateObject)
+}
+
 Meteor.methods({
+    computeRoomToken(roomName) {
+        check(roomName, Match.Maybe(String))
+        const user = Meteor.user()
+        if (!user) return
+
+        log('computeRoomToken: start', { roomName })
+        const token = computeRoomToken(user, roomName)
+        log('computeRoomToken: end', { roomName })
+
+        return token
+    },
+
+    // Meet conference
     computeMeetRoomAccess(zoneId) {
         if (!this.userId) return undefined
         check(zoneId, Match.Id)
@@ -74,6 +91,49 @@ Meteor.methods({
         log('computeMeetRoomAccess: end', { roomName, token })
 
         return { roomName, token }
+    },
+
+    // Meet low level
+    updateUserRoomName(roomName) {
+        check(roomName, Match.Maybe(String))
+        const user = Meteor.user()
+        if (user.meet.roomName === roomName) return
+
+        log('updateUserRoomName: start', { roomName })
+        updateUserRoomName(roomName)
+        log('updateUserRoomName: end', { roomName })
+    },
+    getUserRoomName(userId) {
+        check(userId, Match.OneOf(null, Match.Id))
+        const user = Meteor.users.findOne({ _id: userId || Meteor.userId() }, { fields: { 'meet.roomName': 1 } })
+        if (!user) return
+
+        log('getUserRoomName: start', { userId: userId })
+        return user.meet?.roomName
+        log('getUserRoomName: end', { userId: userId })
+    },
+    computeMeetLowLevelRoomName(usersIds) {
+        if (!this.userId) return undefined
+        check(usersIds, Array)
+
+        log('computeMeetLowLevelRoomName: start', { usersIds })
+
+        const salt = Meteor.settings.meet.salt
+        const meetRoomName = usersIds
+            .sort((a, b) => a.localeCompare(b))
+            .join('-')
+            .toLowerCase()
+
+        const hmac = crypto.createHmac('sha1', salt)
+        hmac.setEncoding('base64')
+        hmac.write(meetRoomName)
+        hmac.end()
+        hashedMeetRoomName = hmac.read().toLowerCase()
+
+        updateUserRoomName(hashedMeetRoomName)
+        log('computeMeetLowLevelRoomName: end', { meetRoomName: hashedMeetRoomName })
+
+        return hashedMeetRoomName
     },
 })
 

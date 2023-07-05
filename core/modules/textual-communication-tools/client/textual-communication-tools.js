@@ -66,26 +66,13 @@ const onMenuOptionSelected = (e) => {
     }
 }
 
-const onPeerDataReceived = (e) => {
-    const { data, meta } = e.detail
-    if (data.type !== 'text') return
-    if (!meta['pop-in']) return
-
-    meta['pop-in'].on('click', () => {
-        if (!data.data.channel) return
-        openMessagingInterface(data.data.channel)
-    })
-}
-
 Template.textualCommunicationTools.onCreated(() => {
     messagesModule.init()
     window.addEventListener(eventTypes.onMenuOptionSelected, onMenuOptionSelected)
-    window.addEventListener(eventTypes.onPeerDataReceived, onPeerDataReceived)
 })
 
 Template.textualCommunicationTools.onDestroyed(() => {
     window.removeEventListener(eventTypes.onMenuOptionSelected, onMenuOptionSelected)
-    window.removeEventListener(eventTypes.onPeerDataReceived, onPeerDataReceived)
 })
 
 Template.textualCommunicationTools.helpers({

@@ -1,6 +1,6 @@
 import { guestAllowed, permissionTypes } from '../../lib/misc'
 
-const talking = () => !!peer.remoteStreamsByUsers.get().length
+const talking = () => Session.get('isLowLevelActive')
 
 Template.userPanel.onCreated(function () {
     if (Meteor.settings.public.features?.userPanel?.enabled === false) return

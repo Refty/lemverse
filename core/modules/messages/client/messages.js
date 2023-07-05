@@ -52,33 +52,6 @@ messagesModule = {
         Session.set('messagesChannel', channel) // set console in the new channel
     },
 
-    async sendWebRTCMessage(channel, content) {
-        try {
-            let showPopInOverEmitter = true
-            if (channel.includes('zon_')) {
-                // only show the pop-in over the character when the targeted channel is the active zone
-                const zone = zoneManager.currentZone(Meteor.user())
-                if (!zone || zone._id !== channel) return
-
-                await sendDataToUsersInZone('text', { content, channel }, Meteor.userId())
-            } else {
-                const userIds = userProximitySensor.filterNearUsers(channel.split(';'))
-                showPopInOverEmitter = !!userIds.length
-                await sendDataToUsers('text', { content, channel }, Meteor.userId(), userIds)
-            }
-
-            // simulate a message from himself to show a pop-in over user's head
-            if (showPopInOverEmitter)
-                userManager.onPeerDataReceived({
-                    emitter: Meteor.userId(),
-                    data: { content, channel },
-                    type: 'text',
-                })
-        } catch (err) {
-            if (err.message !== 'no-targets') lp.notif.error(err)
-        }
-    },
-
     async sendMessage(channel, content, file) {
         if (content.length >= messageMaxLength) throw new Error(`The message is too long (> ${messageMaxLength} chars)`)
         content = lp.purify(content).trim()
@@ -102,8 +75,6 @@ messagesModule = {
                 detail: { channel, messageId },
             })
         )
-
-        if (!channel.includes('qst_') && content.length) this.sendWebRTCMessage(channel, content)
 
         return messageId
     },

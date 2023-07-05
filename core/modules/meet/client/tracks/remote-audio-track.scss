@@ -1,0 +1,22 @@
+.remote-audio {
+    position: relative;
+
+    .mute {
+        position: absolute;
+        z-index: 10;
+        top: 5px;
+        right: 35px;
+        font-size: 24px;
+
+        div:nth-child(1) {
+            position: absolute;
+            z-index: 11;
+        }
+
+        div:nth-child(2) {
+            position: absolute;
+            z-index: 12;
+            transform: scale(0.65);
+        }
+    }
+}
