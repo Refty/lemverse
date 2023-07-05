@@ -1,8 +1,7 @@
 import * as jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 import { canAccessZone } from '../../../lib/misc'
-
-const { randomUUID } = require('crypto')
 
 const computeRoomName = (zone) => {
     check(zone._id, Match.Id)
@@ -11,7 +10,7 @@ const computeRoomName = (zone) => {
 
     let { uuid } = zone
     if (!uuid) {
-        uuid = randomUUID()
+        uuid = crypto.randomUUID()
         Zones.update(zone._id, { $set: { uuid } })
     }
 
@@ -104,15 +103,22 @@ Meteor.methods({
 
         log('computeMeetLowLevelRoomName: start', { usersIds })
 
+        const salt = Meteor.settings.meet.salt
         const meetRoomName = usersIds
             .sort((a, b) => a.localeCompare(b))
             .join('-')
             .toLowerCase()
-        updateUserRoomName(meetRoomName)
 
-        log('computeMeetLowLevelRoomName: end', { meetRoomName })
+        const hmac = crypto.createHmac('sha1', salt)
+        hmac.setEncoding('base64')
+        hmac.write(meetRoomName)
+        hmac.end()
+        hashedMeetRoomName = hmac.read().toLowerCase()
 
-        return meetRoomName
+        updateUserRoomName(hashedMeetRoomName)
+        log('computeMeetLowLevelRoomName: end', { meetRoomName: hashedMeetRoomName })
+
+        return hashedMeetRoomName
     },
 })
 

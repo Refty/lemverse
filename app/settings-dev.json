@@ -224,7 +224,8 @@
         "identifier": "",
         "iss": "",
         "keyid": "",
-        "sub": ""
+        "sub": "",
+        "salt": ""
     },
 
     "s3": {},
