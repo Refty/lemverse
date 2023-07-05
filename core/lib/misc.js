@@ -343,7 +343,7 @@ const getUserExtendedProfile = (user) => {
             baseline: undefined,
         }
 
-    if (canUseLevelFeature(user, "extendedProfile"))
+    if (canUseLevelFeature(user, 'extendedProfile'))
         return {
             name: user.profile.fullName || user.profile.name,
             baseline: user.profile.baseline,

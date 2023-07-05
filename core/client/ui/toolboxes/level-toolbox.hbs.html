@@ -85,7 +85,9 @@
                     <label for="extendedProfile">Extended profile :</label>
                     <select name="extended-profile" id="extended-profile" class="js-extended-profile-select select">
                         {{#each dropdownValues}}
-                        <option value="{{value}}" selected="{{#if eq extendedProfile value}}selected{{/if}}">{{label}}</option>
+                        <option value="{{value}}" selected="{{#if eq extendedProfile value}}selected{{/if}}">
+                            {{label}}
+                        </option>
                         {{/each}}
                     </select>
                 </div>

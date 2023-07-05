@@ -1,4 +1,11 @@
-import { canEditLevel, canModerateLevel, canModerateUser, canEditUserPermissions, getUserExtendedProfile, isLevelOwner } from '../../lib/misc'
+import {
+    canEditLevel,
+    canModerateLevel,
+    canModerateUser,
+    canEditUserPermissions,
+    getUserExtendedProfile,
+    isLevelOwner,
+} from '../../lib/misc'
 
 const userFields = {
     'status.online': 1,
@@ -58,7 +65,7 @@ Template.userListEntry.helpers({
     },
     showAllBaselines() {
         const extendedProfile = this.level.featuresPermissions?.extendedProfile
-        return !extendedProfile || extendedProfile === "enabled"
+        return !extendedProfile || extendedProfile === 'enabled'
     },
     levelOwner() {
         if (!this.level) return false
@@ -113,14 +120,15 @@ Template.userList.helpers({
         return Template.instance().currentLevel
     },
     title() {
-        return "Users online"
+        return 'Users online'
     },
     users() {
-        return users().fetch().sort(sortUserList).map(
-            user => {
+        return users()
+            .fetch()
+            .sort(sortUserList)
+            .map((user) => {
                 user.profile = getUserExtendedProfile(user)
                 return user
-            }
-        )
+            })
     },
 })

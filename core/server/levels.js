@@ -69,7 +69,7 @@ Meteor.methods({
                 { sendVocal: String },
                 { sendLove: String },
                 { sendText: String },
-                { extendedProfile: String},
+                { extendedProfile: String }
             )
         )
 

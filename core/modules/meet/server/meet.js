@@ -25,7 +25,8 @@ const computeRoomToken = (user, roomName, moderator = false) => {
     if (user.roles?.admin) group = 'admin'
     else if (moderator) group = 'moderator'
 
-    const { algorithm, enableAuth, encryptionPassphrase, expiresIn, notBefore, keyid, identifier, iss, sub } = Meteor.settings.meet
+    const { algorithm, enableAuth, encryptionPassphrase, expiresIn, notBefore, keyid, identifier, iss, sub } =
+        Meteor.settings.meet
     if (!enableAuth) return undefined
 
     return jwt.sign(

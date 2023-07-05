@@ -16,16 +16,16 @@ const zoneAnimations = {
 }
 
 const teleportUserOutsideZone = (user, zone) => {
-    const direction = user.profile.direction
-    const position = {x: user.profile.x, y: user.profile.y}
+    const { direction } = user.profile
+    const position = { x: user.profile.x, y: user.profile.y }
     const offset = 100
-    if (direction === "down") {
+    if (direction === 'down') {
         position.y = zone.y1 - offset
-    } else if (direction === "up") {
+    } else if (direction === 'up') {
         position.y = zone.y2 + offset
-    } else if (direction === "left") {
+    } else if (direction === 'left') {
         position.x = zone.x2 + offset
-    } else if (direction === "right") {
+    } else if (direction === 'right') {
         position.x = zone.x1 - offset
     }
     userManager.teleportMainUser(position.x, position.y)

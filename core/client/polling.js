@@ -16,8 +16,7 @@ const usersPollDiff = (oldUsers, newUsers, methods) => {
         if (newUser._id === Meteor.userId()) newUser = Meteor.user()
         LocalUsers.upsert({ _id: newUser._id }, { $set: newUser })
         const oldUser = oldUsers.find((user) => user._id === newUser._id)
-        if (oldUser && !_.isEqual(oldUser, newUser))
-            methods.changed(newUser, oldUser)
+        if (oldUser && !_.isEqual(oldUser, newUser)) methods.changed(newUser, oldUser)
         else if (!oldUser) methods.added(newUser)
     })
 

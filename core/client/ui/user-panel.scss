@@ -23,11 +23,11 @@
             .buttons {
                 background-color: rgba($main-color, 0.4);
             }
-            
+
             .zoom-control {
-               position: fixed;
-               left:10px;
-               background-color: $main-color;
+                position: fixed;
+                left: 10px;
+                background-color: $main-color;
             }
         }
     }
@@ -35,8 +35,8 @@
     @media screen and (max-width: 458px) {
         .zoom-control {
             position: fixed;
-            left:10px;
-         }
+            left: 10px;
+        }
     }
 
     @media screen and (max-width: 400px) {
@@ -92,19 +92,18 @@
             font-size: 18px;
             font-weight: 900;
             line-height: 18px;
-            
+
             @media (hover: hover) {
                 &:hover {
                     color: $main-color;
                 }
             }
-            
+
             @media screen and (max-width: 850px) {
                 height: 16px;
                 width: 16px;
                 padding: 0;
             }
-            
         }
     }
 
@@ -144,7 +143,9 @@
             }
         }
 
-        &.audio:not(.active)::before, &.video:not(.active)::before, &.screen:not(.active)::before {
+        &.audio:not(.active)::before,
+        &.video:not(.active)::before,
+        &.screen:not(.active)::before {
             content: '\\';
             position: absolute;
             color: $main-color;

@@ -42,7 +42,7 @@ Template.settingsBasic.onCreated(function () {
 
 Template.settingsBasic.helpers({
     canSetExtendedProfile() {
-        return canUseLevelFeature(Meteor.user(), "extendedProfile")
+        return canUseLevelFeature(Meteor.user(), 'extendedProfile')
     },
     fieldUpdated() {
         return Template.instance().hasUpdates.get()

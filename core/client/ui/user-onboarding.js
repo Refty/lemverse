@@ -31,9 +31,8 @@ const updateSettingsStream = async (template) => {
     if (!stream) {
         lp.notif.error(`unable to get a valid stream`)
         return
-    } else {
-        Session.set('streamAccepted', true)
     }
+    Session.set('streamAccepted', true)
 
     const { mics, cams } = await userStreams.enumerateDevices()
 
@@ -85,13 +84,11 @@ Template.permissionsModal.events({
 
 Template.permissionsModal.helpers({
     browserName: () => {
-        const userAgent = navigator.userAgent
+        const { userAgent } = navigator
 
-        if (userAgent.match(/chrome|chromium|crios/i))
-            return "chrome"
-        if (userAgent.match(/safari/i))
-            return "safari"
-        return "other"
+        if (userAgent.match(/chrome|chromium|crios/i)) return 'chrome'
+        if (userAgent.match(/safari/i)) return 'safari'
+        return 'other'
     },
 })
 

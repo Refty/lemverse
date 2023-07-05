@@ -1,12 +1,12 @@
 import hotkeys from 'hotkeys-js'
 import Phaser from 'phaser'
+import { Crisp } from 'crisp-sdk-web'
 import meetingRoom from './meeting-room'
 import { setReaction, getHslFromHex, updateFollowOffset } from './helpers'
 import URLOpener from './url-opener'
 import { guestAllowed, permissionTypes } from '../lib/misc'
 import initSentryClient from './sentry'
 import { usersPollDiff, Polling } from './polling'
-import { Crisp } from 'crisp-sdk-web'
 
 initSentryClient()
 

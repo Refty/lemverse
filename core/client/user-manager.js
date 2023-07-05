@@ -245,12 +245,12 @@ userManager = {
         if (nippleMoving) this.inputVector.set(nippleData.vector.x, -nippleData.vector.y)
         else {
             // Horizontal movement
-            if (hotkeys.isPressed("left") || hotkeys.isPressed("q") || hotkeys.isPressed("a")) this.inputVector.x = -1
-            else if (hotkeys.isPressed("right") || hotkeys.isPressed("d")) this.inputVector.x = 1
+            if (hotkeys.isPressed('left') || hotkeys.isPressed('q') || hotkeys.isPressed('a')) this.inputVector.x = -1
+            else if (hotkeys.isPressed('right') || hotkeys.isPressed('d')) this.inputVector.x = 1
 
             // Vertical movement
-            if (hotkeys.isPressed("up") || hotkeys.isPressed("z") || hotkeys.isPressed("w")) this.inputVector.y = -1
-            else if (hotkeys.isPressed("down") || hotkeys.isPressed("s")) this.inputVector.y = 1
+            if (hotkeys.isPressed('up') || hotkeys.isPressed('z') || hotkeys.isPressed('w')) this.inputVector.y = -1
+            else if (hotkeys.isPressed('down') || hotkeys.isPressed('s')) this.inputVector.y = 1
         }
 
         const moving = this.inputVector.x !== 0 || this.inputVector.y !== 0
@@ -266,7 +266,7 @@ userManager = {
         if (!this.controlledCharacter) return
 
         this.handleUserInputs()
-        this.controlledCharacter.running = hotkeys.isPressed("shift")
+        this.controlledCharacter.running = hotkeys.isPressed('shift')
         this.controlledCharacter.moveDirection = this.inputVector
 
         if (peer.isEnabled() && !Session.get('menu')) {
