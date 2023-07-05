@@ -55,6 +55,19 @@ const updateUserRoomName = (roomName) => {
 }
 
 Meteor.methods({
+    computeRoomToken(roomName) {
+        check(roomName, Match.Maybe(String))
+        const user = Meteor.user()
+        if (!user) return
+
+        log('computeRoomToken: start', { roomName })
+        const token = computeRoomToken(user, roomName)
+        log('computeRoomToken: end', { roomName })
+
+        return token
+    },
+
+    // Meet conference
     computeMeetRoomAccess(zoneId) {
         if (!this.userId) return undefined
         check(zoneId, Match.Id)
@@ -79,6 +92,8 @@ Meteor.methods({
 
         return { roomName, token }
     },
+
+    // Meet low level
     updateUserRoomName(roomName) {
         check(roomName, Match.Maybe(String))
         const user = Meteor.user()

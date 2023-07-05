@@ -228,53 +228,59 @@ const onUserPropertyUpdated = async (e, template) => {
  ** LowMeetJs
  */
 
-const DOMAIN = '8x8.vc'
-const getOptions = () => ({
-    // Connection
-    hosts: {
-        domain: DOMAIN,
-        muc: `conference.${DOMAIN}`,
-        focus: `focus.${DOMAIN}`,
-    },
-    serviceUrl: `wss://${DOMAIN}/xmpp-websocket?room=${meetLowLevel.roomName}`,
-    websocketKeepAliveUrl: `https://${DOMAIN}/_unlock?room=${meetLowLevel.roomName}`,
+const getOptions = () => {
+    const serverURL = Meteor.settings.public.meet.serverURL
 
-    // Enable Peer-to-Peer for 1-1 calls
-    p2p: {
-        enabled: false,
-    },
+    if (!serverURL) return
+    const [domain, sub] = serverURL.split('/')
 
-    // Video quality / constraints
-    constraints: {
-        video: {
-            height: {
-                ideal: 720,
-                max: 720,
-                min: 180,
-            },
-            width: {
-                ideal: 1280,
-                max: 1280,
-                min: 320,
+    return {
+        // Connection
+        hosts: {
+            domain: serverURL,
+            muc: `conference.${sub}.${domain}`,
+            focus: `focus.${domain}`,
+        },
+        serviceUrl: `wss://${serverURL}/xmpp-websocket?room=${meetLowLevel.roomName}`,
+        websocketKeepAliveUrl: `https://${serverURL}/_unlock?room=${meetLowLevel.roomName}`,
+
+        // Enable Peer-to-Peer for 1-1 calls
+        p2p: {
+            enabled: false,
+        },
+
+        // Video quality / constraints
+        constraints: {
+            video: {
+                height: {
+                    ideal: 720,
+                    max: 720,
+                    min: 180,
+                },
+                width: {
+                    ideal: 1280,
+                    max: 1280,
+                    min: 320,
+                },
             },
         },
-    },
-    channelLastN: 25,
+        channelLastN: 25,
 
-    // Logging
-    logging: {
-        // Default log level
-        defaultLogLevel: 'trace',
+        // Logging
+        logging: {
+            // Default log level
+            defaultLogLevel: 'trace',
 
-        // The following are too verbose in their logging with the default level
-        'modules/RTC/TraceablePeerConnection.js': 'info',
-        'modules/statistics/CallStats.js': 'info',
-        'modules/xmpp/strophe.util.js': 'log',
-    },
+            // The following are too verbose in their logging with the default level
+            'modules/RTC/TraceablePeerConnection.js': 'info',
+            'modules/statistics/CallStats.js': 'info',
+            'modules/xmpp/strophe.util.js': 'log',
+        },
 
-    // End marker, disregard
-    __end: true,
-})
+        // End marker, disregard
+        __end: true,
+    }
+}
 
 export const meetLowLevel = {
     connectionStarted: false,
@@ -305,20 +311,22 @@ export const meetLowLevel = {
                 })
                 .catch((err) => console.error('An error occured while creating local tracks', err))
 
-            const connection = new jitsiMeetJS.JitsiConnection(null, null, options)
+            Meteor.call('computeRoomToken', this.roomName, (err, token) => {
+                const connection = new jitsiMeetJS.JitsiConnection(null, token, options)
 
-            connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, () => {
-                this.onConnectionSuccess()
-            })
-            connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_FAILED, () => {
-                this.onConnectionFailed()
-            })
-            connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, () => {
-                this.onConnectionDisconnected()
-            })
+                connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, () => {
+                    this.onConnectionSuccess()
+                })
+                connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_FAILED, () => {
+                    this.onConnectionFailed()
+                })
+                connection.addEventListener(jitsiMeetJS.events.connection.CONNECTION_DISCONNECTED, () => {
+                    this.onConnectionDisconnected()
+                })
 
-            connection.connect()
-            this.template.connection.set(connection)
+                connection.connect()
+                this.template.connection.set(connection)
+            })
         }
     },
 
