@@ -23,7 +23,7 @@ const updateLevel = (name, spawnPosition, featuresPermissions = {}) => {
     })
 }
 
-const getFeaturesPermissions = () => currentLevel(Meteor.user()).featuresPermissions || {}
+const getFeaturesPermissions = () => currentLevel(Meteor.user())?.featuresPermissions || {}
 const updateFeaturePermissionLevel = (permission, event) => {
     const level = currentLevel(Meteor.user())
 
