@@ -28,13 +28,8 @@ Accounts.validateNewUser(() => true)
 Accounts.onLogin((param) => {
     const user = Meteor.users.findOne(param.user._id)
 
-    if (user.profile.meetRoomName) {
-        Meteor.users.update(user._id, {
-            $unset: {
-                'profile.meetRoomName': 1,
-            },
-        })
-    }
+    // We should be sure that user room name is reset on login
+    Meteor.call('updateUserRoomName', undefined)
 
     log('onLogin: start', {
         userId: user._id,

@@ -125,26 +125,25 @@ const onUsersComeCloser = (e, template) => {
 
     if (jitsiMeetJS && !template.connection.get() && !meetLowLevel.connectionStarted) {
         meetLowLevel.connectionStarted = true
-        const roomName = users[0]?.profile?.meetRoomName
 
-        if (!roomName) {
-            const usersIds = users.map((user) => user._id).concat(Meteor.userId())
-            Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, computedRoomName) => {
-                if (!computedRoomName) {
-                    lp.notif.error('Unable to load a room, please try later')
-                    return
-                }
+        Meteor.call('getUserRoomName', users[0]._id, (err, roomName) => {
+            if (!roomName) {
+                const usersIds = users.map((user) => user._id).concat(Meteor.userId())
+                Meteor.call('computeMeetLowLevelRoomName', usersIds, (err, computedRoomName) => {
+                    if (!computedRoomName) {
+                        lp.notif.error('Unable to load a room, please try later')
+                        return
+                    }
 
-                meetLowLevel.roomName = computedRoomName
+                    meetLowLevel.roomName = computedRoomName
+                    meetLowLevel.connect()
+                })
+            } else {
+                meetLowLevel.roomName = roomName
+                Meteor.call('updateUserRoomName', roomName)
                 meetLowLevel.connect()
-            })
-        } else {
-            meetLowLevel.roomName = roomName
-            Meteor.users.update(Meteor.userId(), {
-                $set: { 'profile.meetRoomName': roomName },
-            })
-            meetLowLevel.connect()
-        }
+            }
+        })
     }
 
     users.forEach((user) => {
@@ -277,7 +276,7 @@ const getOptions = () => ({
     __end: true,
 })
 
-meetLowLevel = {
+export const meetLowLevel = {
     connectionStarted: false,
     room: undefined,
     roomName: undefined,
@@ -325,10 +324,7 @@ meetLowLevel = {
 
     async disconnect() {
         this.connectionStarted = false
-        Meteor.users.update(Meteor.userId(), {
-            $unset: { 'profile.meetRoomName': 1 },
-        })
-
+        Meteor.call('updateUserRoomName', undefined)
         if (this.room?.room) {
             try {
                 this.room.leave()

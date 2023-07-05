@@ -50,6 +50,11 @@ const computeRoomToken = (user, roomName, moderator = false) => {
     )
 }
 
+const updateUserRoomName = (roomName) => {
+    const updateObject = roomName ? { $set: { 'meet.roomName': roomName } } : { $unset: { 'meet.roomName': 1 } }
+    Meteor.users.update(Meteor.userId(), updateObject)
+}
+
 Meteor.methods({
     computeMeetRoomAccess(zoneId) {
         if (!this.userId) return undefined
@@ -75,9 +80,26 @@ Meteor.methods({
 
         return { roomName, token }
     },
+    updateUserRoomName(roomName) {
+        check(roomName, Match.Maybe(String))
+        const user = Meteor.user()
+        if (user.meet.roomName === roomName) return
+
+        log('updateUserRoomName: start', { roomName })
+        updateUserRoomName(roomName)
+        log('updateUserRoomName: end', { roomName })
+    },
+    getUserRoomName(userId) {
+        check(userId, Match.OneOf(null, Match.Id))
+        const user = Meteor.users.findOne({ _id: userId || Meteor.userId() }, { fields: { 'meet.roomName': 1 } })
+        if (!user) return
+
+        log('getUserRoomName: start', { userId: userId })
+        return user.meet?.roomName
+        log('getUserRoomName: end', { userId: userId })
+    },
     computeMeetLowLevelRoomName(usersIds) {
         if (!this.userId) return undefined
-
         check(usersIds, Array)
 
         log('computeMeetLowLevelRoomName: start', { usersIds })
@@ -86,12 +108,9 @@ Meteor.methods({
             .sort((a, b) => a.localeCompare(b))
             .join('-')
             .toLowerCase()
+        updateUserRoomName(meetRoomName)
 
-        Meteor.users.update(Meteor.userId(), {
-            $set: { 'profile.meetRoomName': meetRoomName },
-        })
-
-        log('computeMeetLowLevelRoomName: start', { meetRoomName })
+        log('computeMeetLowLevelRoomName: end', { meetRoomName })
 
         return meetRoomName
     },

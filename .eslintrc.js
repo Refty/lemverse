@@ -87,7 +87,6 @@ module.exports = {
         layers: 'writable',
         settings: 'writable',
         meet: 'writable',
-        meetLowLevel: 'writable',
         meetHighLevel: 'writable',
         jitsiMeetJS: 'writable',
         zoneManager: 'writable',
