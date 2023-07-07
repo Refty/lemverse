@@ -1,4 +1,4 @@
-import { getTrackType, updateTrack, attachLocalTracks, replaceLocalTrack } from './tracks/utils'
+import { getTrackType, toggleTrackMuteState, attachLocalTrack, replaceLocalTrack } from './tracks/utils'
 
 window.addEventListener('DOMContentLoaded', () => {
     jitsiMeetJS = undefined
@@ -29,29 +29,129 @@ Template.meetLowLevel.onCreated(function () {
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ fields: { 'profile.videoRecorder': 1 } })
+        const user = Meteor.user({ fields: { 'profile.videoRecorder': 1, 'profile.shareVideo': 1 } })
+        console.log('🚀 ------------------------------------------------------------🚀')
+        console.log('🚀 - file: meet-low-level.js:33 - this.autorun - user:', user)
+        console.log('🚀 ------------------------------------------------------------🚀')
 
-        if (!user || !jitsiMeetJS) return
-        jitsiMeetJS
-            .createLocalTracks({
-                devices: ['video'],
-                cameraDeviceId: user?.profile?.videoRecorder,
+        console.log('AUTORUN VIDEO')
+        if (!jitsiMeetJS || !this.connection.get()) return
+
+        const localTracks = this.localTracks.get()
+        const videoTrack = localTracks?.find(
+            (track) => track.getType() === 'video' && track.getVideoType() === 'camera'
+        )
+
+        // Create video track if it doesn't exist yet
+        if (
+            (!videoTrack || (videoTrack && videoTrack.getDeviceId() !== user?.profile?.videoRecorder)) &&
+            user?.profile?.shareVideo
+        ) {
+            console.log('CREATE IT')
+            createLocalTrack('video', { cameraDeviceId: user?.profile?.videoRecorder }).then((newTrack) => {
+                if (!videoTrack) {
+                    console.log('ADD IT')
+                    user?.profile?.shareVideo ? newTrack.unmute() : newTrack.mute()
+                    attachLocalTrack(newTrack)
+
+                    meetLowLevel.room.addTrack(newTrack)
+                    this.localTracks.set([...localTracks, newTrack])
+                } else if (videoTrack.getDeviceId() !== user?.profile?.videoRecorder) {
+                    console.log('REPLACE IT')
+                    // replaceLocalTrack(this, newTrack)
+
+                    this.template.localTracks.set(
+                        this.localTracks.get().map((mapTrack) => {
+                            console.log('🚀 --------------------------------------------------------🚀')
+                            console.log('🚀 - file: utils.js:56 - localTracks.map - track:', track)
+                            console.log('🚀 --------------------------------------------------------🚀')
+                            if (mapTrack.getType() === newTrack.getType()) {
+                                // Replace old tracks by the new one
+                                meetLowLevel.room.replaceTrack(mapTrack, newTrack)
+                                // track.dispose().then(() => console.log('ON DISPOSE'))
+                                attachLocalTrack(newTrack)
+                                return newTrack
+                            }
+
+                            return mapTrack
+                        })
+                    )
+                }
             })
-            .then((tracks) => replaceLocalTrack(this, tracks[0]))
-            .catch((err) => console.error('An error occured while creating local tracks', err))
+            // Else if current video track device differs from the new settings, replace it
+        } else if (videoTrack) {
+            console.log('TOGGLE IT')
+            if (user?.profile?.shareVideo && videoTrack.isMuted()) {
+                console.log('UNMUTE IT')
+                videoTrack.unmute()
+            } else if (!user?.profile?.shareVideo && !videoTrack.isMuted()) {
+                console.log('MUTE IT')
+                videoTrack.mute()
+            }
+        }
     })
 
     this.autorun(() => {
-        const user = Meteor.user({ fields: { 'profile.audioRecorder': 1 } })
+        const user = Meteor.user({ fields: { 'profile.audioRecorder': 1, 'profile.shareAudio': 1 } })
 
-        if (!user || !jitsiMeetJS) return
-        jitsiMeetJS
-            .createLocalTracks({
-                devices: ['audio'],
-                micDeviceId: user?.profile?.audioRecorder,
+        console.log('🚀 ------------------------------------------------------------🚀')
+        console.log('🚀 - file: meet-low-level.js:33 - this.autorun - user:', user)
+        console.log('🚀 ------------------------------------------------------------🚀')
+
+        console.log('AUTORUN AUDIO')
+        if (!jitsiMeetJS || !this.connection.get()) return
+
+        const localTracks = this.localTracks.get()
+        const audioTrack = localTracks?.find((track) => track.getType() === 'audio')
+
+        // Create audio track if it doesn't exist yet
+        if (
+            (!audioTrack || (audioTrack && audioTrack.getDeviceId() !== user?.profile?.audioRecorder)) &&
+            user?.profile?.shareAudio
+        ) {
+            console.log('CREATE IT')
+            createLocalTrack('audio', { micDeviceId: user?.profile?.audioRecorder }).then((newTrack) => {
+                console.log('🚀 -------------------------------------------------------------------------🚀')
+                console.log('🚀 - file: meet-low-level.js:126 - createLocalTrack - newTrack:', newTrack)
+                console.log('🚀 -------------------------------------------------------------------------🚀')
+                if (!audioTrack) {
+                    console.log('ADD IT')
+                    user?.profile?.shareAudio ? newTrack.unmute() : newTrack.mute()
+                    attachLocalTrack(newTrack)
+
+                    meetLowLevel.room.addTrack(newTrack)
+                    this.localTracks.set([newTrack])
+                } else if (audioTrack.getDeviceId() !== user?.profile?.audioRecorder) {
+                    console.log('REPLACE IT')
+                    this.template.localTracks.set(
+                        this.localTracks.get().map((mapTrack) => {
+                            console.log('🚀 --------------------------------------------------------🚀')
+                            console.log('🚀 - file: utils.js:56 - localTracks.map - track:', track)
+                            console.log('🚀 --------------------------------------------------------🚀')
+                            if (mapTrack.getType() === newTrack.getType()) {
+                                // Replace old tracks by the new one
+                                meetLowLevel.room.replaceTrack(mapTrack, newTrack)
+                                // track.dispose().then(() => console.log('ON DISPOSE'))
+                                attachLocalTrack(newTrack)
+                                return newTrack
+                            }
+
+                            return mapTrack
+                        })
+                    )
+                }
             })
-            .then((tracks) => replaceLocalTrack(this, tracks[0]))
-            .catch((err) => console.error('An error occured while creating local tracks', err))
+            // Else if current audio track device differs from the new settings, replace it
+        } else if (audioTrack) {
+            console.log('TOGGLE IT')
+            if (user?.profile?.shareAudio && audioTrack.isMuted()) {
+                console.log('UNMUTE IT')
+                audioTrack.unmute()
+            } else if (!user?.profile?.shareAudio && !audioTrack.isMuted()) {
+                console.log('MUTE IT')
+                audioTrack.mute()
+            }
+        }
     })
 
     this.autorun(() => {
@@ -62,13 +162,13 @@ Template.meetLowLevel.onCreated(function () {
 
     window.addEventListener(eventTypes.onUsersComeCloser, (e) => onUsersComeCloser(e, this))
     window.addEventListener(eventTypes.onUsersMovedAway, (e) => onUsersMovedAway(e, this))
-    window.addEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
+    // window.addEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
 })
 
 Template.meetLowLevel.onDestroyed(() => {
     window.removeEventListener(eventTypes.onUsersComeCloser, (e) => onUsersComeCloser(e, this))
     window.removeEventListener(eventTypes.onUsersMovedAway, (e) => onUsersMovedAway(e, this))
-    window.removeEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
+    // window.removeEventListener(eventTypes.onUserPropertyUpdated, (e) => onUserPropertyUpdated(e, this))
 })
 
 Template.meetLowLevel.helpers({
@@ -83,7 +183,18 @@ Template.meetLowLevel.helpers({
     },
     remoteTracks() {
         // Check a better way to remove undefined tracks
-        return Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio && track.camera)
+        console.log(
+            '🚀 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------🚀'
+        )
+        console.log(
+            '🚀 - file: meet-low-level.js:108 - remoteTracks - Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio && track.camera):',
+            Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio || track.camera)
+        )
+        console.log(
+            '🚀 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------🚀'
+        )
+
+        return Object.values(Template.instance().remoteTracks.get()).filter((track) => track.audio || track.camera)
     },
     isLocalVideoActive() {
         const user = Meteor.user({ fields: { 'profile.shareVideo': 1 } })
@@ -162,6 +273,10 @@ const onUsersComeCloser = (e, template) => {
 const onUsersMovedAway = (e, template) => {
     const { users } = e.detail
 
+    console.log('🚀 -----------------------------------------------------------------------------------------🚀')
+    console.log('🚀 - onUsersMovedAway')
+    console.log('🚀 -----------------------------------------------------------------------------------------🚀')
+
     users.forEach((user) => {
         if (meetLowLevel.usersInCall[user._id]) {
             const duration = (Date.now() - meetLowLevel.usersInCall[user._id].callStartDate) / 1000
@@ -186,9 +301,9 @@ const onUserPropertyUpdated = async (e, template) => {
     if (!localTracks || localTracks.length === 0 || !propertyName) return
 
     if (propertyName === 'shareAudio') {
-        updateTrack('audio', localTracks)
+        toggleTrackMuteState('audio', localTracks)
     } else if (propertyName === 'shareVideo') {
-        updateTrack('video', localTracks)
+        toggleTrackMuteState('video', localTracks)
     } else if (propertyName === 'shareScreen') {
         if (propertyValue) {
             await jitsiMeetJS.createLocalTracks({ devices: ['desktop'] }).then((tracks) => {
@@ -213,6 +328,7 @@ const onUserPropertyUpdated = async (e, template) => {
             const filteredLocalTracks = localTracks.filter((track) => {
                 // While we remove the desktop track, we dispose it at the same time
                 if (track.getVideoType() === 'desktop') {
+                    console.log('ON DISPOSE DESKTOP')
                     track.dispose()
                     return false
                 }
@@ -282,6 +398,18 @@ const getOptions = () => {
     }
 }
 
+const createLocalTrack = async (device, options) => {
+    const track = await jitsiMeetJS
+        .createLocalTracks({
+            ...options,
+            devices: [device],
+        })
+        .then((tracks) => tracks[0])
+        .catch((err) => console.error('An error occured while creating local tracks', err))
+
+    return track
+}
+
 export const meetLowLevel = {
     connectionStarted: false,
     room: undefined,
@@ -297,19 +425,19 @@ export const meetLowLevel = {
             jitsiMeetJS.init(options)
             jitsiMeetJS.setLogLevel(jitsiMeetJS.logLevels.ERROR)
 
-            await jitsiMeetJS
-                .createLocalTracks({
-                    devices: ['audio', 'video'],
-                    cameraDeviceId: user?.profile?.videoRecorder,
-                    micDeviceId: user?.profile?.audioRecorder,
-                })
-                .then((tracks) => {
-                    updateTrack('video', tracks)
-                    updateTrack('audio', tracks)
-                    attachLocalTracks(tracks)
-                    this.template.localTracks.set(tracks)
-                })
-                .catch((err) => console.error('An error occured while creating local tracks', err))
+            // await jitsiMeetJS
+            //     .createLocalTracks({
+            //         devices: ['audio', 'video'],
+            //         cameraDeviceId: user?.profile?.videoRecorder,
+            //         micDeviceId: user?.profile?.audioRecorder,
+            //     })
+            //     .then((tracks) => {
+            //         updateTrack('video', tracks)
+            //         updateTrack('audio', tracks)
+            //         attachLocalTracks(tracks)
+            //         this.template.localTracks.set(tracks)
+            //     })
+            //     .catch((err) => console.error('An error occured while creating local tracks', err))
 
             Meteor.call('computeRoomToken', this.roomName, (err, token) => {
                 const connection = new jitsiMeetJS.JitsiConnection(null, token, options)
@@ -331,6 +459,19 @@ export const meetLowLevel = {
     },
 
     async disconnect() {
+        const connection = this.template.connection.get()
+
+        for (const track of this.template.localTracks.get()) {
+            console.log('track', track, track.isMuted())
+            await track.unmute()
+            console.log('🚀 ---------------------------------------------------------------------------------🚀')
+            console.log('🚀 - file: meet-low-level.js:419 - disconnect - track.isMuted():', track.isMuted())
+            console.log('🚀 ---------------------------------------------------------------------------------🚀')
+            console.log('IS UNMUTE')
+            await track.dispose()
+            console.log('IS DISPOSED')
+        }
+
         this.connectionStarted = false
         Meteor.call('updateUserRoomName', undefined)
         if (this.room?.room) {
@@ -341,7 +482,15 @@ export const meetLowLevel = {
             }
         }
 
-        const connection = this.template.connection.get()
+        console.log('ET LA ON AVANCE')
+
+        this.template.localTracks.set([])
+        this.template.remoteTracks.set({})
+
+        this.usersInCall = []
+        toggleUserProperty('shareScreen', false)
+        toggleUserProperty('shareVideo', false)
+        toggleUserProperty('shareAudio', false)
 
         connection.disconnect()
         connection.removeEventListener(jitsiMeetJS.events.connection.CONNECTION_ESTABLISHED, () => {
@@ -356,6 +505,14 @@ export const meetLowLevel = {
 
         this.room = undefined
         this.template.connection.set(undefined)
+
+        console.log(
+            'this',
+            this,
+            this.template.connection.get(),
+            this.template.localTracks.get(),
+            this.template.remoteTracks.get()
+        )
     },
 
     getCallCount() {
@@ -366,6 +523,7 @@ export const meetLowLevel = {
      **  LowMeetJs events listeners
      */
     onTrackAdded(track) {
+        console.log('LAAAA IL A ADD', track)
         // Since we attach local tracks separately, we do not need attach it again
         if (track.isLocal()) return
 
@@ -388,6 +546,17 @@ export const meetLowLevel = {
             _remoteTracks[participantId][getTrackType(track)] = track
             this.template.remoteTracks.set(_remoteTracks)
         }
+
+        console.log(
+            '🚀 ---------------------------------------------------------------------------------------------------------🚀'
+        )
+        console.log(
+            '🚀 - file: meet-low-level.js:489 - onTrackAdded - this.template.remoteTracks:',
+            this.template.remoteTracks.get()
+        )
+        console.log(
+            '🚀 ---------------------------------------------------------------------------------------------------------🚀'
+        )
     },
 
     onTrackRemoved(track) {
@@ -430,16 +599,22 @@ export const meetLowLevel = {
 
         if (!this.room) {
             this.room = this.template.connection.get().initJitsiConference(this.roomName, {})
-            const _localTracks = this.template.localTracks.get()
+            // const _localTracks = this.template.localTracks.get()
 
-            // Add local tracks before joining
-            for (let i = 0; i < _localTracks.length; i++) {
-                this.room.addTrack(_localTracks[i])
-            }
+            // // Add local tracks before joining
+            // for (let i = 0; i < _localTracks.length; i++) {
+            //     this.room.addTrack(_localTracks[i])
+            // }
 
             // Setup event listeners
             this.room.on(jitsiMeetJS.events.conference.TRACK_ADDED, (track) => this.onTrackAdded(track))
-            this.room.on(jitsiMeetJS.events.conference.TRACK_REMOVED, (track) => this.onTrackRemoved(track))
+            this.room.on(jitsiMeetJS.events.conference.TRACK_REMOVED, (track) => {
+                console.log('TRACK REMOVED')
+                if (track.isLocal()) return
+                console.log('TRACK REMOVED AND NOT LOCAL')
+
+                this.onTrackRemoved(track)
+            })
             this.room.on(jitsiMeetJS.events.conference.CONFERENCE_JOINED, () => {
                 this.onConferenceJoined()
             })
@@ -465,16 +640,5 @@ export const meetLowLevel = {
 
     onConnectionDisconnected() {
         console.log('connection disconnected')
-
-        const _localTracks = this.template.localTracks.get()
-
-        for (let i = 0; i < _localTracks.length; i++) {
-            _localTracks[i].dispose()
-        }
-
-        this.template.localTracks.set([])
-        this.template.remoteTracks.set({})
-        this.usersInCall = []
-        toggleUserProperty('shareScreen', false)
     },
 }

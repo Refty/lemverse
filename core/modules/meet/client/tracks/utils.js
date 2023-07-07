@@ -13,41 +13,59 @@ const getTrackType = (track) => {
 
 const getTrackId = (track) => `${track.getParticipantId()}-${getTrackType(track)}`
 
-const updateTrack = (type, tracks) => {
-    if (!Meteor.userId()) return
+const toggleTrackMuteState = (track) => {
+    if (!Meteor.userId() || !track) return
 
     const user = Meteor.user({ fields: { 'profile.shareAudio': 1, 'profile.shareVideo': 1 } })
-    const track = tracks.find((t) => t.getType() === type)
 
-    if (!track) return
-    if (type === 'audio') user?.profile?.shareAudio ? track.unmute() : track.mute()
-    else if (type === 'video') user?.profile?.shareVideo ? track.unmute() : track.mute()
+    if (
+        (track.getType() === 'audio' && user?.profile?.shareAudio) ||
+        (track.getType() === 'video' && user?.profile?.shareVideo)
+    ) {
+        track.unmute()
+    } else {
+        track.mute()
+    }
 }
 
-const attachLocalTracks = (tracks) => {
+const attachLocalTrack = (track) => {
+    if (track.getType() === 'video') {
+        const videoNode = document.querySelector('#video-stream-me')
+        track.attach(videoNode)
+    }
+}
+
+const detachLocalTracks = (tracks) => {
     tracks.forEach((track) => {
         if (track.getType() === 'video') {
             const videoNode = document.querySelector('#video-stream-me')
-            track.attach(videoNode)
+            track.detach(videoNode)
         }
     })
 }
 
 const replaceLocalTrack = (template, newTrack) => {
     const localTracks = template.localTracks.get()
+    console.log('🚀 ----------------------------------------------------------------------🚀')
+    console.log('🚀 - file: utils.js:55 - replaceLocalTrack - localTracks:', localTracks)
+    console.log('🚀 ----------------------------------------------------------------------🚀')
 
     if (localTracks) {
         template.localTracks.set(
             localTracks.map((track) => {
+                console.log('🚀 --------------------------------------------------------🚀')
+                console.log('🚀 - file: utils.js:56 - localTracks.map - track:', track)
+                console.log('🚀 --------------------------------------------------------🚀')
                 if (track.getType() === newTrack.getType()) {
                     // Replace old tracks by the new one
                     meetLowLevel.room.replaceTrack(track, newTrack)
+                    // track.dispose().then(() => console.log('ON DISPOSE'))
+                    attachLocalTrack(newTrack)
                     return newTrack
                 }
                 return track
             })
         )
-        attachLocalTracks([newTrack])
     }
 }
 
@@ -79,4 +97,4 @@ const trackDetach = (template, trackId) => {
     track.detach(el)
 }
 
-export { trackAttach, trackDetach, getTrackType, updateTrack, attachLocalTracks, replaceLocalTrack }
+export { trackAttach, trackDetach, getTrackType, toggleTrackMuteState, attachLocalTrack, replaceLocalTrack }
